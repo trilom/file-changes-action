@@ -1761,7 +1761,7 @@ function getChangedPushFiles(client, base, head) {
         console.log(`response:${JSON.stringify(response)}`);
         // const distinctCommits = commits.filter(c => c.distinct)
         // console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
-        return sortChangedFiles(response.data);
+        return sortChangedFiles(response.data.files);
     });
 }
 function getPrNumber() {
