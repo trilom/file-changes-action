@@ -20,7 +20,7 @@ class File {
   distinct: boolean = true
 }
 
-async function sortChangedFiles(files: File[]): Promise<ChangedFiles> {
+async function sortChangedFiles(files: any): Promise<ChangedFiles> {
   return files.reduce((acc: ChangedFiles, f: File) => {
     if (f.status === 'added' || f.added) {
       acc.created.push(f.filename === undefined ? f.added : f.filename)
