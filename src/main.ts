@@ -21,7 +21,6 @@ class File {
 }
 
 async function sortChangedFiles(files: any): Promise<ChangedFiles> {
-  console.log(`files:${JSON.stringify(files)}`)
   return files.reduce((acc: ChangedFiles, f: File) => {
     if (f.status === 'added' || f.added) {
       acc.created.push(f.filename === undefined ? f.added : f.filename)
@@ -51,7 +50,6 @@ async function getChangedPRFiles(
     repo: gh.context.repo.repo,
     pull_number: prNumber
   })
-  console.log(`response:${JSON.stringify(response)}`)
   return sortChangedFiles(response.data)
 }
 
@@ -60,16 +58,12 @@ async function getChangedPushFiles(
   base: string,
   head: string
 ): Promise<ChangedFiles> {
-  console.log(`base:${base} head:${head}`)
   const response = await client.repos.compareCommits({
     owner: gh.context.repo.owner,
     repo: gh.context.repo.repo,
     base,
     head
   })
-  console.log(`response:${JSON.stringify(response)}`)
-  // const distinctCommits = commits.filter(c => c.distinct)
-  // console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
   return sortChangedFiles(response.data.files)
 }
 
@@ -84,7 +78,6 @@ async function run(): Promise<void> {
     const github: any = gh.context
     const token: string = core.getInput('githubToken')
     const client = new gh.GitHub(token)
-    console.log(`${JSON.stringify(github)}`)
     let changedFiles = new ChangedFiles()
     if (github.eventName === 'push') {
       // do push actions
