@@ -1766,6 +1766,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const github = gh.context;
+            console.log(`${JSON.stringify(github)}`);
             let changedFiles = new ChangedFiles();
             if (github.eventName === 'push') {
                 // do push actions

@@ -71,6 +71,7 @@ function getPrNumber(): number | null {
 async function run(): Promise<void> {
   try {
     const github: any = gh.context
+    console.log(`${JSON.stringify(github)}`)
     let changedFiles = new ChangedFiles()
     if (github.eventName === 'push') {
       // do push actions
