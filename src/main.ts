@@ -66,9 +66,7 @@ function getPrNumber(): number | null {
 // figure out if it is a PR or Push
 async function run(): Promise<void> {
   try {
-    const token: string = core.getInput('githubtoken')
-    const github: any = core.getInput('githubobject')
-    const client = new gh.GitHub(token)
+    const github: any = gh
     let changedFiles = new ChangedFiles()
     if (github.event_name === 'push') {
       // do push actions
@@ -77,6 +75,8 @@ async function run(): Promise<void> {
       // do PR actions
       const prNumber = getPrNumber()
       if (prNumber != null) {
+        const token: string = core.getInput('githubToken')
+        const client = new gh.GitHub(token)
         changedFiles = await getChangedPRFiles(client, prNumber)
       } else {
         core.setFailed(

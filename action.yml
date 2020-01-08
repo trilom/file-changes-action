@@ -5,9 +5,6 @@ inputs:
   githubToken:
     description: 'The GITHUB_TOKEN secret if necessary'
     required: false
-  githubObject:
-    description: 'The github object goes here.'
-    required: true
 outputs:
   files_created:
     description: 'The names of the newly created files'
