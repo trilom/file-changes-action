@@ -2,9 +2,9 @@ name:        'File Changes Action'
 description: 'This action can be added, and you will get outputs of all of the files that have changed in your repository for you to use.'
 author:      'Bryan Killian <me@trilom.org>'
 inputs:
-  github-token:
+  githubToken:
     description: 'The GITHUB_TOKEN secret if necessary'
-  github-object:
+  githubObject:
     description: 'The github object goes here.'
     required: true
 outputs:
