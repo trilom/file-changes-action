@@ -12,6 +12,7 @@
     "pack": "ncc build",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run pack",
+    "prod": "yarn && yarn all && yarn --prod",
     "clean": "rm -rf node_modules"
   },
   "repository": {

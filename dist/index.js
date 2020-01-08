@@ -1781,7 +1781,7 @@ function run() {
                 }
             }
             else {
-                core.setFailed(`Change not initiated by a PR or Push, it was ${github.event_name} instead.  Github:${github}`);
+                core.setFailed(`Change not initiated by a PR or Push, it was ${github.event_name} instead.  Github:${JSON.stringify(github)}`);
                 return;
             }
             //write files to preserve original functionality
