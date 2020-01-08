@@ -14,9 +14,8 @@ outputs:
     description: 'The names of the updated files'
   files_deleted:
     description: 'The names of the deleted files'
-runs:
-  using: 'node12'
-  main:  'dist/index.js'
+using: 'node12'
+main:  'dist/index.js'
 branding:
   icon:  'file-text'
   color: 'red'
