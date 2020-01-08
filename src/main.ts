@@ -21,6 +21,7 @@ class File {
 }
 
 async function sortChangedFiles(files: any): Promise<ChangedFiles> {
+  console.log(`files:${JSON.stringify(files)}`)
   return files.reduce((acc: ChangedFiles, f: File) => {
     if (f.status === 'added' || f.added) {
       acc.created.push(f.filename === undefined ? f.added : f.filename)
@@ -50,11 +51,14 @@ async function getChangedPRFiles(
     repo: gh.context.repo.repo,
     pull_number: prNumber
   })
+  console.log(`response:${JSON.stringify(response)}`)
   return sortChangedFiles(response.data)
 }
 
 async function getChangedPushFiles(commits: File[]): Promise<ChangedFiles> {
+  console.log(`commits:${JSON.stringify(commits)}`)
   const distinctCommits = commits.filter(c => c.distinct)
+  console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
   return sortChangedFiles(distinctCommits)
 }
 
