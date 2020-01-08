@@ -22,5 +22,5 @@ jobs:
         ls -la
         ls -la lib
     - uses: ./
-      with: 
-        githubToken: 1234abcd
+      with:
+        githubToken: ${{ secrets.GITHUB_TOKEN }}
