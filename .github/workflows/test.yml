@@ -19,8 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - run: |
-      ls -la
-      ls -la lib
+        ls -la
+        ls -la lib
     - uses: ./
       with: 
         githubToken: 1234abcd
