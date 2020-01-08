@@ -68,10 +68,10 @@ async function run(): Promise<void> {
   try {
     const github: any = gh
     let changedFiles = new ChangedFiles()
-    if (github.event_name === 'push') {
+    if (github.eventName === 'push') {
       // do push actions
       changedFiles = await getChangedPushFiles(github.event.commits)
-    } else if (github.event_name === 'pullRequest') {
+    } else if (github.eventName === 'pullRequest') {
       // do PR actions
       const prNumber = getPrNumber()
       if (prNumber != null) {
@@ -87,7 +87,7 @@ async function run(): Promise<void> {
     } else {
       core.setFailed(
         `Change not initiated by a PR or Push, it was ${
-          github.event_name
+          github.eventName
         } instead.  Github:${JSON.stringify(github)}`
       )
       return

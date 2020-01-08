@@ -1763,11 +1763,11 @@ function run() {
         try {
             const github = gh;
             let changedFiles = new ChangedFiles();
-            if (github.event_name === 'push') {
+            if (github.eventName === 'push') {
                 // do push actions
                 changedFiles = yield getChangedPushFiles(github.event.commits);
             }
-            else if (github.event_name === 'pullRequest') {
+            else if (github.eventName === 'pullRequest') {
                 // do PR actions
                 const prNumber = getPrNumber();
                 if (prNumber != null) {
@@ -1781,7 +1781,7 @@ function run() {
                 }
             }
             else {
-                core.setFailed(`Change not initiated by a PR or Push, it was ${github.event_name} instead.  Github:${JSON.stringify(github)}`);
+                core.setFailed(`Change not initiated by a PR or Push, it was ${github.eventName} instead.  Github:${JSON.stringify(github)}`);
                 return;
             }
             //write files to preserve original functionality
