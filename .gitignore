@@ -1,5 +1,5 @@
 # Dependency directory
-node_modules
+# node_modules
 
 # Rest pulled from https://github.com/github/gitignore/blob/master/Node.gitignore
 # Logs
@@ -96,4 +96,3 @@ Thumbs.db
 
 # Ignore built ts files
 __tests__/runner/*
-lib/**/*
