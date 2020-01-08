@@ -1,117 +1,65 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# file-changes-action
 
-# Create a JavaScript Action using TypeScript
+This action will take the information from the Push/Pull Request and output some variables and write files that will let you know what was changed, removed, or added.
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+## Use Cases
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.  
+I have a process where I have AWS Cloudformation templates stored in one directory that might be named PRODUCT-ROLE, and mappings for these templates that span the PRODUCT.  For example **mappings/wordpress.mappings.yml, templates/wordpress-database.yml, templates/wordpress-webserver.yml**, and some of the templates might use different Lambda functions defined in for example **functions/wordpress-webserver/**.
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+In the example below we have a workflow that on *push* to the develop branch we can perform some actions based on the files.  In my use case I look for changes on the develop branch of this repository for every push that happens.  When a push happens and a change is made to any of the paths below the workflow will trigger.  With this action you are able to know exactly which files changed so that you can make decisions later in your CI/CD.
 
-## Create an action from this template
+In this case, if a **templates/*.yml** file is changed, then we want to update the Cloudformation stack.  We can also write specifics for related templates.  For example, if **templates/wordpress-database.yml** changes then we want to deploy **templates/wordpress-webserver.yml** as well after.
 
-Click the `Use this Template` and provide the new repo details for your action
+Another case is if the **mappings/wordpress.mappings.yml** changes, we want to deploy all **template/wordpress-*.yml** files.
 
-## Code in Master
+## How to Use
 
-Install the dependencies  
-```bash
-$ npm install
+In order to make those decisions we need to know what files have changed and that is where this action comes in.  In the example below we are checking out our repository code, and then running the `trilom/file-changes-action@v1` action.  The only thing you need to provide is a GITHUB_TOKEN so that Octokit can make it's API calls.
+
+If a PR is made then it will look at all of the files included in the PR.
+If a push is made then it will compare commits from the SHA `github.context.payload.before` to the SHA `github.context.payload.after` of the push.
+
+After gathering this information it will output the files in 2 ways.  
+  
+- As an output variable, you can use this variable by using `steps.file_changes.outputs.files_modified`, `steps.file_changes.outputs.files_added`, `steps.file_changes.outputs.files_deleted`.
+
+- As a file on the container stored at `$HOME/files.json`, `$HOME/files_modified.json`, `$HOME/files_added.json`, `$HOME/files_deleted.json`.  Example:
+
+```files_added.json
+["cloudformation/mappings/wordpress.mappings.yml","cloudformation/templates/wordpress-database.yml"]
 ```
 
-Build the typescript
-```bash
-$ npm run build
-```
+## Examples  
 
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
+```yaml .github/workflows/push_develop.yml
+name: push-develop
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos.  We will create a releases branch and only checkin production modules (core in this case). 
-
-Comment out node_modules in .gitignore and create a releases/v1 branch
-```bash
-# comment out in distribution branches
-# node_modules/
-```
-
-```bash
-$ git checkout -b releases/v1
-$ git commit -a -m "prod dependencies"
-```
-
-```bash
-$ npm prune --production
-$ git add node_modules
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing the releases/v1 branch
-
-```yaml
-uses: actions/typescript-action@releases/v1
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and tested action
-
-```yaml
-uses: actions/typescript-action@v1
-with:
-  milliseconds: 1000
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'cloudformation/templates/*.yml'
+      - 'cloudformation/mappings/*.yml'
+      - 'functions/*'
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - id: file_changes
+        uses: trilom/file-changes-action@releases/v1
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: test
+        run: |
+          ls $HOME
+          cat $HOME/files.json
+          cat $HOME/files_modified.json
+          cat $HOME/files_added.json
+          cat $HOME/files_deleted.json
+          echo '${{ steps.file_changes.outputs.files_modified}}'
+          echo '${{ steps.file_changes.outputs.files_added}}'
+          echo '${{ steps.file_changes.outputs.files_deleted}}'
 ```
