@@ -134,8 +134,8 @@ async function run(): Promise<void> {
       'utf-8'
     )
     //also export some outputs
-    core.setOutput('files_created', changedFiles.created.join(' '))
-    core.setOutput('files_updated', changedFiles.updated.join(' '))
+    core.setOutput('files_added', changedFiles.created.join(' '))
+    core.setOutput('files_modified', changedFiles.updated.join(' '))
     core.setOutput('files_deleted', changedFiles.deleted.join(' '))
     process.exit(0)
   } catch (error) {

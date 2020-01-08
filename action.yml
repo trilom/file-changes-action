@@ -6,9 +6,9 @@ inputs:
     description: 'The GITHUB_TOKEN secret if necessary'
     required: false
 outputs:
-  files_created:
+  files_added:
     description: 'The names of the newly created files'
-  files_updated:
+  files_modified:
     description: 'The names of the updated files'
   files_deleted:
     description: 'The names of the deleted files'

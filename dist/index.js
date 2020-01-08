@@ -1802,8 +1802,8 @@ function run() {
             fs.writeFileSync(`${process.env.HOME}/files_added.json`, JSON.stringify(changedFiles.created), 'utf-8');
             fs.writeFileSync(`${process.env.HOME}/files_deleted.json`, JSON.stringify(changedFiles.deleted), 'utf-8');
             //also export some outputs
-            core.setOutput('files_created', changedFiles.created.join(' '));
-            core.setOutput('files_updated', changedFiles.updated.join(' '));
+            core.setOutput('files_added', changedFiles.created.join(' '));
+            core.setOutput('files_modified', changedFiles.updated.join(' '));
             core.setOutput('files_deleted', changedFiles.deleted.join(' '));
             process.exit(0);
         }
