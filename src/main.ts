@@ -86,7 +86,7 @@ async function run(): Promise<void> {
       }
     } else {
       core.setFailed(
-        `Change not initiated by a PR or Push, it was ${github.event_name} instead.  ${github}
+        `Change not initiated by a PR or Push, it was ${github.event_name} instead.  ${github}`
       )
       return
     }
