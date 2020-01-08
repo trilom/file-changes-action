@@ -66,11 +66,11 @@ function getPrNumber(): number | null {
 // figure out if it is a PR or Push
 async function run(): Promise<void> {
   try {
-    const github: any = gh
+    const github: any = gh.context
     let changedFiles = new ChangedFiles()
     if (github.eventName === 'push') {
       // do push actions
-      changedFiles = await getChangedPushFiles(github.event.commits)
+      changedFiles = await getChangedPushFiles(github.payload.commits)
     } else if (github.eventName === 'pullRequest') {
       // do PR actions
       const prNumber = getPrNumber()

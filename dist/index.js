@@ -1761,11 +1761,11 @@ function getPrNumber() {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const github = gh;
+            const github = gh.context;
             let changedFiles = new ChangedFiles();
             if (github.eventName === 'push') {
                 // do push actions
-                changedFiles = yield getChangedPushFiles(github.event.commits);
+                changedFiles = yield getChangedPushFiles(github.payload.commits);
             }
             else if (github.eventName === 'pullRequest') {
                 // do PR actions
