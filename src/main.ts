@@ -55,11 +55,22 @@ async function getChangedPRFiles(
   return sortChangedFiles(response.data)
 }
 
-async function getChangedPushFiles(commits: File[]): Promise<ChangedFiles> {
-  console.log(`commits:${JSON.stringify(commits)}`)
-  const distinctCommits = commits.filter(c => c.distinct)
-  console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
-  return sortChangedFiles(distinctCommits)
+async function getChangedPushFiles(
+  client: gh.GitHub,
+  base: string,
+  head: string
+): Promise<ChangedFiles> {
+  console.log(`base:${base} head:${head}`)
+  const response = await client.repos.compareCommits({
+    owner: gh.context.repo.owner,
+    repo: gh.context.repo.repo,
+    base,
+    head
+  })
+  console.log(`response:${JSON.stringify(response)}`)
+  // const distinctCommits = commits.filter(c => c.distinct)
+  // console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
+  return sortChangedFiles(response.data)
 }
 
 function getPrNumber(): number | null {
@@ -71,17 +82,21 @@ function getPrNumber(): number | null {
 async function run(): Promise<void> {
   try {
     const github: any = gh.context
+    const token: string = core.getInput('githubToken')
+    const client = new gh.GitHub(token)
     console.log(`${JSON.stringify(github)}`)
     let changedFiles = new ChangedFiles()
     if (github.eventName === 'push') {
       // do push actions
-      changedFiles = await getChangedPushFiles(github.payload.commits)
+      changedFiles = await getChangedPushFiles(
+        client,
+        github.payload.before,
+        github.payload.after
+      )
     } else if (github.eventName === 'pullRequest') {
       // do PR actions
       const prNumber = getPrNumber()
       if (prNumber != null) {
-        const token: string = core.getInput('githubToken')
-        const client = new gh.GitHub(token)
         changedFiles = await getChangedPRFiles(client, prNumber)
       } else {
         core.setFailed(

@@ -1749,12 +1749,19 @@ function getChangedPRFiles(client, prNumber) {
         return sortChangedFiles(response.data);
     });
 }
-function getChangedPushFiles(commits) {
+function getChangedPushFiles(client, base, head) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`commits:${JSON.stringify(commits)}`);
-        const distinctCommits = commits.filter(c => c.distinct);
-        console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`);
-        return sortChangedFiles(distinctCommits);
+        console.log(`base:${base} head:${head}`);
+        const response = yield client.repos.compareCommits({
+            owner: gh.context.repo.owner,
+            repo: gh.context.repo.repo,
+            base,
+            head
+        });
+        console.log(`response:${JSON.stringify(response)}`);
+        // const distinctCommits = commits.filter(c => c.distinct)
+        // console.log(`distinctCommits:${JSON.stringify(distinctCommits)}`)
+        return sortChangedFiles(response.data);
     });
 }
 function getPrNumber() {
@@ -1766,18 +1773,18 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const github = gh.context;
+            const token = core.getInput('githubToken');
+            const client = new gh.GitHub(token);
             console.log(`${JSON.stringify(github)}`);
             let changedFiles = new ChangedFiles();
             if (github.eventName === 'push') {
                 // do push actions
-                changedFiles = yield getChangedPushFiles(github.payload.commits);
+                changedFiles = yield getChangedPushFiles(client, github.payload.before, github.payload.after);
             }
             else if (github.eventName === 'pullRequest') {
                 // do PR actions
                 const prNumber = getPrNumber();
                 if (prNumber != null) {
-                    const token = core.getInput('githubToken');
-                    const client = new gh.GitHub(token);
                     changedFiles = yield getChangedPRFiles(client, prNumber);
                 }
                 else {
