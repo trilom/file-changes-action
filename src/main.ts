@@ -93,7 +93,7 @@ async function run(): Promise<void> {
         github.payload.before,
         github.payload.after
       )
-    } else if (github.eventName === 'pullRequest') {
+    } else if (github.eventName === 'pull_request') {
       // do PR actions
       const prNumber = getPrNumber()
       if (prNumber != null) {
