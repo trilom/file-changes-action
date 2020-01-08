@@ -4,6 +4,7 @@ author:      'Bryan Killian <me@trilom.org>'
 inputs:
   githubToken:
     description: 'The GITHUB_TOKEN secret if necessary'
+    required: false
   githubObject:
     description: 'The github object goes here.'
     required: true
@@ -14,8 +15,9 @@ outputs:
     description: 'The names of the updated files'
   files_deleted:
     description: 'The names of the deleted files'
-using: 'node12'
-main:  'dist/index.js'
+runs:
+  using: 'node12'
+  main:  'dist/index.js'
 branding:
   icon:  'file-text'
   color: 'red'
