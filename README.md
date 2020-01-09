@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - id: file_changes
-        uses: trilom/file-changes-action@releases/v1
+        uses: trilom/file-changes-action@v1
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: test
