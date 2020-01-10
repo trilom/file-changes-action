@@ -1,7 +1,6 @@
 {
   "name": "file-changes-action",
   "version": "1.0.0",
-  "private": true,
   "description": "This action can be added, and you will get outputs of all of the files that have changed in your repository for you to use.'",
   "main": "lib/main.js",
   "scripts": {
