@@ -1,5 +1,5 @@
 name: 'File Changes Action'
-description: 'This action can be added, and you will get outputs of all of the files that have changed in your repository for you to use.'
+description: 'Creates outputs variables of files modified, added, or deleted by a PR or Push.'
 author: 'Bryan Killian <me@trilom.org>'
 inputs:
   githubToken:
