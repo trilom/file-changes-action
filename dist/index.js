@@ -1717,6 +1717,7 @@ class File {
 }
 function sortChangedFiles(files) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log(`${JSON.stringify(files)}`);
         return files.reduce((acc, f) => {
             if (f.status === 'added' || f.added) {
                 acc.created.push(f.filename === undefined ? f.added : f.filename);
@@ -1744,7 +1745,9 @@ function getChangedPRFiles(client, prNumber) {
             repo: gh.context.repo.repo,
             pull_number: prNumber
         });
-        return sortChangedFiles(client.paginate(options));
+        return sortChangedFiles(yield client.paginate(options).then(files => {
+            return files;
+        }));
     });
 }
 function getChangedPushFiles(client, base, head) {
