@@ -1717,7 +1717,6 @@ class File {
 }
 function sortChangedFiles(files) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`${JSON.stringify(files)}`);
         return files.reduce((acc, f) => {
             if (f.status === 'added' || f.added) {
                 acc.created.push(f.filename === undefined ? f.added : f.filename);
