@@ -51,11 +51,10 @@ async function getChangedPRFiles(
     repo: gh.context.repo.repo,
     pull_number: prNumber
   })
-  return sortChangedFiles(
-    await client.paginate(options).then(files => {
-      return files
-    })
-  )
+  const files = await client.paginate(options).then(changedFiles => {
+    return changedFiles
+  })
+  return sortChangedFiles(files)
 }
 
 async function getChangedPushFiles(
