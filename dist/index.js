@@ -1739,12 +1739,12 @@ function sortChangedFiles(files) {
 }
 function getChangedPRFiles(client, prNumber) {
     return __awaiter(this, void 0, void 0, function* () {
-        const response = yield client.pulls.listFiles({
+        const options = client.pulls.listFiles.endpoint.merge({
             owner: gh.context.repo.owner,
             repo: gh.context.repo.repo,
             pull_number: prNumber
         });
-        return sortChangedFiles(response.data);
+        return sortChangedFiles(client.paginate(options));
     });
 }
 function getChangedPushFiles(client, base, head) {

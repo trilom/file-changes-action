@@ -1,8 +1,7 @@
 {
   "name": "file-changes-action",
-  "version": "1.0.0",
-  "private": true,
-  "description": "This action can be added, and you will get outputs of all of the files that have changed in your repository for you to use.'",
+  "version": "1.1.0",
+  "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
