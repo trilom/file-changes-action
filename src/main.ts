@@ -45,12 +45,16 @@ async function getChangedPRFiles(
   client: gh.GitHub,
   prNumber: number
 ): Promise<ChangedFiles> {
-  const response = await client.pulls.listFiles({
+  const options = client.pulls.listFiles.endpoint.merge({
     owner: gh.context.repo.owner,
     repo: gh.context.repo.repo,
     pull_number: prNumber
   })
-  return sortChangedFiles(response.data)
+  return sortChangedFiles(
+    await client.paginate(options).then(files => {
+      return files
+    })
+  )
 }
 
 async function getChangedPushFiles(
