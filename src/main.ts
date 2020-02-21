@@ -8,6 +8,30 @@ class ChangedFiles {
   created: string[] = []
   deleted: string[] = []
   files: string[] = []
+
+  getOutput(files: string[]): string {
+    if (core.getInput('plaintext')) {
+      return files.join(' ')
+    } else {
+      return JSON.stringify(files)
+    }
+  }
+
+  createdOutput(): string {
+    return this.getOutput(this.created)
+  }
+
+  fileOutput(): string {
+    return this.getOutput(this.files)
+  }
+
+  updatedOutput(): string {
+    return this.getOutput(this.updated)
+  }
+
+  deletedOutput(): string {
+    return this.getOutput(this.deleted)
+  }
 }
 
 class File {
@@ -109,31 +133,33 @@ async function run(): Promise<void> {
       )
       return
     }
+
     //write files to preserve original functionality
     fs.writeFileSync(
       `${process.env.HOME}/files.json`,
-      JSON.stringify(changedFiles.files),
+      changedFiles.fileOutput(),
       'utf-8'
     )
     fs.writeFileSync(
       `${process.env.HOME}/files_modified.json`,
-      JSON.stringify(changedFiles.updated),
+      changedFiles.updatedOutput(),
       'utf-8'
     )
     fs.writeFileSync(
       `${process.env.HOME}/files_added.json`,
-      JSON.stringify(changedFiles.created),
+      changedFiles.createdOutput(),
       'utf-8'
     )
     fs.writeFileSync(
       `${process.env.HOME}/files_deleted.json`,
-      JSON.stringify(changedFiles.deleted),
+      changedFiles.deletedOutput(),
       'utf-8'
     )
     //also export some outputs
-    core.setOutput('files_added', JSON.stringify(changedFiles.created))
-    core.setOutput('files_modified', JSON.stringify(changedFiles.updated))
-    core.setOutput('files_deleted', JSON.stringify(changedFiles.deleted))
+    core.setOutput('files', changedFiles.fileOutput())
+    core.setOutput('files_added', changedFiles.createdOutput())
+    core.setOutput('files_modified', changedFiles.updatedOutput())
+    core.setOutput('files_deleted', changedFiles.deletedOutput())
     process.exit(0)
   } catch (error) {
     core.error(error)

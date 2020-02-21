@@ -5,6 +5,9 @@ inputs:
   githubToken:
     description: 'The GITHUB_TOKEN secret if necessary'
     required: false
+  plaintext:
+    description: 'If true, outputs in plain text instead of JSON string array'
+    required: false
 outputs:
   files_added:
     description: 'The names of the newly created files'
