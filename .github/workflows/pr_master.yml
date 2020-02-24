@@ -37,4 +37,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: trilom-lint
-          eslint_flags: 'src/'
+          eslint_flags: 'src/**/*.ts'
