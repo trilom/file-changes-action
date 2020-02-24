@@ -52,6 +52,7 @@ jobs:
       with:
         repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.event.pull_request.head.ref }}
+        token: ${{ secrets.TRILOM_BOT_TOKEN }}
     - name: Build code
       run: make run
     - name: Format code
