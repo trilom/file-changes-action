@@ -1,6 +1,8 @@
 # if a pr is made into master and any further pushes(syncronize)
 # this will run prettier every run and auto-commit back the code
 # then we will lint and report back any issues
+
+# this will build, format (and push back), test, and lint and provide feedback the project on PR actions
 name: Format and lint reviewdog
 on: 
   pull_request:
@@ -8,6 +10,26 @@ on:
     branches:
       - develop
 jobs:
+  # make sure we can build
+  build:
+    name: Build file-changes-action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+  # test with jest
+  test:
+    name: Test file-changes-action
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+      - name: Run jest on code
+        run: make run COMMAND=test
+  # check format and push changes if they exist
   format_check_push:
     runs-on: ubuntu-latest
     steps:
@@ -22,12 +44,16 @@ jobs:
         make run COMMAND=format
     - name: Commit files
       if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # TODO: CHANGE TO releases/v1 BRANCH
       run: |
         sudo make clean
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action - Format"
         git commit -m "Add format changes" -a
-        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.ref }}
+  # this will lint your code and return any problems to the pr
   lint_reviewdog:
     name: Run eslint and report to PR
     runs-on: ubuntu-latest
