@@ -55,7 +55,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action - Format"
         git commit -m "Add format changes" -a
-        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.head.ref }}
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }}
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
     name: Run eslint and report to PR with Reviewdog
