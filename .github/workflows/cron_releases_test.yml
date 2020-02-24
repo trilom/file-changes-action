@@ -1,12 +1,11 @@
 # test a release in release branch
 name: Try a fake release and echo the outputs.
 on:
-  push:
   schedule:
     - cron: 0 17 * * *
 jobs:
   test:
-    name: release
+    name: Test fake release on releases/v1 branch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
