@@ -11,10 +11,18 @@ ifdef RELEASE
 CI:=TRUE
 endif
 
-clean:
-	find ./lib/ ! -name .gitignore -type f -exec rm -rf {} + && \
-	find ./dist/ ! -name .gitignore -type f -exec rm -rf {} + && \
-	find ./node_modules/ ! -name .gitignore -type f -exec rm -rf {} +
+IGNORE:=printf '%s\n%s' '**/*' '!.gitignore'
+
+clean.files:
+	rm -rf lib dist node_modules
+
+clean.create:
+	mkdir lib dist node_modules && \
+	 $(IGNORE) > lib/.gitignore && \
+	$(IGNORE) > dist/.gitignore && \
+	$(IGNORE) > node_modules/.gitignore
+
+clean: clean.files clean.create
 
 run:
 	docker run \
