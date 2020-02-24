@@ -1,7 +1,7 @@
 # if a push is made into any branch
 # this will build node_modules and typescript code
 name: Build yarn install and tsc
-on: push
+on: [push, pull_request]
 jobs:
   # make sure we can build
   build:
