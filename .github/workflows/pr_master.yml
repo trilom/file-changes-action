@@ -34,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: Build code
       run: make run
     - name: Run prettier --check on code
@@ -52,7 +54,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action - Format"
         git commit -m "Add format changes" -a
-        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.ref }}
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.event.pull_request.head.sha }}
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
     name: Run eslint and report to PR
