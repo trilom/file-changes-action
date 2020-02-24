@@ -60,6 +60,8 @@ jobs:
       run: |
         make run COMMAND=format
         sudo make clean
+        git config --local user.email "trilom-bot@trailmix.me"
+        git config --local user.name "trilom-bot"
         git commit -m "Add format changes" -a
         git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
   # this will lint your code and return any problems to the pr
