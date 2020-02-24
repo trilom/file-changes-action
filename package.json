@@ -32,7 +32,7 @@
   "license": "MIT",
   "release": {
     "branches": [
-      "develop"
+      "test/v1"
     ],
   "dryRun": false,
   "plugins": [
