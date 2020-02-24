@@ -30,6 +30,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
+        token: $${{ env.GITHUB_TOKEN }}
         repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.event.pull_request.head.ref }}
     - name: Build
