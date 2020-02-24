@@ -4,7 +4,9 @@ import * as fs from 'fs'
 import * as gh from '@actions/github'
 import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
-async function getChangedPRFiles(client: gh.GitHub, prNumber: number
+async function getChangedPRFiles(
+  client: gh.GitHub,
+  prNumber: number
 ): Promise<ChangedFiles> {
   const options = client.pulls.listFiles.endpoint.merge({
     owner: gh.context.repo.owner,
