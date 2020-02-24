@@ -1,7 +1,7 @@
 # if a pr is made into master and any further pushes(syncronize)
 # this will run prettier every run and auto-commit back the code
 # then we will lint and report back any issues
-name: Run prettier and push, and eslint reviewdog feedback
+name: eslint reviewdog feedback then prettier and push
 on: 
   pull_request:
     # TODO: CHANGE TO MASTER BRANCH
@@ -40,7 +40,7 @@ jobs:
     - name: Format-check code
       run: |
         make run COMMAND=format-check
-    - name: Format and push code
+    - name: Format and push code if check failed
       if: failure()
       run: |
         make run COMMAND=format
