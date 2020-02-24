@@ -10,7 +10,7 @@
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
-    "test": "jest",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "clean": "rm -rf node_modules"
   },
   "repository": {
