@@ -4,7 +4,7 @@ name: Build, format-check, test, lint, build for release, push release code on p
 on:
   push:
     tags-ignore:
-      - v1.*
+      - 'v[12].[0-9]+.[0-9]'
 jobs:
   # test semantic release on releases/v1
   semantic_release_test:
