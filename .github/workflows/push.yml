@@ -1,0 +1,140 @@
+# this will build, format-check, test, and lint the project on all pushes
+# if the push is on the master branch then it will build for release, and push the changes back
+name: Build, format-check, test, lint, build for release, push release code on push.
+on: 
+  push:
+    tags-ignore:
+          - v1.*
+jobs:
+  # test semantic release on releases/v1
+  semantic_release_test:
+    name: Test semantic-release and echo outputs on each push to test/v1
+    runs-on: ubuntu-latest
+    # TODO: CHANGE TO releases/v1 BRANCH
+    if: endsWith( github.ref, 'test/v1' )
+    steps:
+      - uses: actions/checkout@v2
+      - name: Semantic Release Dry Run
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic_test
+        with:
+          # TODO: CHANGE TO releases/v1 BRANCH
+          branch: test/v1
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Echo test outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic_test.outputs.new_release_version }}
+          echo ${{ steps.semantic_test.outputs.new_release_major_version }}
+          echo ${{ steps.semantic_test.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic_test.outputs.new_release_patch_version }}
+  # make sure we can build
+  build:
+    name: Build file-changes-action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+  # check format
+  format_check:
+    name: Check format on file-changes-action
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+      - name: Run prettier --check on code
+        run: make run COMMAND=format-check
+  # test with jest
+  test:
+    name: Test file-changes-action
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+      - name: Run jest on code
+        run: make run COMMAND=test
+  # lint
+  lint:
+    name: Lint file-changes-action
+    runs-on: ubuntu-latest
+    needs: format_check
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+      - name: Run eslint on code
+        run: make run COMMAND=lint
+  # if push to master then build for release, and push to releases/v1 branch
+  release_build:
+    name: Build, package, and push release code to releases/v1
+    runs-on: ubuntu-latest
+    needs: lint
+    # TODO: CHANGE TO MASTER BRANCH
+    if: endsWith( github.ref, 'develop' )
+    steps:
+      - name: Build code for release
+        run: make run COMMAND=release RELEASE=TRUE
+      - name: Commit release files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action - Release Build"
+          git commit -m "Add release changes" -a  
+      - name: Push release files
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # TODO: CHANGE TO releases/v1 BRANCH
+          branch: test/v1
+  # if push to releases/v1 then increment package.json
+  release_push:
+    name: Increment and push package.json to releases/v1
+    runs-on: ubuntu-latest
+    needs: release_build
+    # TODO: CHANGE TO releases/v1 BRANCH
+    if: endsWith( github.ref, 'test/v1' )
+    steps:
+      - uses: actions/checkout@v2
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          # TODO: CHANGE TO releases/v1 BRANCH
+          branch: test/v1
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Setup Node.js with GitHub Package Registry
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          registry-url: 'https://npm.pkg.github.com'
+          scope: 'trilom'
+      - name: Publish To GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Commit release files
+        if: steps.semantic.outputs.new_release_published == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # TODO: CHANGE TO releases/v1 BRANCH
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action - Release Deploy"
+          git commit -m "Bump release version 🎉" -a
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
