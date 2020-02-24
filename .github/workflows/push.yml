@@ -1,6 +1,6 @@
 # this will build, format-check, test, and lint the project on all pushes
 # if the push is on the master branch then it will build for release, and push the changes back
-name: Build, format-check, test, lint, build for release, push release code on push.
+name: Build for release, push release code to release branch on push to master.
 on:
   push:
     # TODO: CHANGE TO MASTER BRANCH and releases/v1

@@ -3,7 +3,7 @@
 # then we will lint and report back any issues
 
 # this will build, format (and push back), test, and lint and provide feedback the project on PR actions
-name: Format and lint reviewdog
+name: Build, format (and push back), test, lint and lint reviewdog to provide feedback to the PR
 on: 
   pull_request:
     # TODO: CHANGE TO MASTER BRANCH
