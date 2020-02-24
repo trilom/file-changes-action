@@ -4,7 +4,9 @@ import * as fs from 'fs'
 import * as gh from '@actions/github'
 import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
-async function getChangedPRFiles(client: gh.GitHub, prNumber: number
+async function getChangedPRFiles(
+  client: gh.GitHub,
+  prNumber: number
 ): Promise<ChangedFiles> {
   const options = client.pulls.listFiles.endpoint.merge({
     owner: gh.context.repo.owner,
@@ -18,7 +20,10 @@ async function getChangedPRFiles(client: gh.GitHub, prNumber: number
   )
 }
 
-async function getChangedPushFiles(client: gh.GitHub,base: string,head: string
+async function getChangedPushFiles(
+  client: gh.GitHub,
+  base: string,
+  head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
     owner: gh.context.repo.owner,
@@ -38,7 +43,7 @@ function writeFiles(format: string, changedFiles: ChangedFiles): void {
   switch (format.trim()) {
     case 'json':
       format = '.json'
-      break;
+      break
     case ',':
       format = '.csv'
       break
