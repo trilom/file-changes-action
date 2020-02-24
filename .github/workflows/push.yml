@@ -1,7 +1,7 @@
 # this will build, format-check, test, and lint the project on all pushes
 # if the push is on the master branch then it will build for release, and push the changes back
 name: Build, format-check, test, lint, build for release, push release code on push.
-on: 
+on:
   push:
     tags-ignore:
       - v1.*
@@ -88,7 +88,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action - Release Build"
-          git commit -m "Add release changes" -a  
+          git commit -m "Add release changes" -a
       - name: Push release files
         uses: ad-m/github-push-action@master
         with:
