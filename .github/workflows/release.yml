@@ -1,0 +1,56 @@
+# on push to releases/v1 run semantic release to push npm
+# then publish to github package repo
+# then push the incremented package.json to releases/v1 which will release to action marketplace
+name: Package and deploy release 🎉
+on:
+  push:
+    # TODO: CHANGE TO releases/v1
+    branches:
+      - test/v1
+jobs:
+  # if push to releases/v1 then increment package.json
+  release_push:
+    name: Increment and push package.json to release
+    runs-on: ubuntu-latest
+    # TODO: CHANGE TO releases/v1 BRANCH
+    if: github.actor == 'trilom-bot'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.TRILOM_BOT_TOKEN }}
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          # TODO: CHANGE TO releases/v1 BRANCH
+          branch: test/v1
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Setup Node.js with GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: 'trilom'
+      - name: Publish To GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - name: Commit release files
+        if: steps.semantic.outputs.new_release_published == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+        # TODO: CHANGE TO releases/v1 BRANCH
+        run: |
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
+          git commit -m "Bump release version 🎉" -a
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
+

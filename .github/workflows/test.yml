@@ -1,0 +1,20 @@
+# if a pr is made into master and any further pushes(syncronize)
+# this will run jest
+name: Test with jest
+on: 
+  pull_request:
+    # TODO: CHANGE TO MASTER BRANCH
+    branches:
+      - develop
+jobs:
+  # test with jest
+  test:
+    name: Test - jest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run
+      - name: Run jest on code
+        run: make run COMMAND=test

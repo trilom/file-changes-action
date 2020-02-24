@@ -1,0 +1,13 @@
+# if a push is made into any branch
+# this will build node_modules and typescript code
+name: Build yarn install and tsc
+on: push
+jobs:
+  # make sure we can build
+  build:
+    name: Build - yarn install && tsc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build code
+        run: make run

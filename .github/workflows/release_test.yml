@@ -1,12 +1,22 @@
-# test a release in release branch
-name: Try a fake release and echo the outputs.
+# every week at 5PM GMT run a release test
+# on push to release run a release test 
+name: Semantic-release test
 on:
+  push:
+    # TODO: CHANGE TO releases/v1
+    branches:
+      - test/v1
   schedule:
     - cron: 0 17 * * *
 jobs:
   test:
     name: Test fake release on releases/v1 branch
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # TODO: CHANGE TO releases/v1 BRANCH
+    if: github.actor == 'trilom-bot'
     steps:
       - uses: actions/checkout@v2
       - name: Semantic Release
@@ -19,8 +29,6 @@ jobs:
             @semantic-release/git
             @semantic-release/changelog
           dry_run: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Outputs
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
