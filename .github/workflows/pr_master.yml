@@ -1,7 +1,7 @@
 # if a pr is made into master and any further pushes(syncronize)
 # this will run prettier every run and auto-commit back the code
 # then we will lint and report back any issues
-name: format and lint reviewdog
+name: Format and lint reviewdog
 on: 
   pull_request:
     # TODO: CHANGE TO MASTER BRANCH
@@ -36,5 +36,5 @@ jobs:
         uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: trilom-lint
+          reporter: github-pr-review
           eslint_flags: 'src/**/*.ts'
