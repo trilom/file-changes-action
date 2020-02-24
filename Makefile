@@ -18,7 +18,6 @@ clean:
 
 run:
 	docker run \
-		-it \
 		--mount type=bind,source="$(MKFILEPATH)",target=/code \
 		$(DOCKER) \
 		/bin/sh -c 'cd /code && make .yarn COMMAND=$(CMD)' && \
