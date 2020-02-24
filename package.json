@@ -19,10 +19,16 @@
   },
   "keywords": [
     "actions",
+    "action",
+    "github-action",
+    "github-actions",
+    "github",
     "node",
-    "setup"
+    "typescript",
+    "examples"
   ],
   "author": "Bryan Killian <me@trilom.org>",
+  "homepage": "https://github.com/trilom/file-changes-action#readme",
   "license": "MIT",
   "release": {
     "branches": [
