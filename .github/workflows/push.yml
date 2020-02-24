@@ -43,6 +43,7 @@ jobs:
     # TODO: CHANGE TO MASTER BRANCH
     if: endsWith( github.ref, 'develop' )
     steps:
+      - uses: actions/checkout@v2
       - name: Build code for release
         run: make run COMMAND=release RELEASE=TRUE
       - name: Commit release files
