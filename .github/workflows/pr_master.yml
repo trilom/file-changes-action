@@ -23,7 +23,7 @@ jobs:
     - name: Commit files
       if: failure()
       run: |
-        make clean
+        sudo make clean
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action - Format"
         git commit -m "Add format changes" -a
