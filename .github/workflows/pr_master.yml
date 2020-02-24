@@ -31,7 +31,7 @@ jobs:
         run: make run COMMAND=test
   # check format
   format_check:
-    name: Run prettier and commit the changes.
+    name: Run prettier check.
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
