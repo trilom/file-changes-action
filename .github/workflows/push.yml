@@ -12,6 +12,8 @@ jobs:
   semantic_release_test:
     name: Test semantic-release
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     # TODO: CHANGE TO releases/v1 BRANCH
     if: endsWith( github.ref, 'test/v1' ) && github.actor == 'trilom-bot'
     steps:
@@ -26,8 +28,6 @@ jobs:
             @semantic-release/git
             @semantic-release/changelog
           dry_run: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Echo test outputs
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
@@ -43,15 +43,15 @@ jobs:
     if: endsWith( github.ref, 'develop' ) && github.actor == 'trilom-bot'
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.TRILOM_BOT_TOKEN }}
       - name: Build code for release
         run: make run COMMAND=release RELEASE=TRUE
       - name: Commit release files
-        env:
-          GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
         # TODO: CHANGE TO releases/v1 BRANCH
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action - Release Build"
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
           git commit -m "Add release changes" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
   # if push to releases/v1 then increment package.json
@@ -64,6 +64,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.TRILOM_BOT_TOKEN }}
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
@@ -85,15 +87,15 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
       - name: Commit release files
         if: steps.semantic.outputs.new_release_published == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
         # TODO: CHANGE TO releases/v1 BRANCH
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action - Release Deploy"
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
           git commit -m "Bump release version 🎉" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
 
