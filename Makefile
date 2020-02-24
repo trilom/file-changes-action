@@ -18,7 +18,7 @@ clean.files:
 
 clean.create:
 	mkdir lib dist node_modules && \
-	 $(IGNORE) > lib/.gitignore && \
+	$(IGNORE) > lib/.gitignore && \
 	$(IGNORE) > dist/.gitignore && \
 	$(IGNORE) > node_modules/.gitignore
 
