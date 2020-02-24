@@ -53,9 +53,9 @@ jobs:
         repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.event.pull_request.head.ref }}
         token: ${{ secrets.TRILOM_BOT_TOKEN }}
-    - name: Build code
+    - name: Build
       run: make run
-    - name: Format code
+    - name: Format
       env:
         GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       run: |
@@ -72,7 +72,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Lint code
+      - name: Lint and report
         uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
