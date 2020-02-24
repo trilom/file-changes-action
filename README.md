@@ -176,6 +176,7 @@ jobs:
 
 5. Once PR is accepted and merged into master, this will trigger the workflow to release to `releases/v1` which will persist on the Github Action Marketplace.
 
+
  
 ```bash
 # install project dependencies (including devDependencies)
