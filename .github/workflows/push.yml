@@ -65,15 +65,16 @@ jobs:
         run: make run COMMAND=test
   # lint
   lint:
-    name: Lint file-changes-action
+    name: Run eslint and report to PR
     runs-on: ubuntu-latest
     needs: format_check
     steps:
       - uses: actions/checkout@v2
-      - name: Build code
-        run: make run
-      - name: Run eslint on code
-        run: make run COMMAND=lint
+      - uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-check
+          eslint_flags: 'src/**/*.ts'
   # if push to master then build for release, and push to releases/v1 branch
   release_build:
     name: Build, package, and push release code to releases/v1
