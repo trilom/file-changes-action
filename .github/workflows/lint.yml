@@ -8,41 +8,6 @@ on:
     branches:
       - develop
 jobs:
-  # check format
-  format_check:
-    name: Lint - prettier --check
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build code
-      run: make run
-    - name: Format-check code
-      run: |
-        make run COMMAND=format-check
-  # check format and push changes if they exist
-  format_push:
-    name: Lint - prettier --write and push
-    runs-on: ubuntu-latest
-    # dont run this if pushed from bot
-    if: github.actor != 'trilom-bot'
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        token: ${{ env.GITHUB_TOKEN }}
-        repository: ${{ github.event.pull_request.head.repo.full_name }}
-        ref: ${{ github.event.pull_request.head.ref }}
-    - name: Build
-      run: make run
-    - name: Format
-      run: |
-        make run COMMAND=format
-        sudo make clean
-        git config --local user.email "trilom-bot@trailmix.me"
-        git config --local user.name "trilom-bot"
-        git commit -m "Add format changes" -a
-        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
     name: Lint - eslint and report to PR with reviewdog.
@@ -55,3 +20,32 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           eslint_flags: 'src/**/*.ts'
+  # check format and push changes if they exist
+  format_check_push:
+    name: Lint - prettier --write and push
+    runs-on: ubuntu-latest
+    # dont run this if pushed from bot or format_check succeeded
+    needs: lint_reviewdog
+    if: github.actor != 'trilom-bot'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ env.GITHUB_TOKEN }}
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }}
+    - name: Build
+      run: make run
+    - name: Format-check code
+      run: |
+        make run COMMAND=format-check
+    - name: Format and push code
+      if: failure()
+      run: |
+        make run COMMAND=format
+        sudo make clean
+        git config --local user.email "trilom-bot@trailmix.me"
+        git config --local user.name "trilom-bot"
+        git commit -m "Add format changes" -a
+        git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
