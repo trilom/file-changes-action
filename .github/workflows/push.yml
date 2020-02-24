@@ -10,7 +10,7 @@ on:
 jobs:
   # test semantic release on releases/v1
   semantic_release_test:
-    name: Test semantic-release and echo outputs on each push to test/v1
+    name: Test semantic-release
     runs-on: ubuntu-latest
     # TODO: CHANGE TO releases/v1 BRANCH
     if: endsWith( github.ref, 'test/v1' ) && github.actor == 'trilom-bot'
@@ -37,7 +37,7 @@ jobs:
           echo ${{ steps.semantic_test.outputs.new_release_patch_version }}
   # if push to master then build for release, and push to releases/v1 branch
   release_build:
-    name: Build, package, and push release code to releases/v1
+    name: Build, package, and push release code to release
     runs-on: ubuntu-latest
     # TODO: CHANGE TO MASTER BRANCH
     if: endsWith( github.ref, 'develop' ) && github.actor == 'trilom-bot'
@@ -56,7 +56,7 @@ jobs:
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
   # if push to releases/v1 then increment package.json
   release_push:
-    name: Increment and push package.json to releases/v1
+    name: Increment and push package.json to release
     runs-on: ubuntu-latest
     # TODO: CHANGE TO releases/v1 BRANCH
     if: endsWith( github.ref, 'test/v1' ) && github.actor == 'trilom-bot'
