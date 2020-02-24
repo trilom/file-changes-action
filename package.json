@@ -4,19 +4,18 @@
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
+    "release": "yarn build && yarn run pack && yarn --prod",
+    "build": "yarn && tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack",
-    "prod": "yarn && yarn all && yarn --prod",
     "clean": "rm -rf node_modules"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trilom/file-changes-action"
+    "url": "git+https://github.com/trilom/file-changes-action.git"
   },
   "keywords": [
     "actions",
