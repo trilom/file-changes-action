@@ -24,6 +24,34 @@
   ],
   "author": "Bryan Killian <me@trilom.org>",
   "license": "MIT",
+  "release": {
+    "branches": [
+      "develop"
+    ],
+  "dryRun": false,
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    "@semantic-release/github",
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "package.json",
+          "yarn.lock"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ]
+  ]
+  },
   "dependencies": {
     "@actions/core": "^1.2.0",
     "@actions/github": "^2.0.0",
