@@ -96,5 +96,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action - Release Deploy"
           git commit -m "Bump release version 🎉" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.head.ref }}
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
 
