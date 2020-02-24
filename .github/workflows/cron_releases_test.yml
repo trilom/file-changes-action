@@ -2,9 +2,6 @@
 name: Try a fake release and echo the outputs.
 on:
   push:
-    # TODO: CHANGE TO releases/v1 BRANCH
-    branches:
-      - test/v1
   schedule:
     - cron: 0 17 * * *
 jobs:
