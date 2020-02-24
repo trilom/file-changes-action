@@ -13,7 +13,7 @@ jobs:
     name: Test semantic-release and echo outputs on each push to test/v1
     runs-on: ubuntu-latest
     # TODO: CHANGE TO releases/v1 BRANCH
-    if: endsWith( github.ref, 'test/v1' )
+    if: endsWith( github.ref, 'test/v1' ) && github.actor == 'trilom-bot'
     steps:
       - uses: actions/checkout@v2
       - name: Semantic Release Dry Run
@@ -39,16 +39,15 @@ jobs:
   release_build:
     name: Build, package, and push release code to releases/v1
     runs-on: ubuntu-latest
-    needs: lint
     # TODO: CHANGE TO MASTER BRANCH
-    if: endsWith( github.ref, 'develop' )
+    if: endsWith( github.ref, 'develop' ) && github.actor == 'trilom-bot'
     steps:
       - uses: actions/checkout@v2
       - name: Build code for release
         run: make run COMMAND=release RELEASE=TRUE
       - name: Commit release files
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
         # TODO: CHANGE TO releases/v1 BRANCH
         run: |
           git config --local user.email "action@github.com"
@@ -59,9 +58,10 @@ jobs:
   release_push:
     name: Increment and push package.json to releases/v1
     runs-on: ubuntu-latest
-    needs: release_build
     # TODO: CHANGE TO releases/v1 BRANCH
-    if: endsWith( github.ref, 'test/v1' )
+    if: endsWith( github.ref, 'test/v1' ) && github.actor == 'trilom-bot'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Semantic Release
@@ -74,13 +74,11 @@ jobs:
             @semantic-release/git
             @semantic-release/changelog
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Setup Node.js with GitHub Package Registry
         uses: actions/setup-node@v1
         with:
           node-version: 12
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           registry-url: 'https://npm.pkg.github.com'
           scope: 'trilom'
       - name: Publish To GitHub Package Registry
@@ -91,7 +89,7 @@ jobs:
       - name: Commit release files
         if: steps.semantic.outputs.new_release_published == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
         # TODO: CHANGE TO releases/v1 BRANCH
         run: |
           git config --local user.email "action@github.com"

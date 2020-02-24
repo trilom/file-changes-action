@@ -29,10 +29,22 @@ jobs:
         run: make run
       - name: Run jest on code
         run: make run COMMAND=test
-  # check format and push changes if they exist
-  format_check_push:
+  # check format
+  format_check:
     name: Run prettier and commit the changes.
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build code
+      run: make run
+    - name: Format-check code
+      run: |
+        make run COMMAND=format-check
+  # check format and push changes if they exist
+  format_push:
+    name: Run prettier and commit the changes.
+    runs-on: ubuntu-latest
+    if: github.actor != 'trilom-bot'
     steps:
     - uses: actions/checkout@v2
       with:
@@ -40,28 +52,27 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
     - name: Build code
       run: make run
-    - name: Run prettier --check on code
-      run: make run COMMAND=format-check
     - name: Format code
-      if: failure()
+      env:
+        GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       run: |
         make run COMMAND=format
-    - name: Commit files
-      if: failure()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # TODO: CHANGE TO releases/v1 BRANCH
-      run: |
         sudo make clean
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action - Format"
         git commit -m "Add format changes" -a
         git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }}
+    - name: Commit files
+      if: failure()
+
+      # TODO: CHANGE TO releases/v1 BRANCH
+      run: |
+
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
     name: Run eslint and report to PR with Reviewdog
     runs-on: ubuntu-latest
-    needs: format_check_push
+    needs: format_check
     steps:
       - uses: actions/checkout@v2
       - name: Lint code
