@@ -6,33 +6,37 @@ This action will take the information from the Push/Pull Request and output some
 
 ### githubToken
 
-**Required**  - string - your github token
+**Required**  - `string` - your github token
 
 ### output
 
-_Optional_  - string - type of output for output variables, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example ' |FILE:' will output 'file1.yml |FILE:file2.yml |FILE:file3.yml'.
+_Optional_  - `string` - type of output for output variables, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example ' |FILE:' will output 'file1.yml |FILE:file2.yml |FILE:file3.yml'.
 
 ### fileOutput
 
-_Optional_  - string - type of output for file output, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example ' |FILE:' will output 'file1.yml |FILE:file2.yml |FILE:file3.yml'.  If you select json then the file format will be .json, if you select ',' then the file format will be .csv, anything else will output the files as .txt
+_Optional_  - `string` - type of output for file output, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example `\ |FILE:` will output:
+
+> file1.yml |FILE:file2.yml |FILE:file3.yml  
+
+If you select json then the file format will be .json, if you select ',' then the file format will be .csv, anything else will output the files as .txt
 
 ## Outputs
 
 ### files
 
-**Required** - string - The names all new, updated, and deleted files.  The output is dependant on the output input, default is a json string.
+**Required** - `string` - The names all new, updated, and deleted files.  The output is dependant on the output input, default is a json string.
 
 ### files_added
 
-**Required** - string - The names of the newly created files.  The output is dependant on the output input, default is a json string.
+**Required** - `string` - The names of the newly created files.  The output is dependant on the output input, default is a json string.
 
 ### files_modified
 
-**Required** - string - The names of the updated files.  The output is dependant on the output input, default is a json string.
+**Required** - `string` - The names of the updated files.  The output is dependant on the output input, default is a json string.
 
 ### files_deleted
 
-**Required** - string - The names of the deleted files.  The output is dependant on the output input, default is a json string.
+**Required** - `string` - The names of the deleted files.  The output is dependant on the output input, default is a json string.
 
 ## Example usage
 
