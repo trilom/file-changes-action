@@ -1,4 +1,4 @@
-# on push to develop create a PR
+# on push to master create a PR to merge to release
 name: Create PR
 on:
   push:
@@ -64,5 +64,4 @@ jobs:
           labels: automated pr
           assignees: '${{ github.actor }},trilom'
           reviewers: trilom
-          # TODO: CHANGE TO develop
-          branch: develop-test
+          branch: release-promotion

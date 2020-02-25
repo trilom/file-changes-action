@@ -4,9 +4,8 @@
 name: Lint
 on: 
   pull_request:
-    # TODO: CHANGE TO MASTER BRANCH
     branches:
-      - develop
+      - release-promotion
 jobs:
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
@@ -26,7 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     # dont run this if pushed from bot or format_check succeeded
     needs: lint_reviewdog
-    if: github.actor != 'trilom-bot'
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:

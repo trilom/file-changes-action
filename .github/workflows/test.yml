@@ -3,9 +3,8 @@
 name: Test
 on: 
   pull_request:
-    # TODO: CHANGE TO MASTER BRANCH
     branches:
-      - develop
+      - '**'
 jobs:
   # test with jest
   test:

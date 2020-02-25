@@ -1,12 +1,12 @@
-# on push to master this will build the production code and push to release
+# on push to release-promotion this will build the production code and push to release
+# also run a test release every sunday at 5pm gmt
 name: Release Build
 on:
   schedule:
     - cron: 0 17 * * *
   push:
-    # TODO: CHANGE TO MASTER BRANCH
     branches:
-      - develop
+      - release-promotion
 jobs:
   # if push to master then build for release, and push to releases/v1 branch
   release_build:
