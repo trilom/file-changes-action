@@ -119,6 +119,7 @@ async function run(): Promise<void> {
     }
     // write file output
     writeFiles(fileOutput, changedFiles)
+
     // write output vars
     writeOutput(output, changedFiles)
 

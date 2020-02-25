@@ -1,26 +1,17 @@
-name: "build-test"
-on: # rebuild any PRs and main branch changes
+# if a pr is made into master and any further pushes(syncronize)
+# this will run jest
+name: Test
+on: 
   pull_request:
-  push:
+    # TODO: CHANGE TO MASTER BRANCH
     branches:
-      - master
-      - 'releases/*'
-
+      - develop
 jobs:
-  build: # make sure build/ci work properly
+  # test with jest
+  test:
+    name: jest
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - run: |
-        ls -la
-        ls -la lib
-    - uses: ./
-      with:
-        githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - run: make run
+      - run: make run COMMAND=test
