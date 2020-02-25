@@ -1,0 +1,68 @@
+# on push to develop create a PR
+name: Create PR
+on:
+  push:
+    # TODO: CHANGE TO develop
+    branches:
+      - develop-test
+jobs:
+  create_pr:
+    name: Create PR to master
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: get a list of files that have changed in the Push
+        id: file_changes
+        uses: trilom/file-changes-action@releases/v1
+        with:
+          githubToken: ${{ env.GITHUB_TOKEN }}
+      # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
+      # with a custom delimiter in file_changes 
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          commit-message: '${{ github.event.push.commits[0].message }}'
+          committer: trilom-bot <trilom-bot@trailmix.me>
+          author: trilom-bot <trilom-bot@trailmix.me>
+          title: '[${{ github.actor }}] - ${{ github.event.push.commits[0].message }}(${{ github.event.push.distinct_size }} commits)'
+          body: |
+            # ${{ github.actor }} would like to merge ${{ github.event.push.distinct_size }} commits into file-changes-action
+            
+            ## [**compare link**](${{ github.event.push.compare }})
+
+            ### Commits
+            ```json
+              ${{ toJSON(github.event.push.commits)}}
+            ```
+            
+            #### Files
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files)}}
+            ```
+            
+            #### Files modified
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_modified)}}
+            ```
+            
+            #### Files added
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_added)}}
+            ```
+            
+            #### Files deleted
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_deleted)}}
+            ```
+          labels: automated pr
+          assignees: '${{ github.actor },trilom'
+          reviewers: trilom
+          # TODO: CHANGE TO master
+          branch: develop
