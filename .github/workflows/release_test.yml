@@ -9,7 +9,7 @@ on:
   schedule:
     - cron: 0 17 * * *
 jobs:
-  test:
+  test_release:
     name: Test fake release on releases branch
     runs-on: ubuntu-latest
     env:
