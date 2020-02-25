@@ -10,7 +10,7 @@ on:
     - cron: 0 17 * * *
 jobs:
   test:
-    name: Test fake release on releases/v1 branch
+    name: Test fake release on releases branch
     runs-on: ubuntu-latest
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

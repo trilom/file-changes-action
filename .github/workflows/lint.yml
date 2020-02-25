@@ -1,7 +1,7 @@
 # if a pr is made into master and any further pushes(syncronize)
 # this will run prettier every run and auto-commit back the code
 # then we will lint and report back any issues
-name: eslint reviewdog feedback then prettier and push
+name: Lint
 on: 
   pull_request:
     # TODO: CHANGE TO MASTER BRANCH
@@ -10,7 +10,7 @@ on:
 jobs:
   # this will lint your code and return any problems to the pr
   lint_reviewdog:
-    name: Lint - eslint and report to PR with reviewdog.
+    name: eslint and reviewdog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
           eslint_flags: 'src/**/*.ts'
   # check format and push changes if they exist
   format_check_push:
-    name: Lint - prettier --write and push
+    name: prettier
     runs-on: ubuntu-latest
     # dont run this if pushed from bot or format_check succeeded
     needs: lint_reviewdog
@@ -35,12 +35,11 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Build
-        run: make run
-      - name: Format-check code
+      - run: make run
+      - name: make run COMMAND=format-check code
         run: |
           make run COMMAND=format-check
-      - name: Format and push code if check failed
+      - name: make run COMMAND=format and push code if check failed
         if: failure()
         run: |
           make run COMMAND=format
