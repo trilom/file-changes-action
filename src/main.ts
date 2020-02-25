@@ -20,10 +20,7 @@ async function getChangedPRFiles(
   )
 }
 
-async function getChangedPushFiles(
-  client: gh.GitHub,
-  base: string,
-  head: string
+async function getChangedPushFiles( client: gh.GitHub, base: string, head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
     owner: gh.context.repo.owner,
@@ -46,10 +43,10 @@ function writeFiles(format: string, changedFiles: ChangedFiles): void {
       break
     case ',':
       format = '.csv'
-      break
+      break;
     default:
       format = '.txt'
-      break
+      break;
   }
   //write files to preserve original functionality
   fs.writeFileSync(
