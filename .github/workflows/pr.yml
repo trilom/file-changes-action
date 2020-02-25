@@ -62,7 +62,7 @@ jobs:
               ${{ toJSON(steps.file_changes.outputs.files_deleted)}}
             ```
           labels: automated pr
-          assignees: '${{ github.actor },trilom'
+          assignees: '${{ github.actor }},trilom'
           reviewers: trilom
           # TODO: CHANGE TO master
           branch: develop
