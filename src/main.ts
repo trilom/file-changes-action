@@ -20,7 +20,10 @@ async function getChangedPRFiles(
   )
 }
 
-async function getChangedPushFiles( client: gh.GitHub, base: string, head: string
+async function getChangedPushFiles(
+  client: gh.GitHub,
+  base: string,
+  head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
     owner: gh.context.repo.owner,
@@ -116,9 +119,7 @@ async function run(): Promise<void> {
     }
     // write file output
     writeFiles(fileOutput, changedFiles)
-    
-    
-    
+
     // write output vars
     writeOutput(output, changedFiles)
 
