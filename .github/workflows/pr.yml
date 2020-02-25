@@ -2,9 +2,9 @@
 name: Create PR
 on:
   push:
-    # TODO: CHANGE TO develop
+    # TODO: CHANGE TO master
     branches:
-      - develop-test
+      - develop
 jobs:
   create_pr:
     name: Create PR to master
@@ -64,5 +64,5 @@ jobs:
           labels: automated pr
           assignees: '${{ github.actor }},trilom'
           reviewers: trilom
-          # TODO: CHANGE TO master
-          branch: develop
+          # TODO: CHANGE TO develop
+          branch: develop-test
