@@ -14,6 +14,8 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
       - name: Build code for release
         run: make run COMMAND=release RELEASE=TRUE
       - name: Commit release files
@@ -21,5 +23,5 @@ jobs:
         run: |
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
-          git commit -m "Add release changes" -a
+          git commit -m "Add release changes ⚙️" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
