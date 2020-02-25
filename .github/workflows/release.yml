@@ -15,7 +15,7 @@ jobs:
     # TODO: CHANGE TO releases/v1 BRANCH
     if: github.actor == 'trilom-bot'
     env:
-      ${{ secrets.GITHUB_TOKEN }}: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
         with:
