@@ -192,6 +192,7 @@ jobs:
       - uses: actions/checkout@v2
         # TODO: ref: master
         with:
+          token: ${{ env.GITHUB_TOKEN }}
           ref: develop
       - id: file_changes
         uses: trilom/file-changes-action@test/v1
@@ -300,6 +301,8 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
       - name: Test semantic release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
