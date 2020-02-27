@@ -1,0 +1,244 @@
+# if PR is opened then merge it into a develop branch
+# and make a new PR from staging-SHA into master with the code
+# inform the committer of the change in PRs
+# build, test, and lint code and inform of changes
+# use semantic-release to iterate release version if push to master
+# push to npm, github packages, and github action marketplace if push to master
+
+name: Pull Requests
+env:
+  develop_branch: 'staging'
+  staging_branch: 'sandbox'
+  master_branch: 'develop'
+  release_branch: 'test/v'
+  bot: 'trilom-bot'
+  bot_email: 'trilom-bot@trailmix.me'
+  owner: 'trilom'
+  owner_email: 'me@trilom.org'
+on: [pull_request, push]
+jobs:
+  # close any PR not going to staging-SHA or develop
+  close_non_develop_pr:
+    name: 'close non ${{ env.develop_branch }} PR'
+    runs-on: ubuntu-latest
+    if: (! (startsWith(github.event.pull_request.base.ref, env.master_branch )) && github.event.pull_request.base.ref != env.develop_branch) && github.event.pull_request.state == 'opened'
+    steps:
+      - uses: superbrothers/close-pull-request@v2
+        with:
+          comment: "Please merge your code into ${{ env.develop_branch }}, this will trigger the desired merge workflow."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # merge develop PR, create PR to merge staging-SHA into master
+  merge_develop_pr:
+    name: 'close ${{ env.develop_branch }} PR, open ${{ env.staging_branch }}-HASH PR'
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == ${{ env.develop_branch }} && github.event.pull_request.state == 'opened'
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'automerge pr to ${{ env.develop_branch }}'
+        uses: pascalgn/automerge-action@v0.7.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          UPDATE_LABELS: ''
+      - name: notify if any problems occur
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
+
+            This is possibly because the head is not ${{ env.develop_branch }}.
+            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
+            
+            ## Event JSON
+            ```json
+              ${{ toJSON(github.event.pull_request)}}
+            ```
+      - name: get a list of files that have changed in the Push
+        id: file_changes
+        uses: trilom/file-changes-action@releases/v1
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: create authors file
+        run: |
+          git shortlog -se \
+          | perl -spe 's/^\s+\d+\s+//' \
+          | sed -e '/^CommitSyncScript.*$/d' \
+          > AUTHORS
+          git add AUTHORS
+          git commit -m "Updating AUTHORS 📓" -a
+      # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
+      # with a custom delimiter in file_changes 
+      - name: 'create pr to ${{ env.staging_branch }}-HASH'
+        id: create-pr
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          commit-message: '${{ github.event.pull_request.user.login }} would like to merge **${{ github.event.pull_request.base.commits }} commits** with ${{ github.event.pull_request.base.additions }} additions, ${{ github.event.pull_request.base.deletions }} deletions, ${{ github.event.pull_request.base.changed_files }} changed files into file-changes-action'
+          committer: '${{ github.event.pull_request.user.login }}'
+          author: '${{ github.event.pull_request.user.login }}'
+          title: '${{ github.event.pull_request.title }}'
+          body: |
+            [Original PR URL](${{ github.event.pull_request.url }} )
+            $${{ github.event.pull_request.body }}
+            
+            ### Files
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files)}}
+            ```
+            
+            ### Files modified
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_modified)}}
+            ```
+            
+            ### Files added
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_added)}}
+            ```
+            
+            ### Files deleted
+            ```json
+              ${{ toJSON(steps.file_changes.outputs.files_deleted)}}
+            ```
+          labels: 'automated pr'
+          assignees: '${{ github.event.pull_request.user.login }},trilom'
+          reviewers: trilom
+          base: '${{ env.master_branch }}'
+          branch: '${{ env.staging_branch }}'
+          branch-suffix: short-commit-hash
+      - name: 'rebase develop back to ${{ env.master_branch }}'
+        uses: cirrus-actions/rebase@1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: notify initial commiter of change
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Hey @${{ github.event.pull_request.user.login }},
+            I have automerged this PR into ${{ env.develop_branch }}.
+
+            [After this I will create a new PR that you can follow with this link.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
+
+            Please use this new PR to communicate about your changes.
+
+            Thanks, trilom.
+  # make sure we can build
+  build:
+    name: yarn install && tsc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make run
+  # test with jest
+  test:
+    name: jest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - run: make run
+      - run: make run COMMAND=test
+  # this will lint your code and return any problems to the pr
+  lintdog:
+    name: eslintdog (reviewdog)
+    runs-on: ubuntu-latest
+    needs: test
+    if: startsWith(github.event.pull_request.base.ref, ${{ env.master_branch }}) && startsWith(github.event.pull_request.head.ref, '${{ env.staging_branch }}-')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint and report
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          eslint_flags: 'src/**/*.ts'
+  # check format and push changes if they exist
+  format_check_push:
+    name: prettier
+    runs-on: ubuntu-latest
+    # don't format pushes from the bot, no endless loop
+    if: startsWith(github.event.pull_request.base.ref, ${{ env.master_branch }}) && startsWith(github.event.pull_request.head.ref, '${{ env.staging_branch }}-') && github.actor != ${{ env.bot }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          repository: '${{ github.event.pull_request.head.repo.full_name }}'
+          ref: '${{ github.event.pull_request.head.ref }}'
+      - run: make run
+      - name: make run COMMAND=format-check code
+        run: |
+          make run COMMAND=format-check
+      - name: make run COMMAND=format and push code if check failed
+        if: failure()
+        run: |
+          make run COMMAND=format
+          sudo make clean
+          git config --local user.email "${{ env.bot_email }}"
+          git config --local user.name "${{ env.bot }}"
+          git commit -m "Add format changes" -a
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
+  # if pr from staging-* to master
+  # build test build for release and output vars
+  # if push to master 
+  # do a real build, push to npm and github package repo
+  # and push the code to releases/v1 for github actions marketplace
+  release_build:
+    name: 'Build, if push, push to ${{ env.release_branch }} branch'
+    runs-on: ubuntu-latest
+    if: (startsWith(github.event.pull_request.base.ref, ${{ env.master_branch }}) && startsWith(github.event.pull_request.head.ref, '${{ env.staging_branch }}-')) || endsWith(github.event.push.ref, ${{ env.master_branch }})
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test semantic release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          branch: '${{ github.ref }}'
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+          dry_run: ${{ contains( github.ref, 'refs/pull/'}}
+      - name: Test Outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      # from here on, this will only run if a push happens to master, not a PR
+      - name: Setup Node.js with GitHub Package Registry
+        if: endsWith(github.event.push.ref, ${{ env.master_branch }}) && steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: 'trilom'
+      - name: Publish To GitHub Package Registry
+        if: endsWith(github.event.push.ref, ${{ env.master_branch }}) && steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - run: make run COMMAND=release RELEASE=TRUE
+        # TODO: CHANGE TO master BRANCH
+        if: endsWith(github.event.push.ref, ${{ env.master_branch }}) && steps.semantic.outputs.new_release_published == 'true'
+      - name: Push release files
+        if: endsWith(github.event.push.ref, ${{ env.master_branch }}) && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: CHANGE TO releases/v1 BRANCH 
+        run: |
+          git config --local user.email "${{ env.owner }}"
+          git config --local user.name "${{ env.owner_email }}"
+          git add --all
+          git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ env.release_branch }}${{steps.semantic.outputs.new_release_major_version}}
