@@ -1,74 +1,46 @@
-# close_non_develop_pr
-# should: close PR not on develop
-# open PR
-# check comment to see if it matches close comment
-
-# if PR is opened then merge it into a develop branch
-# and make a new PR from staging-SHA into master with the code
-# inform the committer of the change in PRs
-# build, test, and lint code and inform of changes
-# use semantic-release to iterate release version if push to master
-# push to npm, github packages, and github action marketplace if push to master
+# if PR is opened and not in master branch than close it and put the dunce cap on
 
 name: Pull Requests
 on: [pull_request, push]
 jobs:
-  # close any PR not going to staging-SHA or develop
-  close_non_develop_pr:
-    name: close non develop PR
+  # close any PR not going to master
+  close_non_master_pr:
+    name: close non master PR
     runs-on: ubuntu-latest
+    # TODO: && ! (github.base_ref == 'master' || startsWith(github.head_ref, 'master-'))
     if: >
       github.event_name == 'pull_request'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
-      && ! (github.base_ref == 'staging' || startsWith(github.head_ref, 'sandbox-'))
+      && ! (github.base_ref == 'develop' || startsWith(github.head_ref, 'develop-'))
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
-          comment: Please merge your code into staging, this will trigger the desired merge workflow.
+          comment: Please merge your code into master, this will trigger the desired merge workflow.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  # merge develop PR, create PR to merge staging-SHA into master
-  merge_develop_pr:
-    name: close develop PR, open staging-HASH PR
+      - uses: actions/github@v1.0.0
+        if: success()
+        with:
+          args: label "doesnt read directions"
+  # create lint pr to prepare for release
+  create_master_auto_pr:
+    name: open master-HASH PR to master
     runs-on: ubuntu-latest
+    # TODO: && endsWith(github.ref, 'master')
     if: >
-      github.event_name == 'pull_request'
-      && github.base_ref == 'staging'
-      && (github.event.action == 'opened' || github.event.action == 'reopened')
+      github.event_name == 'push'
+      && endsWith(github.ref, 'develop')
+      && github.actor != 'trilom-bot'
     steps:
-      - name: automerge pr to develop
-        uses: pascalgn/automerge-action@v0.7.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_METHOD: merge
-          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
-          UPDATE_METHOD: merge
-          MERGE_LABELS: ''
-          UPDATE_LABELS: ''
-      - name: notify if any problems occur
-        uses: peter-evans/create-or-update-comment@v1
-        if: failure()
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
-
-            This is possibly because the head is not staging.
-            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
-            
-            ## Event JSON
-            ```json
-              ${{ toJSON(github.event.pull_request)}}
-            ```
       - uses: actions/checkout@v2
+        # TODO: ref: master
         with:
-          ref: staging
-      - name: get a list of files that have changed in the original PR
-        id: file_changes
+          ref: develop
+      - id: file_changes
         uses: trilom/file-changes-action@test/v1
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          output: '**  \n**'
       - name: create authors file
         run: |
           git shortlog -se \
@@ -81,88 +53,125 @@ jobs:
           git commit -m "Updating AUTHORS 📓" -a
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
-      - name: create pr to staging-HASH
+      - name: create pr to master-HASH
         id: create-pr
         uses: peter-evans/create-pull-request@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: ${{ github.event.pull_request.user.login }} would like to merge **${{ github.event.pull_request.base.commits }} commits** with ${{ github.event.pull_request.base.additions }} additions, ${{ github.event.pull_request.base.deletions }} deletions, ${{ github.event.pull_request.base.changed_files }} changed files into file-changes-action
-          committer: trilom-bot <trilom-bot@users.noreply.github.com>
-          author: ${{ github.event.pull_request.user.login }} <${{ github.event.pull_request.user.login }}@users.noreply.github.com>
-          title: ${{ github.event.pull_request.title }}
+          commit-message: '${{ github.event.push.commits[0].message }}'
+          committer: trilom-bot <trilom-bot@trailmix.me>
+          author: ${{ github.event.push.commits[0].author.name }} <${{ github.event.push.commits[0].author.email }}>
+          title: '[${{ github.actor }}] - ${{ github.event.push.commits[0].message }}(${{ github.event.push.distinct_size }} commits)'
           body: |
-            [Original PR URL](${{ github.event.pull_request.url }} )
-            $${{ github.event.pull_request.body }}
+            # ${{ github.actor }} would like to merge ${{ github.event.push.distinct_size }} commits into file-changes-action
             
-            ### Files
+            ## [**compare link**](${{ github.event.push.compare }})
+
+            ### Commits
+            
             ```json
-              ${{ toJSON(steps.file_changes.outputs.files)}}
+              ${{ toJSON(github.event.push.commits)}}
             ```
             
-            ### Files modified
-            ```json
-              ${{ toJSON(steps.file_changes.outputs.files_modified)}}
-            ```
+            #### Files
             
-            ### Files added
-            ```json
-              ${{ toJSON(steps.file_changes.outputs.files_added)}}
-            ```
+            **${{ steps.file_changes.outputs.files}}**
             
-            ### Files deleted
-            ```json
-              ${{ toJSON(steps.file_changes.outputs.files_deleted)}}
-            ```
+            #### Files modified
+            
+            **${{ steps.file_changes.outputs.files_modified}}**
+            
+            #### Files added
+            
+            **${{ steps.file_changes.outputs.files_added}}**
+            
+            #### Files deleted
+            
+            **${{ steps.file_changes.outputs.files_deleted}}**
           labels: 'automated pr'
-          assignees: ${{ github.event.pull_request.user.login }},trilom
+          assignees: trilom
           reviewers: trilom
+          # TODO: base: 'master'
           base: 'develop'
-          branch: 'sandbox'
+          # TODO: branch: 'master'
+          branch: 'develop'
           branch-suffix: short-commit-hash
-      - name: rebase develop back to master
-        uses: cirrus-actions/rebase@1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/github-script@0.6.0
+        id: pr
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+            })
+            const pr = result.data.length > 0 && result.data[0];
+            return pr.number || '1'
       - name: notify initial commiter of change
         uses: peter-evans/create-or-update-comment@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ teps.pr.outputs.result }}
           body: |
-            Hey @${{ github.event.pull_request.user.login }},
-            I have automerged this PR into staging.
+            Hey @${{ github.event.push.commits[0].message }},
 
-            [After this I will create a new PR that you can follow with this link.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
+            [I will create a new PR that you can follow with this link that details the release.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
 
-            Please use this new PR to communicate about your changes.
+            Please use this new PR if there are any issues to communicate further.
 
             Thanks, trilom.
   # make sure we can build
   build:
     name: yarn install && tsc
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
       - run: make run
+      - uses: actions/github@v1.0.0
+        if: success()
+        with:
+          args: label builds
+      - uses: actions/github@v1.0.0
+        if: failure()
+        with:
+          args: label "doesnt build"
   # test with jest
   test:
     name: jest
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
       - run: make run
       - run: make run COMMAND=test
-  # this will lint your code and return any problems to the pr
+      - uses: actions/github@v1.0.0
+        if: success()
+        with:
+          args: label tested
+      - name: apply automerge label if successful
+        uses: actions/github@v1.0.0
+        if: failure()
+        with:
+          args: label untested
+  # Lint code before going into release.
   lintdog:
     name: eslintdog (reviewdog)
     runs-on: ubuntu-latest
     needs: test
+    # TODO: && startsWith(github.base_ref, 'master') 
+    # TODO: && startsWith(github.head_ref, 'master-') 
     if: >
       github.event_name == 'pull_request' 
-      && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-'))
+      && startsWith(github.base_ref, 'develop') 
+      && startsWith(github.head_ref, 'develop-')
+      && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
+      && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
@@ -171,48 +180,84 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           eslint_flags: 'src/**/*.ts'
-  # check format and push changes if they exist
+  # Format code before going into release.
   format_check_push:
     name: prettier
     runs-on: ubuntu-latest
-    # don't format pushes from the bot, no endless loop
+    needs: lintdog
+    # TODO: && startsWith(github.base_ref, 'master') 
+    # TODO: && startsWith(github.head_ref, 'master-') 
     if: >
       github.event_name == 'pull_request' 
-      && github.actor != 'trilom-bot'
-      && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-')) 
+      && startsWith(github.base_ref, 'develop') 
+      && startsWith(github.head_ref, 'develop-')
+      && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
+      && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v2
         with:
           token: ${{ env.GITHUB_TOKEN }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
       - run: make run
-      - name: make run COMMAND=format-check code
-        run: |
-          make run COMMAND=format-check
+      - run: make run COMMAND=format-check
+      - uses: actions/github@v1.0.0
+        if: success()
+        with:
+          args: label pretty
       - name: make run COMMAND=format and push code if check failed
-        if: failure()
+        if: failure() && github.actor != 'trilom-bot'
         run: |
           make run COMMAND=format
           sudo make clean
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
           git commit -m "Add format changes" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
-  # if pr from staging-* to master
-  # build test build for release and output vars
-  # if push to master 
-  # do a real build, push to npm and github package repo
-  # and push the code to releases/v1 for github actions marketplace
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
+      - uses: actions/github@v1.0.0
+        if: failure()
+        with:
+          args: label ugly
+      - name: automerge pr to master if all good
+        uses: pascalgn/automerge-action@v0.7.5
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: 'pretty,builds,tested,'
+          UPDATE_LABELS: ''
+      - name: notify if any problems occur
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
+
+            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
+            
+            ## Event JSON
+            ```json
+              ${{ toJSON(github.event.pull_request)}}
+            ```
   release_build:
-    name: Build, if push, push to release branch
+    name: Test release, if push, push to release branch
     runs-on: ubuntu-latest
+    # TODO: && startsWith(github.base_ref, 'master') 
+    # TODO: && startsWith(github.head_ref, 'master-')
+    # TODO: && github.ref == 'master'
     if: >
       (github.event_name == 'pull_request' 
-        && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-'))) 
-      || (github.event_name == 'push' && endsWith(github.ref, 'develop'))
+        && startsWith(github.base_ref, 'develop') 
+        && startsWith(github.head_ref, 'develop-')
+        && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
+        && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action')
+      || (github.event_name == 'push' 
+        && github.ref == 'develop'
+        && github.actor == 'trilom-bot')
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -226,7 +271,7 @@ jobs:
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
-          dry_run: ${{ contains( github.ref, 'refs/pull/') == 'true'}}
+          dry_run: ${{ github.event_name == 'pull_request' }}
       - name: Test Outputs
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
@@ -234,28 +279,35 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_major_version }}
           echo ${{ steps.semantic.outputs.new_release_minor_version }}
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
-      # from here on, this will only run if a push happens to master, not a PR
+      # from here on, this will only run if a push happens not PR
       - name: Setup Node.js with GitHub Package Registry
-        if: endsWith(github.event.push.ref, 'develop') && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: 'https://npm.pkg.github.com'
           scope: trilom
       - name: Publish To GitHub Package Registry
-        if: endsWith(github.event.push.ref, 'develop') && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
       - run: make run COMMAND=release RELEASE=TRUE
-        # TODO: CHANGE TO master BRANCH
-        if: endsWith(github.event.push.ref, 'develop') && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
       - name: Push release files
-        if: endsWith(github.event.push.ref, 'develop') && steps.semantic.outputs.new_release_published == 'true'
-        # TODO: CHANGE TO releases/v1 BRANCH 
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/releases/v${{steps.semantic.outputs.new_release_major_version}}
         run: |
           git config --local user.email "trilom"
           git config --local user.name "me@trilom.org"
           git add --all
           git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ env.release_branch }}${{steps.semantic.outputs.new_release_major_version}}
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
+      - uses: actions/github@v1.0.0
+        if: success() && github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          args: label released
