@@ -1,19 +1,21 @@
 name: Contribution Workflow
 on: [pull_request, push]
 jobs:
-  # close any PR not going to master
-  close_non_master_pr:
-    name: close non master PR
+  # close any PR not going to master or develop
+  close_pr:
+    name: close non develop/master PR
     runs-on: ubuntu-latest
-    # TODO: && ! (github.base_ref == 'master' || startsWith(github.head_ref, 'master-'))
+    # && ! (github.base_ref == 'develop')
+    # && ! (github.base_ref == 'master' || github.head_ref == 'develop')
     if: >
       github.event_name == 'pull_request'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
-      && ! (github.base_ref == 'develop' || startsWith(github.head_ref, 'develop-'))
+      && ! (github.base_ref == 'staging')
+      && ! (github.base_ref == 'develop' || github.head_ref == 'staging')
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
-          comment: Please merge your code into master, this will trigger the desired merge workflow.
+          comment: Please merge your code into develop, this will trigger the desired merge workflow.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/github@v1.0.0
@@ -29,25 +31,13 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - uses: actions/github@v1.0.0
-        # TODO: && startsWith(github.base_ref, 'master') 
-        # TODO: && startsWith(github.head_ref, 'master-') 
-        if: >
-          success()
-          && startsWith(github.base_ref, 'develop') 
-          && startsWith(github.head_ref, 'develop-')
-          && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-          && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
+        # if: success() && github.base_ref == 'master' && github.head_ref == 'develop'
+        if: success() && github.base_ref == 'develop' && github.head_ref == 'staging'
         with:
           args: label builds
       - uses: actions/github@v1.0.0
-        # TODO: && startsWith(github.base_ref, 'master') 
-        # TODO: && startsWith(github.head_ref, 'master-') 
-        if: >
-          failure()
-          && startsWith(github.base_ref, 'develop') 
-          && startsWith(github.head_ref, 'develop-')
-          && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-          && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
+        # if: failure() && github.base_ref == 'master' && github.head_ref == 'develop'
+        if: failure() && github.base_ref == 'develop' && github.head_ref == 'staging'
         with:
           args: label "doesnt build"
   # test with jest
@@ -60,132 +50,21 @@ jobs:
       - run: make run
       - run: make run COMMAND=test
       - uses: actions/github@v1.0.0
-        # TODO: && startsWith(github.base_ref, 'master') 
-        # TODO: && startsWith(github.head_ref, 'master-') 
-        if: >
-          success()
-          && startsWith(github.base_ref, 'develop') 
-          && startsWith(github.head_ref, 'develop-')
-          && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-          && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
+        # if: success() && github.base_ref == 'master' && github.head_ref == 'develop'
+        if: success() && github.base_ref == 'develop' && github.head_ref == 'staging'
         with:
           args: label tested
       - uses: actions/github@v1.0.0
-        # TODO: && startsWith(github.base_ref, 'master') 
-        # TODO: && startsWith(github.head_ref, 'master-') 
-        if: >
-          failure()
-          && startsWith(github.base_ref, 'develop') 
-          && startsWith(github.head_ref, 'develop-')
-          && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-          && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
+        # if: failure() && github.base_ref == 'master' && github.head_ref == 'develop'
+        if: failure() && github.base_ref == 'develop' && github.head_ref == 'staging'
         with:
           args: label untested
-  # lint code and comment back if possible
-  lintdog:
-    name: eslintdog (reviewdog)
-    runs-on: ubuntu-latest
-    # TODO: && startsWith(github.base_ref, 'master') 
-    # TODO: && startsWith(github.head_ref, 'master-') 
-    if: >
-      github.event_name == 'pull_request' 
-      && startsWith(github.base_ref, 'develop') 
-      && startsWith(github.head_ref, 'develop-')
-      && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-      && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Lint and report
-        uses: reviewdog/action-eslint@v1
-        with:
-          github_token: ${{ secrets.TRILOM_BOT_TOKEN }}
-          reporter: github-pr-review
-          eslint_flags: 'src/**/*.ts'
-  # format and push code back
-  format_check_push:
-    name: prettier
-    runs-on: ubuntu-latest
-    needs: lintdog
-    # TODO: && startsWith(github.base_ref, 'master') 
-    # TODO: && startsWith(github.head_ref, 'master-') 
-    if: >
-      github.event_name == 'pull_request' 
-      && startsWith(github.base_ref, 'develop') 
-      && startsWith(github.head_ref, 'develop-')
-      && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-      && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
-      - run: make run
-      - run: make run COMMAND=format-check
-      - uses: actions/github@v1.0.0
-        with:
-          args: label pretty
-      - uses: actions/github@v1.0.0
-        with:
-          args: label ugly
-      - name: make run COMMAND=format and push code if check failed
-        if: failure() && github.actor != 'trilom-bot'
-        run: |
-          make run COMMAND=format
-          sudo make clean
-          git config --local user.email "trilom-bot@trailmix.me"
-          git config --local user.name "trilom-bot"
-          git commit -m "Add format changes" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
-  # automerge a passing PR
-  automerge_pr:
-    name: automerge a passing PR
-    runs-on: ubuntu-latest
-    needs: format_check_push
-    # TODO: && startsWith(github.base_ref, 'master') 
-    # TODO: && startsWith(github.head_ref, 'master-')
-    if: >
-      github.event_name == 'pull_request' 
-      && startsWith(github.base_ref, 'develop') 
-      && startsWith(github.head_ref, 'develop-')
-      && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-      && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action'
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-    steps:
-      - name: automerge pr to master if all good
-        uses: pascalgn/automerge-action@v0.7.5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_METHOD: merge
-          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
-          UPDATE_METHOD: merge
-          MERGE_LABELS: 'pretty,builds,tested,'
-          UPDATE_LABELS: ''
-      - name: notify if any problems occur
-        uses: peter-evans/create-or-update-comment@v1
-        if: failure()
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
-
-            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
-            
-            ## Event JSON
-            ```json
-              ${{ toJSON(github.event.pull_request)}}
-            ```
   # create automerge PR
   create_master_auto_pr:
-    name: open master-HASH PR to master
+    name: open PR to merge develop into master
     runs-on: ubuntu-latest
-    # TODO: && endsWith(github.ref, 'master')
-    if: >
-      github.event_name == 'push'
-      && endsWith(github.ref, 'develop')
-      && github.actor != 'trilom-bot'
+    # if: github.event_name == 'push' && endsWith(github.ref, 'develop')
+    if: github.event_name == 'push' && endsWith(github.ref, 'staging')
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
@@ -209,26 +88,23 @@ jobs:
           githubToken: ${{ env.GITHUB_TOKEN }}
           output: '**  \n**'
       - uses: actions/checkout@v2
+      # git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
       - name: create authors file
         run: |
           git shortlog -se \
           | perl -spe 's/^\s+\d+\s+//' \
           | sed -e '/^CommitSyncScript.*$/d' \
           > AUTHORS
-          echo '\n' >> AUTHORS
-          git rev-parse HEAD >> AUTHORS
           git add AUTHORS
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           git commit -m "Updating AUTHORS 📓" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
-      # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
-      # with a custom delimiter in file_changes 
-      - name: create pr to master-HASH
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/staging
+      - name: create pr to master
         id: create-pr
         uses: peter-evans/create-pull-request@v2
         with:
-          token: ${{ env.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: '${{ github.event.commits[0].message }}'
           committer: trilom-bot <trilom-bot@trailmix.me>
           author: ${{ github.event.commits[0].author.name }} <${{ github.event.commits[0].author.email }}>
@@ -264,9 +140,8 @@ jobs:
           reviewers: trilom
           # TODO: base: 'master'
           base: 'develop'
-          # TODO: branch: 'master'
-          branch: 'develop'
-          branch-suffix: short-commit-hash
+          # TODO: branch: 'develop'
+          branch: 'staging'
       - name: notify initial commiter of change
         uses: peter-evans/create-or-update-comment@v1
         with:
@@ -280,22 +155,93 @@ jobs:
             Please use this new PR if there are any issues to communicate further.
 
             Thanks, trilom.
+  # lint code and comment back if possible
+  lintdog:
+    name: eslintdog (reviewdog)
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'pull_request' && github.base_ref == 'master' && github.head_ref == 'develop'
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop' && github.head_ref == 'staging'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint and report
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.TRILOM_BOT_TOKEN }}
+          reporter: github-pr-review
+          eslint_flags: 'src/**/*.ts'
+  # format and push code back
+  format_check_push:
+    name: prettier
+    runs-on: ubuntu-latest
+    needs: lintdog
+    # if: github.event_name == 'pull_request' && github.base_ref == 'master' && github.head_ref == 'develop'
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop' && github.head_ref == 'staging'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+      - run: make run
+      - run: make run COMMAND=format-check
+      - uses: actions/github@v1.0.0
+        with:
+          args: label pretty
+      - uses: actions/github@v1.0.0
+        with:
+          args: label ugly
+      - name: make run COMMAND=format and push code if check failed
+        if: failure() && github.actor != 'trilom-bot'
+        run: |
+          make run COMMAND=format
+          sudo make clean
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
+          git commit -m "Add format changes" -a
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
+  # automerge a passing PR
+  automerge_pr:
+    name: automerge a passing PR
+    runs-on: ubuntu-latest
+    needs: format_check_push
+    # if: github.event_name == 'pull_request' && github.base_ref == 'master' && github.head_ref == 'develop'
+    if: github.event_name == 'pull_request' && github.base_ref == 'develop' && github.head_ref == 'staging'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - name: automerge pr to master if all good
+        uses: pascalgn/automerge-action@v0.7.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: 'pretty,builds,tested,'
+          UPDATE_LABELS: ''
+      - name: notify if any problems occur
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
+
+            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
+            
+            ## Event JSON
+            ```json
+              ${{ toJSON(github.event.pull_request)}}
+            ```
   # build for release and push
   release_build:
     name: Test release, if push, push to release branch
     runs-on: ubuntu-latest
-    # TODO: && startsWith(github.base_ref, 'master') 
-    # TODO: && startsWith(github.head_ref, 'master-')
-    # TODO: && github.ref == 'master'
+    # ((github.event_name == 'pull_request' && github.base_ref == 'master' && github.head_ref == 'develop')
+    # && (github.event_name == 'push' && github.ref == 'master' && github.actor == 'trilom-bot'))
     if: >
-      (github.event_name == 'pull_request' 
-        && startsWith(github.base_ref, 'develop') 
-        && startsWith(github.head_ref, 'develop-')
-        && github.event.pull_request.base.repo.full_name == 'trilom/file-changes-action'
-        && github.event.pull_request.head.repo.full_name == 'trilom/file-changes-action')
-      || (github.event_name == 'push' 
-        && github.ref == 'develop'
-        && github.actor == 'trilom-bot')
+      ((github.event_name == 'pull_request' && github.base_ref == 'develop' && github.head_ref == 'staging')
+        && (github.event_name == 'push' && github.ref == 'develop' && github.actor == 'trilom-bot'))
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
