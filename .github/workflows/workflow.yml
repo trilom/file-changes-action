@@ -24,23 +24,23 @@ on: [pull_request, push]
 jobs:
   # close any PR not going to staging-SHA or develop
   close_non_develop_pr:
-    name: 'close non ${{ env.develop_branch }} PR'
+    name: close non ${{ env.develop_branch }} PR
     runs-on: ubuntu-latest
     if: (! (startsWith(github.event.pull_request.base.ref, env.master_branch )) && github.event.pull_request.base.ref != env.develop_branch) && github.event.pull_request.state == 'opened'
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
-          comment: "Please merge your code into ${{ env.develop_branch }}, this will trigger the desired merge workflow."
+          comment: Please merge your code into ${{ env.develop_branch }}, this will trigger the desired merge workflow.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # merge develop PR, create PR to merge staging-SHA into master
   merge_develop_pr:
-    name: 'close ${{ env.develop_branch }} PR, open ${{ env.staging_branch }}-HASH PR'
+    name: close ${{ env.develop_branch }} PR, open ${{ env.staging_branch }}-HASH PR
     runs-on: ubuntu-latest
     if: github.event.pull_request.base.ref == ${{ env.develop_branch }} && github.event.pull_request.state == 'opened'
     steps:
       - uses: actions/checkout@v2
-      - name: 'automerge pr to ${{ env.develop_branch }}'
+      - name: automerge pr to ${{ env.develop_branch }}
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,15 +79,15 @@ jobs:
           git commit -m "Updating AUTHORS 📓" -a
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
-      - name: 'create pr to ${{ env.staging_branch }}-HASH'
+      - name: create pr to ${{ env.staging_branch }}-HASH
         id: create-pr
         uses: peter-evans/create-pull-request@v2
         with:
-          token: '${{ secrets.GITHUB_TOKEN }}'
-          commit-message: '${{ github.event.pull_request.user.login }} would like to merge **${{ github.event.pull_request.base.commits }} commits** with ${{ github.event.pull_request.base.additions }} additions, ${{ github.event.pull_request.base.deletions }} deletions, ${{ github.event.pull_request.base.changed_files }} changed files into file-changes-action'
-          committer: '${{ github.event.pull_request.user.login }}'
-          author: '${{ github.event.pull_request.user.login }}'
-          title: '${{ github.event.pull_request.title }}'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: ${{ github.event.pull_request.user.login }} would like to merge **${{ github.event.pull_request.base.commits }} commits** with ${{ github.event.pull_request.base.additions }} additions, ${{ github.event.pull_request.base.deletions }} deletions, ${{ github.event.pull_request.base.changed_files }} changed files into file-changes-action
+          committer: ${{ github.event.pull_request.user.login }}
+          author: ${{ github.event.pull_request.user.login }}
+          title: ${{ github.event.pull_request.title }}
           body: |
             [Original PR URL](${{ github.event.pull_request.url }} )
             $${{ github.event.pull_request.body }}
@@ -112,12 +112,12 @@ jobs:
               ${{ toJSON(steps.file_changes.outputs.files_deleted)}}
             ```
           labels: 'automated pr'
-          assignees: '${{ github.event.pull_request.user.login }},trilom'
+          assignees: ${{ github.event.pull_request.user.login }},trilom
           reviewers: trilom
-          base: '${{ env.master_branch }}'
-          branch: '${{ env.staging_branch }}'
+          base: ${{ env.master_branch }}
+          branch: ${{ env.staging_branch }}
           branch-suffix: short-commit-hash
-      - name: 'rebase develop back to ${{ env.master_branch }}'
+      - name: rebase develop back to ${{ env.master_branch }}
         uses: cirrus-actions/rebase@1.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -177,8 +177,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           token: ${{ env.GITHUB_TOKEN }}
-          repository: '${{ github.event.pull_request.head.repo.full_name }}'
-          ref: '${{ github.event.pull_request.head.ref }}'
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
       - run: make run
       - name: make run COMMAND=format-check code
         run: |
@@ -198,7 +198,7 @@ jobs:
   # do a real build, push to npm and github package repo
   # and push the code to releases/v1 for github actions marketplace
   release_build:
-    name: 'Build, if push, push to ${{ env.release_branch }} branch'
+    name: Build, if push, push to ${{ env.release_branch }} branch
     runs-on: ubuntu-latest
     if: (startsWith(github.event.pull_request.base.ref, ${{ env.master_branch }}) && startsWith(github.event.pull_request.head.ref, '${{ env.staging_branch }}-')) || endsWith(github.event.push.ref, ${{ env.master_branch }})
     env:
@@ -210,7 +210,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
         with:
-          branch: '${{ github.ref }}'
+          branch: ${{ github.ref }}
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
@@ -229,7 +229,7 @@ jobs:
         with:
           node-version: 12
           registry-url: 'https://npm.pkg.github.com'
-          scope: 'trilom'
+          scope: trilom
       - name: Publish To GitHub Package Registry
         if: endsWith(github.event.push.ref, ${{ env.master_branch }}) && steps.semantic.outputs.new_release_published == 'true'
         run: npm publish
