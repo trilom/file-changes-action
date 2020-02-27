@@ -163,20 +163,6 @@ jobs:
         run: |
           cat $HOME/files.txt
 ```
-
-## Contributing
-
-1. Fork the master branch from the repo.
-
-2. Make your changes in the `src` directory to the typescript files.  Once satisfied, or along the way you can run `make run COMMAND=format` to make your code pretty, and `make run COMMAND=lint` to validate it.  You must pull the dependencies with `make run COMMAND=build` in order to run these commands.
-
-3. **NOT IMPLEMENTED** Run `make run COMMAND=test` to test your changes prior to releasing.
-
-4. To initiate a release please attempt a PR to the `master` branch, this will trigger the workflow for production testing.  Your PR to `master` should not include code in `node_modules`, `dist`, or `lib` these are left for the release process and are in the master for local building.
-
-5. Once PR is accepted and merged into master, this will trigger the workflow to release to `releases/v1` which will persist on the Github Action Marketplace.
-
-
  
 ```bash
 # install project dependencies (including devDependencies)
