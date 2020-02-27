@@ -199,7 +199,7 @@ jobs:
             const result = github.repos.listPullRequestsAssociatedWithCommit({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              commit_sha: context.sha,
+              commit_sha: context.payload.after,
             })
             const pr = result.data.length > 0 && result.data[0];
             return pr.number || '1'
