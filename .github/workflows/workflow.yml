@@ -1,3 +1,8 @@
+# close_non_develop_pr
+# should: close PR not on develop
+# open PR
+# check comment to see if it matches close comment
+
 # if PR is opened then merge it into a develop branch
 # and make a new PR from staging-SHA into master with the code
 # inform the committer of the change in PRs
