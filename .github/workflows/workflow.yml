@@ -17,7 +17,7 @@ jobs:
   close_non_develop_pr:
     name: close non develop PR
     runs-on: ubuntu-latest
-    if: (! (startsWith(github.event.pull_request.base.ref, 'develop' )) && github.event.pull_request.base.ref != 'staging') && github.event.pull_request.state == 'opened'
+    if: (! (startsWith(github.event.pull_request.base.ref, 'develop' )) && github.event.pull_request.base.ref != 'staging') && github.event.action == 'opened'
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
@@ -28,7 +28,7 @@ jobs:
   merge_develop_pr:
     name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == 'staging' && github.event.pull_request.state == 'opened'
+    if: github.event.pull_request.base.ref == 'staging' && github.event.action == 'opened'
     steps:
       - uses: actions/checkout@v2
       - name: automerge pr to develop
