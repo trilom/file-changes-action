@@ -5,6 +5,7 @@
 - [Overview](#overview)
   - [Pull Request](#pull-request)
     - [master](#master)
+    - [any branch not master](#any-branch-not-master)
   - [Push](#push)
     - [master](#master-1)
 
@@ -19,43 +20,40 @@
 
 - When any `opened`, `reopened`, or `synchronize` **Pull Request** type runs:
   - Build code with `make run` which runs `yarn` and `tsc` (**build**)
-    - Label with builds if passing
-    - Label with doesnt build if failed
+    - Label with builds if passing and on inner workspace
+    - Label with doesnt build if failed and on inner workspace
   - Test code with `make run COMMAND=test` which runs `jest` (**test**)
-    - Label with tested if passing
-    - Label with untested if failed
-- When a **Pull Request** is `opened` to anything other than _master_ (**close_non_develop_pr**):
-  - Close **Pull Request** and inform user to open **Pull Request** to _master_
-
-### master
-
-- When a PR is `opened`, `reopened`, or `synchronize`(d) to _master_ from _master-HASH_ (**lintdog**)
-  - If event from trilom-bot
-    - Test code with eslint reviewdog
-    - Pull the head repo (**format_check_push**)
+    - Label with tested if passing and on inner workspace
+    - Label with untested if failed and on inner workspace
+  - Lint code with `make run COMMAND=lint` which runs `eslint` (**lintdog**)
+  - Check format of code with `make run COMMAND=format-check` which runs `prettier --check` (**format_check_push**)
+    - Test code with eslint reviewdog and report back if inner workspace
+    - Pull the head repo
     - Build code with `make run` which runs `yarn` and `tsc`
-    - Check format of code with `make run COMMAND=format-check` which runs `prettier --check`
-      - If format-check succeeds
+      - If format-check succeeds and on inner workspace
         - Label with pretty
         - Auto merge PR to master if all tags are there (pretty,builds,tested)
           - Comment on PR with info if failure
-      - If format-check fails
+      - If format-check fails and on inner workspace and actor is not trilom-bot
         - Run `make run COMMAND=format` which runs `prettier --write`
         - Clean build files with `make clean`
         - Commit the format changes as trilom-bot to **Pull Request** head
           - Label with ugly if failed
-  - If event from anyone else:
-    - Test code with eslint reviewdog
-    - Pull the head repo (**format_check_push**)
-    - Build code with `make run` which runs `yarn` and `tsc`
-    - Check format of code with `make run COMMAND=format-check` which runs `prettier --check`
-      - If format-check succeeds
-        - Label with pretty
-        - Auto merge PR to master if all tags are there (pretty,builds,tested)
-          - Comment on PR with info if failure
+
+### master
+
+- When a PR is `opened`, `reopened`, or `synchronize`(d) to _master_ from _master-HASH_ (**automerge_pr**)
+  - ( after **format_check_push** )
+  - Auto merge PR to master if all tags are there (pretty,builds,tested)
+    - Comment on PR with info if failure
   - Pull the head repo (**release_build**)
   - Run a dry run of semantic release
     - If new release, output the results
+
+### any branch not master
+
+- When a **Pull Request** is `opened` to anything other than _master_ (**close_non_develop_pr**):
+  - Close **Pull Request** and inform user to open **Pull Request** to _master_
 
 ## Push
 
