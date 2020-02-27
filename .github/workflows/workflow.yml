@@ -24,7 +24,7 @@ on: [pull_request, push]
 jobs:
   # close any PR not going to staging-SHA or develop
   close_non_develop_pr:
-    name: "close non ${{ env.develop_branch }} PR"
+    name: close non develop PR
     runs-on: ubuntu-latest
     if: (! (startsWith(github.event.pull_request.base.ref, env.master_branch )) && github.event.pull_request.base.ref != env.develop_branch) && github.event.pull_request.state == 'opened'
     steps:
@@ -35,12 +35,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # merge develop PR, create PR to merge staging-SHA into master
   merge_develop_pr:
-    name: "close ${{ env.develop_branch }} PR, open ${{ env.staging_branch }}-HASH PR"
+    name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
     if: github.event.pull_request.base.ref == ${{ env.develop_branch }} && github.event.pull_request.state == 'opened'
     steps:
       - uses: actions/checkout@v2
-      - name: automerge pr to ${{ env.develop_branch }}
+      - name: automerge pr to develop
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
           git commit -m "Updating AUTHORS 📓" -a
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
-      - name: "create pr to ${{ env.staging_branch }}-HASH"
+      - name: create pr to staging-HASH
         id: create-pr
         uses: peter-evans/create-pull-request@v2
         with:
@@ -117,7 +117,7 @@ jobs:
           base: ${{ env.master_branch }}
           branch: ${{ env.staging_branch }}
           branch-suffix: short-commit-hash
-      - name: "rebase develop back to ${{ env.master_branch }}"
+      - name: rebase develop back to master
         uses: cirrus-actions/rebase@1.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -198,7 +198,7 @@ jobs:
   # do a real build, push to npm and github package repo
   # and push the code to releases/v1 for github actions marketplace
   release_build:
-    name: "Build, if push, push to ${{ env.release_branch }} branch"
+    name: Build, if push, push to release branch
     runs-on: ubuntu-latest
     if: (startsWith(github.event.pull_request.base.ref, ${{ env.master_branch }}) && startsWith(github.event.pull_request.head.ref, '${{ env.staging_branch }}-')) || endsWith(github.event.push.ref, ${{ env.master_branch }})
     env:
