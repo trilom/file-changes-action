@@ -16,13 +16,11 @@
 3. In the new **Pull Request** tests will be ran against the code.  Once satisfied the code will be merged into _master_
 4. Once merged into _master_ the workflow will deploy the code to NPM, Github Package Repo, and Github Actions marketplace by pushing to _releases/v1_.
 
-
-- When any **Push** or **Pull Request** type runs:
-  - Build code with `make run` which runs `yarn` and `tsc` (**build**)
-  - Test code with `make run COMMAND=test` which runs `jest` (**test**)
-
 ## Pull Request
 
+- When any `opened`, `reopened`, or `synchronize` **Pull Request** type runs:
+  - Build code with `make run` which runs `yarn` and `tsc` (**build**)
+  - Test code with `make run COMMAND=test` which runs `jest` (**test**)
 - When a **Pull Request** is `opened` to anything other than _develop_ or _master_ (**close_non_develop_pr**):
   - Close **Pull Request** and inform user to merge to _develop_
 

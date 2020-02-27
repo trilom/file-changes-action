@@ -130,6 +130,7 @@ jobs:
   build:
     name: yarn install && tsc
     runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.base.ref, 'develop')
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -138,6 +139,7 @@ jobs:
     name: jest
     runs-on: ubuntu-latest
     needs: build
+    if: startsWith(github.event.pull_request.base.ref, 'develop')
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -205,7 +207,7 @@ jobs:
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
-          dry_run: ${{ contains( github.ref, 'refs/pull/')}}
+          dry_run: ${{ contains( github.ref, 'refs/pull/') == 'true'}}
       - name: Test Outputs
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
