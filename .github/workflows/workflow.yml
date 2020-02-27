@@ -17,7 +17,10 @@ jobs:
   close_non_develop_pr:
     name: close non develop PR
     runs-on: ubuntu-latest
-    if: (! (startsWith(github.event.pull_request.base.ref, 'develop' )) && github.event.pull_request.base.ref != 'staging') && github.event.action == 'opened'
+    if: >
+      github.event_name == 'pull_request'
+      && (github.event.action == 'opened' || github.event.action == 'reopened')
+      && (github.base_ref != 'develop' || startsWith(github.base_ref, 'sandbox-'))
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
@@ -28,7 +31,10 @@ jobs:
   merge_develop_pr:
     name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == 'staging' && contains(['opened','reopened'], github.event.action)
+    if: >
+      github.event_name == 'pull_request'
+      && github.base_ref == 'staging'
+      && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
       - uses: actions/checkout@v2
       - name: automerge pr to develop
@@ -130,7 +136,7 @@ jobs:
   build:
     name: yarn install && tsc
     runs-on: ubuntu-latest
-    if: startsWith(github.event.pull_request.base.ref, 'develop')
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -139,7 +145,7 @@ jobs:
     name: jest
     runs-on: ubuntu-latest
     needs: build
-    if: startsWith(github.event.pull_request.base.ref, 'develop')
+    if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -149,7 +155,9 @@ jobs:
     name: eslintdog (reviewdog)
     runs-on: ubuntu-latest
     needs: test
-    if: startsWith(github.event.pull_request.base.ref, 'develop') && startsWith(github.event.pull_request.head.ref, 'sandbox-')
+    if: >
+      github.event_name == 'pull_request' 
+      && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-'))
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
@@ -163,7 +171,10 @@ jobs:
     name: prettier
     runs-on: ubuntu-latest
     # don't format pushes from the bot, no endless loop
-    if: startsWith(github.event.pull_request.base.ref, 'develop') && startsWith(github.event.pull_request.head.ref, 'sandbox-') && github.actor != 'trilom-bot'
+    if: >
+      github.event_name == 'pull_request' 
+      && github.actor != 'trilom-bot'
+      && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-')) 
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
@@ -193,7 +204,10 @@ jobs:
   release_build:
     name: Build, if push, push to release branch
     runs-on: ubuntu-latest
-    if: (startsWith(github.event.pull_request.base.ref, 'develop') && startsWith(github.event.pull_request.head.ref, 'sandbox-')) || endsWith(github.event.push.ref, 'develop')
+    if: >
+      (github.event_name == 'pull_request' 
+        && ( github.base_ref == 'develop' && startsWith(github.head_ref, 'sandbox-'))) 
+      || (github.event_name == 'push' && endsWith(github.ref, 'develop'))
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
