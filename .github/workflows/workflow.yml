@@ -28,7 +28,7 @@ jobs:
   merge_develop_pr:
     name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == 'staging' && github.event.action == 'opened'
+    if: github.event.pull_request.base.ref == 'staging' && contains(['opened','reopened'], github.event.action)
     steps:
       - uses: actions/checkout@v2
       - name: automerge pr to develop
