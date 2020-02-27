@@ -214,7 +214,7 @@ jobs:
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
-          dry_run: ${{ contains( github.ref, 'refs/pull/'}}
+          dry_run: ${{ contains( github.ref, 'refs/pull/')}}
       - name: Test Outputs
         if: steps.semantic.outputs.new_release_published == 'true'
         run: |
