@@ -12,32 +12,32 @@
 
 name: Pull Requests
 env:
-  develop_branch: 'staging'
-  staging_branch: 'sandbox'
-  master_branch: 'develop'
-  release_branch: 'test/v'
-  bot: 'trilom-bot'
-  bot_email: 'trilom-bot@trailmix.me'
-  owner: 'trilom'
-  owner_email: 'me@trilom.org'
+  DEVELOP_BRANCH: 'staging'
+  STAGING_BRANCH: 'sandbox'
+  MASTER_BRANCH: 'develop'
+  RELEASE_BRANCH: 'test/v'
+  BOT: 'trilom-bot'
+  BOT_EMAIL: 'trilom-bot@trailmix.me'
+  OWNER: 'trilom'
+  OWNER_EMAIL: 'me@trilom.org'
 on: [pull_request, push]
 jobs:
   # close any PR not going to staging-SHA or develop
   close_non_develop_pr:
     name: close non develop PR
     runs-on: ubuntu-latest
-    if: (! (startsWith(github.event.pull_request.base.ref, $master_branch )) && github.event.pull_request.base.ref != $develop_branch) && github.event.pull_request.state == 'opened'
+    if: (! (startsWith(github.event.pull_request.base.ref, env.MASTER_BRANCH )) && github.event.pull_request.base.ref != env.DEVELOP_BRANCH) && github.event.pull_request.state == 'opened'
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
-          comment: Please merge your code into ${{ env.develop_branch }}, this will trigger the desired merge workflow.
+          comment: Please merge your code into ${{ env.DEVELOP_BRANCH }}, this will trigger the desired merge workflow.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   # merge develop PR, create PR to merge staging-SHA into master
   merge_develop_pr:
     name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == $develop_branch && github.event.pull_request.state == 'opened'
+    if: github.event.pull_request.base.ref == env.DEVELOP_BRANCH && github.event.pull_request.state == 'opened'
     steps:
       - uses: actions/checkout@v2
       - name: automerge pr to develop
@@ -57,7 +57,7 @@ jobs:
           body: |
             @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
 
-            This is possibly because the head is not ${{ env.develop_branch }}.
+            This is possibly because the head is not ${{ env.DEVELOP_BRANCH }}.
             Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
             
             ## Event JSON
@@ -114,8 +114,8 @@ jobs:
           labels: 'automated pr'
           assignees: ${{ github.event.pull_request.user.login }},trilom
           reviewers: trilom
-          base: ${{ env.master_branch }}
-          branch: ${{ env.staging_branch }}
+          base: ${{ env.MASTER_BRANCH }}
+          branch: ${{ env.STAGING_BRANCH }}
           branch-suffix: short-commit-hash
       - name: rebase develop back to master
         uses: cirrus-actions/rebase@1.2
@@ -128,7 +128,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             Hey @${{ github.event.pull_request.user.login }},
-            I have automerged this PR into ${{ env.develop_branch }}.
+            I have automerged this PR into ${{ env.DEVELOP_BRANCH }}.
 
             [After this I will create a new PR that you can follow with this link.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
 
@@ -156,7 +156,7 @@ jobs:
     name: eslintdog (reviewdog)
     runs-on: ubuntu-latest
     needs: test
-    if: startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-')
+    if: startsWith(github.event.pull_request.base.ref, env.MASTER_BRANCH) && startsWith(github.event.pull_request.head.ref, 'env.STAGING_BRANCH-')
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
@@ -170,7 +170,7 @@ jobs:
     name: prettier
     runs-on: ubuntu-latest
     # don't format pushes from the bot, no endless loop
-    if: startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-') && github.actor != $bot
+    if: startsWith(github.event.pull_request.base.ref, env.MASTER_BRANCH) && startsWith(github.event.pull_request.head.ref, 'env.STAGING_BRANCH-') && github.actor != $bot
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
@@ -188,8 +188,8 @@ jobs:
         run: |
           make run COMMAND=format
           sudo make clean
-          git config --local user.email "${{ env.bot_email }}"
-          git config --local user.name "${{ env.bot }}"
+          git config --local user.email "${{ env.BOT_EMAIL }}"
+          git config --local user.name "${{ env.BOT }}"
           git commit -m "Add format changes" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.event.pull_request.head.repo.full_name }}.git HEAD:refs/heads/${{ github.event.pull_request.head.ref }} && exit 0
   # if pr from staging-* to master
@@ -200,7 +200,7 @@ jobs:
   release_build:
     name: Build, if push, push to release branch
     runs-on: ubuntu-latest
-    if: (startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-')) || endsWith(github.event.push.ref, $master_branch)
+    if: (startsWith(github.event.pull_request.base.ref, env.MASTER_BRANCH) && startsWith(github.event.pull_request.head.ref, 'env.STAGING_BRANCH-')) || endsWith(github.event.push.ref, env.MASTER_BRANCH)
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -224,26 +224,26 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
       # from here on, this will only run if a push happens to master, not a PR
       - name: Setup Node.js with GitHub Package Registry
-        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, env.MASTER_BRANCH) && steps.semantic.outputs.new_release_published == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: 'https://npm.pkg.github.com'
           scope: trilom
       - name: Publish To GitHub Package Registry
-        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, env.MASTER_BRANCH) && steps.semantic.outputs.new_release_published == 'true'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
       - run: make run COMMAND=release RELEASE=TRUE
         # TODO: CHANGE TO master BRANCH
-        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, env.MASTER_BRANCH) && steps.semantic.outputs.new_release_published == 'true'
       - name: Push release files
-        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, env.MASTER_BRANCH) && steps.semantic.outputs.new_release_published == 'true'
         # TODO: CHANGE TO releases/v1 BRANCH 
         run: |
-          git config --local user.email "${{ env.owner }}"
-          git config --local user.name "${{ env.owner_email }}"
+          git config --local user.email "${{ env.OWNER }}"
+          git config --local user.name "${{ env.OWNER_EMAIL }}"
           git add --all
           git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ env.release_branch }}${{steps.semantic.outputs.new_release_major_version}}
