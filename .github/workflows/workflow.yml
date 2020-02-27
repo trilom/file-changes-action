@@ -189,15 +189,42 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
-        # TODO: ref: master
+      - name: get push PR number
+        uses: actions/github-script@0.6.0
+        id: pr
         with:
-          ref: ${{ env.event.before }}
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+            })
+            const pr = result.data.length > 0 && result.data[0];
+            return pr.number || '1'
+      - name: get push HEAD commit sha
+        uses: actions/github-script@0.6.0
+        id: sha
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ steps.pr.outputs.result }}
+            })
+            return result.data.head.sha || result;
       - id: file_changes
         uses: trilom/file-changes-action@test/v1
         with:
           githubToken: ${{ env.GITHUB_TOKEN }}
           output: '**  \n**'
+      - uses: actions/checkout@v2
+        with:
+          # this is the sha from the function prior which is the sha of the Pushs HEAD Commit
+          ref: ${{ steps.sha.outputs.result }}
       - name: create authors file
         run: |
           git shortlog -se \
@@ -253,19 +280,6 @@ jobs:
           # TODO: branch: 'master'
           branch: 'develop'
           branch-suffix: short-commit-hash
-      - uses: actions/github-script@0.6.0
-        id: pr
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const result = github.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-            })
-            const pr = result.data.length > 0 && result.data[0];
-            return pr.number || '1'
       - name: notify initial commiter of change
         uses: peter-evans/create-or-update-comment@v1
         with:
