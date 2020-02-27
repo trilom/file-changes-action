@@ -36,7 +36,6 @@ jobs:
       && github.base_ref == 'staging'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
     steps:
-      - uses: actions/checkout@v2
       - name: automerge pr to develop
         uses: pascalgn/automerge-action@v0.7.5
         env:
@@ -62,7 +61,10 @@ jobs:
             ```json
               ${{ toJSON(github.event.pull_request)}}
             ```
-      - name: get a list of files that have changed in the Push
+      - uses: actions/checkout@v2
+        with:
+          ref: staging
+      - name: get a list of files that have changed in the original PR
         id: file_changes
         uses: trilom/file-changes-action@releases/v1
         with:
