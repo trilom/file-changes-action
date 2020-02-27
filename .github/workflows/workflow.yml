@@ -20,7 +20,7 @@ jobs:
     if: >
       github.event_name == 'pull_request'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
-      && (github.base_ref != 'develop' || startsWith(github.base_ref, 'sandbox-'))
+      && ! (github.base_ref == 'staging' || startsWith(github.head_ref, 'sandbox-'))
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
@@ -44,6 +44,7 @@ jobs:
           MERGE_METHOD: merge
           MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
+          MERGE_LABELS: ''
           UPDATE_LABELS: ''
       - name: notify if any problems occur
         uses: peter-evans/create-or-update-comment@v1
