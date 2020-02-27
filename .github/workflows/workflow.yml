@@ -203,39 +203,25 @@ jobs:
               commit_sha: context.payload.head_commit.id
             })
             return result.data[0].number;
-      - name: get push HEAD commit sha
-        uses: actions/github-script@0.6.0
-        id: sha
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          debug: true
-          script: |
-            const result = await github.pulls.get({
-              owner: context.payload.repository.owner.name,
-              repo: context.payload.repository.name,
-              pull_number: ${{ steps.pr.outputs.result }}
-            })
-            return result.data.head.sha;
       - id: file_changes
         uses: trilom/file-changes-action@test/v1
         with:
           githubToken: ${{ env.GITHUB_TOKEN }}
           output: '**  \n**'
       - uses: actions/checkout@v2
-        with:
-          # this is the sha from the function prior which is the sha of the Pushs HEAD Commit
-          ref: ${{ steps.sha.outputs.result }}
       - name: create authors file
         run: |
           git shortlog -se \
           | perl -spe 's/^\s+\d+\s+//' \
           | sed -e '/^CommitSyncScript.*$/d' \
           > AUTHORS
+          echo '\n' >> AUTHORS
+          git rev-parse HEAD >> AUTHORS
           git add AUTHORS
-          git config --local user.email "trilom"
-          git config --local user.name "me@trilom.org"
+          git config --local user.email "trilom-bot"
+          git config --local user.name "trilom-bot@trailmix.me"
           git commit -m "Updating AUTHORS 📓" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
       - name: create pr to master-HASH
