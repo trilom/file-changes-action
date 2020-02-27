@@ -74,6 +74,8 @@ jobs:
           | sed -e '/^CommitSyncScript.*$/d' \
           > AUTHORS
           git add AUTHORS
+          git config --local user.email "trilom"
+          git config --local user.name "me@trilom.org"
           git commit -m "Updating AUTHORS 📓" -a
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
