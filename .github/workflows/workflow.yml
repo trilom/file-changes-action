@@ -161,7 +161,7 @@ jobs:
     name: prettier
     runs-on: ubuntu-latest
     # don't format pushes from the bot, no endless loop
-    if: startsWith(github.event.pull_request.base.ref, 'develop') && startsWith(github.event.pull_request.head.ref, 'sandbox-') && github.actor != $bot
+    if: startsWith(github.event.pull_request.base.ref, 'develop') && startsWith(github.event.pull_request.head.ref, 'sandbox-') && github.actor != 'trilom-bot'
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
