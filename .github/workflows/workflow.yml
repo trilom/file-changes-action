@@ -192,8 +192,7 @@ jobs:
       - uses: actions/checkout@v2
         # TODO: ref: master
         with:
-          token: ${{ env.GITHUB_TOKEN }}
-          ref: develop
+          ref: ${{ env.event.before }}
       - id: file_changes
         uses: trilom/file-changes-action@test/v1
         with:
@@ -216,19 +215,19 @@ jobs:
         uses: peter-evans/create-pull-request@v2
         with:
           token: ${{ env.GITHUB_TOKEN }}
-          commit-message: '${{ github.event.push.commits[0].message }}'
+          commit-message: '${{ github.event.commits[0].message }}'
           committer: trilom-bot <trilom-bot@trailmix.me>
-          author: ${{ github.event.push.commits[0].author.name }} <${{ github.event.push.commits[0].author.email }}>
-          title: '[${{ github.actor }}] - ${{ github.event.push.commits[0].message }}(${{ github.event.push.distinct_size }} commits)'
+          author: ${{ github.event.commits[0].author.name }} <${{ github.event.commits[0].author.email }}>
+          title: '[${{ github.actor }}] - ${{ github.event.commits[0].message }}(${{ github.event.distinct_size }} commits)'
           body: |
-            # ${{ github.actor }} would like to merge ${{ github.event.push.distinct_size }} commits into file-changes-action
+            # ${{ github.actor }} would like to merge ${{ github.event.distinct_size }} commits into file-changes-action
             
-            ## [**compare link**](${{ github.event.push.compare }})
+            ## [**compare link**](${{ github.event.compare }})
 
             ### Commits
             
             ```json
-              ${{ toJSON(github.event.push.commits)}}
+              ${{ toJSON(github.event.commits)}}
             ```
             
             #### Files
@@ -273,7 +272,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ steps.pr.outputs.result }}
           body: |
-            Hey @${{ github.event.push.commits[0].message }},
+            Hey @${{ github.event.commits[0].message }},
 
             [I will create a new PR that you can follow with this link that details the release.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
 
