@@ -26,7 +26,7 @@ jobs:
   close_non_develop_pr:
     name: close non develop PR
     runs-on: ubuntu-latest
-    if: (! (startsWith(github.event.pull_request.base.ref, env.master_branch )) && github.event.pull_request.base.ref != env.develop_branch) && github.event.pull_request.state == 'opened'
+    if: (! (startsWith(github.event.pull_request.base.ref, $master_branch )) && github.event.pull_request.base.ref != $develop_branch) && github.event.pull_request.state == 'opened'
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
@@ -37,7 +37,7 @@ jobs:
   merge_develop_pr:
     name: close develop PR, open staging-HASH PR
     runs-on: ubuntu-latest
-    if: github.event.pull_request.base.ref == env.develop_branch && github.event.pull_request.state == 'opened'
+    if: github.event.pull_request.base.ref == $develop_branch && github.event.pull_request.state == 'opened'
     steps:
       - uses: actions/checkout@v2
       - name: automerge pr to develop
@@ -156,7 +156,7 @@ jobs:
     name: eslintdog (reviewdog)
     runs-on: ubuntu-latest
     needs: test
-    if: startsWith(github.event.pull_request.base.ref, env.master_branch) && startsWith(github.event.pull_request.head.ref, 'env.staging_branch-')
+    if: startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-')
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
@@ -170,7 +170,7 @@ jobs:
     name: prettier
     runs-on: ubuntu-latest
     # don't format pushes from the bot, no endless loop
-    if: startsWith(github.event.pull_request.base.ref, env.master_branch) && startsWith(github.event.pull_request.head.ref, 'env.staging_branch-') && github.actor != env.bot
+    if: startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-') && github.actor != $bot
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
     steps:
@@ -200,7 +200,7 @@ jobs:
   release_build:
     name: Build, if push, push to release branch
     runs-on: ubuntu-latest
-    if: (startsWith(github.event.pull_request.base.ref, env.master_branch) && startsWith(github.event.pull_request.head.ref, 'env.staging_branch-')) || endsWith(github.event.push.ref, env.master_branch)
+    if: (startsWith(github.event.pull_request.base.ref, $master_branch) && startsWith(github.event.pull_request.head.ref, '$staging_branch-')) || endsWith(github.event.push.ref, $master_branch)
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -224,22 +224,22 @@ jobs:
           echo ${{ steps.semantic.outputs.new_release_patch_version }}
       # from here on, this will only run if a push happens to master, not a PR
       - name: Setup Node.js with GitHub Package Registry
-        if: endsWith(github.event.push.ref, env.master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: 'https://npm.pkg.github.com'
           scope: trilom
       - name: Publish To GitHub Package Registry
-        if: endsWith(github.event.push.ref, env.master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
       - run: make run COMMAND=release RELEASE=TRUE
         # TODO: CHANGE TO master BRANCH
-        if: endsWith(github.event.push.ref, env.master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
       - name: Push release files
-        if: endsWith(github.event.push.ref, env.master_branch) && steps.semantic.outputs.new_release_published == 'true'
+        if: endsWith(github.event.push.ref, $master_branch) && steps.semantic.outputs.new_release_published == 'true'
         # TODO: CHANGE TO releases/v1 BRANCH 
         run: |
           git config --local user.email "${{ env.owner }}"
