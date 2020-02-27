@@ -1,34 +1,67 @@
 {
-  "name": "file-changes-action",
+  "name": "@trilom/file-changes-action",
   "version": "1.1.0",
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
+    "release": "yarn build && yarn run pack && yarn --prod",
+    "build": "yarn && tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack",
-    "prod": "yarn && yarn all && yarn --prod",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "clean": "rm -rf node_modules"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trilom/file-changes-action"
+    "url": "git+https://github.com/trilom/file-changes-action.git"
   },
   "keywords": [
     "actions",
+    "action",
+    "github-action",
+    "github-actions",
+    "github",
     "node",
-    "setup"
+    "typescript",
+    "examples"
   ],
   "author": "Bryan Killian <me@trilom.org>",
+  "homepage": "https://github.com/trilom/file-changes-action#README",
   "license": "MIT",
+  "release": {
+    "branches": [
+      "test/v1"
+    ],
+  "dryRun": false,
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    "@semantic-release/npm",
+    "@semantic-release/github",
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md",
+          "package.json",
+          "yarn.lock"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ]
+  ]
+  },
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^2.0.0",
-    "@types/node": "^13.1.4"
+    "@actions/github": "^2.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
