@@ -163,3 +163,23 @@ jobs:
         run: |
           cat $HOME/files.txt
 ```
+ 
+```bash
+# install project dependencies (including devDependencies)
+yarn
+# build the project (dist files)
+yarn build
+# build and lint
+
+# run prettier (this will make your ugly code pretty)
+yarn format
+# dry-run prettier (this will tell you if your ugly code needs to be made pretty)
+yarn format-check
+# lint project
+yarn lint
+# test
+yarn jest
+
+# clean duh
+yarn clean
+```

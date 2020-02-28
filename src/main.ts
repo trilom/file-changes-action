@@ -4,9 +4,7 @@ import * as fs from 'fs'
 import * as gh from '@actions/github'
 import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
-async function getChangedPRFiles(
-  client: gh.GitHub,
-  prNumber: number
+async function getChangedPRFiles( client: gh.GitHub, prNumber: number
 ): Promise<ChangedFiles> {
   const options = client.pulls.listFiles.endpoint.merge({
     owner: gh.context.repo.owner,
@@ -20,10 +18,7 @@ async function getChangedPRFiles(
   )
 }
 
-async function getChangedPushFiles(
-  client: gh.GitHub,
-  base: string,
-  head: string
+async function getChangedPushFiles( client: gh.GitHub, base: string, head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
     owner: gh.context.repo.owner,
@@ -46,10 +41,10 @@ function writeFiles(format: string, changedFiles: ChangedFiles): void {
       break
     case ',':
       format = '.csv'
-      break
+      break;
     default:
       format = '.txt'
-      break
+      break;
   }
   //write files to preserve original functionality
   fs.writeFileSync(
@@ -119,6 +114,7 @@ async function run(): Promise<void> {
     }
     // write file output
     writeFiles(fileOutput, changedFiles)
+
     // write output vars
     writeOutput(output, changedFiles)
 
