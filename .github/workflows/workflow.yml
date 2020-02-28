@@ -35,11 +35,21 @@ jobs:
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           args: label builds
+     - uses: actions/github@v1.0.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          args: unlabel "doesnt build"
       - uses: actions/github@v1.0.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           args: label "doesnt build"
+      - uses: actions/github@v1.0.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          args: unlabel builds
   # test with jest
   test:
     name: jest
@@ -58,9 +68,19 @@ jobs:
           args: label tested
       - uses: actions/github@v1.0.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          args: unlabel untested
+      - uses: actions/github@v1.0.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           args: label untested
+      - uses: actions/github@v1.0.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          args: unlabel tested
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)
@@ -95,9 +115,17 @@ jobs:
         with:
           args: label pretty
       - uses: actions/github@v1.0.0
+        if: success()
+        with:
+          args: unlabel ugly
+      - uses: actions/github@v1.0.0
         if: failure()
         with:
           args: label ugly
+      - uses: actions/github@v1.0.0
+        if: failure()
+        with:
+          args: unlabel pretty
       - name: make run COMMAND=format and push code if check failed
         if: failure() && github.actor != 'trilom-bot'
         run: |
