@@ -150,6 +150,8 @@ jobs:
           | perl -spe 's/^\s+\d+\s+//' \
           | sed -e '/^CommitSyncScript.*$/d' \
           > AUTHORS
+          echo '\n' >> AUTHORS
+          git rev-parse HEAD >> AUTHOR
           git add AUTHORS
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
