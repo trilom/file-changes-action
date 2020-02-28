@@ -35,7 +35,7 @@ jobs:
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           args: label builds
-     - uses: actions/github@v1.0.0
+      - uses: actions/github@v1.0.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
