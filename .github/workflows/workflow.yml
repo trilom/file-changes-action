@@ -67,8 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     # if: github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
     if: github.event_name == 'pull_request' && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
