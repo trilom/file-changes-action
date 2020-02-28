@@ -227,16 +227,3 @@ jobs:
             ```json
               ${{ toJSON(github.event.pull_request)}}
             ```
-  # test build for release, if push then push release
-  release_build:
-    name: Test release, if push, push to release branch
-    runs-on: ubuntu-latest
-    # ((github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-'))
-    # && (github.event_name == 'push' && github.ref == 'master' && github.actor == 'trilom-bot'))
-    if: >
-      ((github.event_name == 'pull_request' && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-'))
-        && (github.event_name == 'push' && github.ref == 'develop' && github.actor == 'trilom-bot'))
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-    steps:
