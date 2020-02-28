@@ -144,6 +144,8 @@ jobs:
           githubToken: ${{ env.GITHUB_TOKEN }}
           output: '**  \n**'
       - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
       - name: create authors file
         run: |
           git shortlog -se \
