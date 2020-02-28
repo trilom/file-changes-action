@@ -12,9 +12,9 @@
 
 # Overview
 
-1. Make a **Pull Request** from your forked branch (forked from _develop_) with changes to _trilom/file-changes-action/develop_ branch.
-2. Once merged into _develop_ a new **Pull Request** will be opened to _master_.
-3. In the new **Pull Request** tests will be ran against the code, and linting changes will be pushed.  If all is good it will be automatically merged to _master_, if not then a comment will be made on the PR to discuss.
+1. Make a **Pull Request** from your forked branch (forked from _master_) with changes to _trilom/file-changes-action/master_ branch.
+2. Once merged into _master_ this will create a new _master-HASH_ branch and a new **Pull Request** will be opened from that branch to _master_.
+3. In the new **Pull Request** tests will be ran against the code, and linting changes will be pushed.  If all is good (labels linted, tested, and builds) it will be automatically merged to _master_, if not then a comment will be made on the PR to discuss.
 4. Once merged into _master_ the workflow will deploy the code to NPM, Github Package Repo, and Github Actions marketplace by pushing to _releases/v1_.
 
 ## Pull Request
@@ -52,8 +52,8 @@
 
 ### any branch not master or develop
 
-- When a **Pull Request** is `opened` to anything other than _master_ or _develop_ (**close_non_develop_pr**):
-  - Close **Pull Request** and inform user to open **Pull Request** to _develop_
+- When a **Pull Request** is `opened` to anything other than _master_ (**close_non_master_pr**):
+  - Close **Pull Request** and inform user to open **Pull Request** to _master_
 
 ## Push
 

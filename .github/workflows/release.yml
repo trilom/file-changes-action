@@ -1,0 +1,216 @@
+name: Release Workflow
+on: 
+  pull_request:
+    types:
+      - labeled
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+jobs:
+  # automerge a passing PR to master with pretty, builds and tested tags
+  automerge_pr:
+    name: automerge a passing PR
+    runs-on: ubuntu-latest
+    needs: format_check_push
+    # if: github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-')
+    if: >
+      github.event_name == 'pull_request' 
+      && github.base_ref == 'develop' 
+      && startsWith(github.head_ref, 'pre-release-') 
+      && contains(github.event.pull_request.labels.*.name, 'pretty')
+      && contains(github.event.pull_request.labels.*.name, 'builds')
+      && contains(github.event.pull_request.labels.*.name, 'tested')
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - name: automerge pr to master if all good
+        uses: pascalgn/automerge-action@v0.7.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: 'pretty,builds,tested,'
+          UPDATE_LABELS: ''
+      - name: notify if any problems occur
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
+
+            Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
+            
+            ## Event JSON
+            ```json
+              ${{ toJSON(github.event.pull_request)}}
+            ```
+  # test build for release, if push then push release
+  release_build:
+    name: Test release, if push, push to release branch
+    runs-on: ubuntu-latest
+    # ((github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-'))
+    # && (github.event_name == 'push' && github.ref == 'master' && github.actor == 'trilom-bot'))
+    if: >
+      ((github.event_name == 'pull_request' && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-'))
+        && (github.event_name == 'push' && github.ref == 'develop' && github.actor == 'trilom-bot'))
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+      - name: Test semantic release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          branch: ${{ github.ref }}
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+          dry_run: ${{ github.event_name == 'pull_request' }}
+      - name: Test Outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      # from here on, this will only run if a push happens not PR
+      - name: Setup Node.js with GitHub Package Registry
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: trilom
+      - name: Publish To GitHub Package Registry
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - run: make run COMMAND=release RELEASE=TRUE
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+      - name: Push release files
+        # TODO: if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        # TODO: git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/releases/v${{steps.semantic.outputs.new_release_major_version}}
+        run: |
+          git config --local user.email "trilom"
+          git config --local user.name "me@trilom.org"
+          git add --all
+          git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
+      - uses: actions/github@v1.0.0
+        if: success() && github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          args: label released
+  # create automerge PR
+  create_master_auto_pr:
+    name: open pre-release-HASH PR to master
+    runs-on: ubuntu-latest
+    # TODO: && endsWith(github.ref, 'master')
+    if: >
+      github.event_name == 'push'
+      && endsWith(github.ref, 'develop')
+      && github.actor != 'trilom-bot'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+    steps:
+      - name: get push PR number
+        uses: actions/github-script@0.6.0
+        id: pr
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          debug: true
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.head_commit.id
+            })
+            return result.data[0].number;
+      - id: file_changes
+        uses: trilom/file-changes-action@test/v1
+        with:
+          githubToken: ${{ env.GITHUB_TOKEN }}
+          output: '**  \n**'
+      - uses: actions/checkout@v2
+      - name: create authors file
+        run: |
+          git shortlog -se \
+          | perl -spe 's/^\s+\d+\s+//' \
+          | sed -e '/^CommitSyncScript.*$/d' \
+          > AUTHORS
+          git add AUTHORS
+          git config --local user.email "trilom-bot"
+          git config --local user.name "trilom-bot@trailmix.me"
+          git commit -m "Updating AUTHORS 📓" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
+      # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
+      # with a custom delimiter in file_changes 
+      - name: create pr to master-HASH
+        id: create-pr
+        uses: peter-evans/create-pull-request@v2
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          commit-message: '${{ github.event.commits[0].message }}'
+          committer: trilom-bot <trilom-bot@trailmix.me>
+          author: ${{ github.event.commits[0].author.name }} <${{ github.event.commits[0].author.email }}>
+          title: '[${{ github.actor }}] - ${{ github.event.commits[0].message }}(${{ github.event.distinct_size }} commits)'
+          body: |
+            # ${{ github.actor }} would like to merge ${{ github.event.distinct_size }} commits into file-changes-action
+            
+            ## [**compare link**](${{ github.event.compare }})
+
+            ### Commits
+            
+            ```json
+              ${{ toJSON(github.event.commits)}}
+            ```
+            
+            #### Files
+            
+            **${{ steps.file_changes.outputs.files}}**
+            
+            #### Files modified
+            
+            **${{ steps.file_changes.outputs.files_modified}}**
+            
+            #### Files added
+            
+            **${{ steps.file_changes.outputs.files_added}}**
+            
+            #### Files deleted
+            
+            **${{ steps.file_changes.outputs.files_deleted}}**
+          labels: 'automated pr'
+          assignees: trilom
+          reviewers: trilom
+          # TODO: base: 'master'
+          base: 'develop'
+          # TODO: branch: 'pre-release'
+          branch: 'pre-release'
+          branch-suffix: short-commit-hash
+      - name: notify initial commiter of change
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ steps.pr.outputs.result }}
+          body: |
+            Hey @${{ github.event.commits[0].message }},
+
+            [I will create a new PR that you can follow with this link that details the release.](https://github.com/trilom/file-changes-action/pull/${{ steps.create_pr.outputs.pr_number }})
+
+            Please use this new PR if there are any issues to communicate further.
+
+            Thanks, trilom.
