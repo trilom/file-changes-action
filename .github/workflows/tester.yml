@@ -4,6 +4,7 @@ env:
   pr_number: ${{ join(github.event.pull_request.number, github.event.issue.number) }}
 on:
   issue_comment:
+    types: [created]
   pull_request:
 jobs:
   # when /release is typed from trilom or when a PR is tagged
