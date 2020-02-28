@@ -13,7 +13,6 @@ jobs:
   automerge_pr:
     name: automerge a passing PR
     runs-on: ubuntu-latest
-    needs: format_check_push
     # if: github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-')
     if: >
       github.event_name == 'pull_request' 
