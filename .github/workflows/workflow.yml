@@ -25,6 +25,8 @@ jobs:
     name: yarn install && tsc
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -43,6 +45,8 @@ jobs:
     name: jest
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - run: make run
@@ -63,6 +67,8 @@ jobs:
     runs-on: ubuntu-latest
     # if: github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-')
     if: github.event_name == 'pull_request' && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Lint and report
