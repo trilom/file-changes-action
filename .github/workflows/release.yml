@@ -4,24 +4,28 @@ on:
     types:
       - labeled
     branches:
+      # - master
       - develop
   push:
     branches:
+      # - master
       - develop
 jobs:
-  # create automerge PR
-  create_master_auto_pr:
-    name: open pre-release-HASH PR to master
+  # release PR if it's ready
+  release_pr:
+    name: test PR, and release if ready
     runs-on: ubuntu-latest
-    # TODO: && endsWith(github.ref, 'master')
+    # if push to master or PR from automerge branch
+    # RELEASE: master
     if: >
       ((github.event_name == 'push' && endsWith(github.ref, 'develop'))
       || (github.event_name == 'pull_request' && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')))
     env:
-      GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - name: get push PR number
+      # if push get the PR it's associated with
+      - name: if push, get PR number
         uses: actions/github-script@0.6.0
         id: pr
         if: github.event_name == 'push'
@@ -36,7 +40,7 @@ jobs:
               commit_sha: context.payload.head_commit.id
             })
             return result.data[0].number;
-      - name: get push HEAD commit ref
+      - name: if push, get HEAD ref
         uses: actions/github-script@0.6.0
         id: head
         if: github.event_name == 'push'
@@ -50,70 +54,7 @@ jobs:
               pull_number: ${{ steps.pr.outputs.result }}
             })
             return result.data.head.ref || result;
-      # if head ref from pre-release- then release
       - uses: actions/checkout@v2
-        if:  >
-          ((github.event_type == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'pre-release-'))
-          || (github.event_type == 'push' && startsWith(steps.head.outputs.result, 'pre-release-')))
-      - name: Test semantic release
-        if:  >
-          ((github.event_type == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'pre-release-'))
-          || (github.event_type == 'push' && startsWith(steps.head.outputs.result, 'pre-release-')))
-        uses: cycjimmy/semantic-release-action@v2
-        id: semantic
-        with:
-          branch: ${{ github.ref }}
-          extra_plugins: |
-            @semantic-release/git
-            @semantic-release/changelog
-          dry_run: ${{ github.event_name == 'pull_request' }}
-      - name: Test Outputs
-        if:  >
-          ((github.event_type == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'pre-release-'))
-          || (github.event_type == 'push' && startsWith(steps.head.outputs.result, 'pre-release-')))
-          && steps.semantic.outputs.new_release_published == 'true'
-        run: |
-          echo ${{ steps.semantic.outputs.new_release_version }}
-          echo ${{ steps.semantic.outputs.new_release_major_version }}
-          echo ${{ steps.semantic.outputs.new_release_minor_version }}
-          echo ${{ steps.semantic.outputs.new_release_patch_version }}
-      # from here on, this will only run if a push happens not PR
-      - name: Setup Node.js with GitHub Package Registry
-        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true' && startsWith(steps.head.outputs.result, 'pre-release-')
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: 'https://npm.pkg.github.com'
-          scope: trilom
-      - name: Publish To GitHub Package Registry
-        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true' && startsWith(steps.head.outputs.result, 'pre-release-')
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
-      - run: make run COMMAND=release RELEASE=TRUE
-        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true' && startsWith(steps.head.outputs.result, 'pre-release-')
-      - name: Push release files
-        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true' && startsWith(steps.head.outputs.result, 'pre-release-')
-        # TODO: git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/releases/v${{steps.semantic.outputs.new_release_major_version}}
-        run: |
-          git config --local user.email "trilom"
-          git config --local user.name "me@trilom.org"
-          git add --all
-          git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
-      - uses: actions/github@v1.0.0
-        if: success() && github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true' && startsWith(steps.head.outputs.result, 'pre-release-')
-        with:
-          args: label released
-      # if head from somewhere else then create automerge PR
-      - id: file_changes
-        uses: trilom/file-changes-action@test/v1
-        if:  github.event_type == 'push' && ! (startsWith(steps.head.outputs.result, 'pre-release-'))
-        with:
-          githubToken: ${{ secrets.TRILOM_BOT_TOKEN }}
-          output: '_<br />&nbsp;&nbsp;_'
-      - uses: actions/checkout@v2
-        if:  github.event_type == 'push' && ! (startsWith(steps.head.outputs.result, 'pre-release-'))
       - name: create authors file
         env:
           GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
@@ -122,12 +63,66 @@ jobs:
           | perl -spe 's/^\s+\d+\s+//' \
           | sed -e '/^CommitSyncScript.*$/d' \
           > AUTHORS
-          echo '\n' >> AUTHORS
           git rev-parse HEAD >> AUTHORS
           git add AUTHORS
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           git commit -m "Updating AUTHORS 📓" -a
+      # if PR head is from pre-release-* then release
+      - name: semantic-release run
+        if: startsWith(github.head_ref, 'pre-release-') ||  startsWith(steps.head.outputs.result, 'pre-release-')
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          branch: ${{ github.ref }}
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+      #   if PR then dry run only
+          dry_run: ${{ github.event_name == 'pull_request' }}
+      - name: echo release outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: Setup Node.js with GitHub Package Registry
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: trilom
+      - name: Publish To GitHub Package Registry
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - run: make run COMMAND=release RELEASE=TRUE
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+      - name: Push release files
+        if: github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+      #   RELEASE: git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/releases/v${{steps.semantic.outputs.new_release_major_version}}
+        run: |
+          git config --local user.email "trilom"
+          git config --local user.name "me@trilom.org"
+          git add --all
+          git commit -m "Add release changes ⚙️ for v${{steps.semantic.outputs.new_release_version}}" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/test/v${{steps.semantic.outputs.new_release_major_version}}
+      - name: if released, label as released
+        uses: actions/github@v1.0.0
+        if: success() && github.event_name == 'push' && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          args: label released
+      # else create automerge PR for release
+      - name: get changed files and format for automerge PR
+        id: file_changes
+        uses: trilom/file-changes-action@test/v1
+        if:  github.event_type == 'push' && ! (startsWith(steps.head.outputs.result, 'pre-release-'))
+        with:
+          githubToken: ${{ secrets.TRILOM_BOT_TOKEN }}
+          output: '_<br />&nbsp;&nbsp;_'
       - name: create pr to master-HASH
         if:  github.event_type == 'push' && ! (startsWith(steps.head.outputs.result, 'pre-release-'))
         id: create-pr
@@ -168,9 +163,9 @@ jobs:
           labels: 'automated pr'
           assignees: trilom
           reviewers: trilom
-          # TODO: base: 'master'
+      #   RELEASE: base: 'master'
           base: 'develop'
-          # TODO: branch: 'pre-release'
+      #   RELEASE: branch: 'pre-release'
           branch: 'pre-release'
           branch-suffix: short-commit-hash
       - name: notify initial commiter of change
@@ -192,11 +187,11 @@ jobs:
   automerge_pr:
     name: automerge a passing PR
     runs-on: ubuntu-latest
-    # if: github.event_name == 'pull_request' && github.base_ref == 'master' && startsWith(github.head_ref, 'pre-release-')
+    # RELEASE: && github.base_ref == 'develop' 
     if: >
-      github.event_name == 'pull_request' 
-      && github.base_ref == 'develop' 
-      && startsWith(github.head_ref, 'pre-release-') 
+      github.event_name == 'pull_request'
+      && github.base_ref == 'develop'
+      && startsWith(github.head_ref, 'pre-release-')
       && contains(github.event.pull_request.labels.*.name, 'pretty')
       && contains(github.event.pull_request.labels.*.name, 'builds')
       && contains(github.event.pull_request.labels.*.name, 'tested')
