@@ -30,25 +30,33 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: make run
-      - name: label issue
+      - name: label success
         uses: actions/github-script@0.6.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         id: pr
-        # if: github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
-          github-token: ${{env.GITHUB_TOKEN}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: (${{ success() }} ? 'builds' : 'doesnt build')
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'builds'
             })
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: (!(${{ success() }}) ? 'builds' : 'doesnt build')
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'doesnt build'
+            })
+      - name: label failure
+        uses: actions/github-script@0.6.0
+        # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        id: pr
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'doesnt build'
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'builds'
             })
   # test with jest
   test:
@@ -61,25 +69,33 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - run: make run COMMAND=test
-      - name: label issue
+      - name: label success
         uses: actions/github-script@0.6.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         id: pr
-        # if: github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
-          github-token: ${{env.GITHUB_TOKEN}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: (${{ success() }} ? 'tested' : 'untested')
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'tested'
             })
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: (!(${{ success() }}) ? 'tested' : 'untested')
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'untested'
+            })
+      - name: label failure
+        uses: actions/github-script@0.6.0
+        # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        id: pr
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'untested'
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'tested'
             })
   # lint code and comment back if possible
   lintdog:
@@ -110,23 +126,31 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
       - run: make run
       - run: make run COMMAND=format-check
-      - name: label issue
+      - name: label success
         uses: actions/github-script@0.6.0
+        if: success()
         id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: (${{ success() }} ? 'pretty' : 'ugly')
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'pretty'
             })
-            github.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: (!(${{ success() }}) ? 'pretty' : 'ugly')
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'ugly'
+            })
+      - name: label failure
+        uses: actions/github-script@0.6.0
+        if: failure()
+        id: pr
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: 'ugly'
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'pretty'
             })
       - name: make run COMMAND=format and push code if check failed
         if: failure() && github.actor != 'trilom-bot'
