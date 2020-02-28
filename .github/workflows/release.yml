@@ -144,8 +144,6 @@ jobs:
           githubToken: ${{ env.GITHUB_TOKEN }}
           output: '**  \n**'
       - uses: actions/checkout@v2
-        with:
-          token: ${{ env.GITHUB_TOKEN }}
       - name: create authors file
         run: |
           git shortlog -se \
@@ -156,7 +154,6 @@ jobs:
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           git commit -m "Updating AUTHORS 📓" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/develop
       # TODO: enhance here so that the report doesn't just spit json but spits out ordered output
       # with a custom delimiter in file_changes 
       - name: create pr to master-HASH
