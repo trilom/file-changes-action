@@ -9,7 +9,8 @@ jobs:
     if: >
       github.event_name == 'pull_request'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
-      && !
+      && ! (github.base_ref == 'develop' || startsWith(github.head_ref, 'pre-release-'))
+    steps:
       - uses: superbrothers/close-pull-request@v2
         with:
           comment: Please merge your code into develop, this will trigger the desired merge workflow.
