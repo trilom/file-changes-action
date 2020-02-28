@@ -9,8 +9,7 @@ jobs:
     if: >
       github.event_name == 'pull_request'
       && (github.event.action == 'opened' || github.event.action == 'reopened')
-      && ! (github.base_ref == 'develop' || startsWith(github.head_ref, 'pre-release-'))
-    steps:
+      && !
       - uses: superbrothers/close-pull-request@v2
         with:
           comment: Please merge your code into develop, this will trigger the desired merge workflow.
@@ -30,11 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: make run
-      - name: label success
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -44,11 +41,9 @@ jobs:
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'doesnt build'
             })
-      - name: label failure
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -69,11 +64,9 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - run: make run COMMAND=test
-      - name: label success
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -83,11 +76,9 @@ jobs:
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'untested'
             })
-      - name: label failure
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -126,10 +117,8 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
       - run: make run
       - run: make run COMMAND=format-check
-      - name: label success
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         if: success()
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -139,10 +128,8 @@ jobs:
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'ugly'
             })
-      - name: label failure
-        uses: actions/github-script@0.6.0
+      - uses: actions/github-script@0.6.0
         if: failure()
-        id: pr
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
