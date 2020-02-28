@@ -35,7 +35,6 @@ jobs:
         with:
           github-token: ${{env.GITHUB_TOKEN}}
           result-encoding: string
-          debug: true
           script: |
             const result = await github.repos.listPullRequestsAssociatedWithCommit({
               owner: context.payload.repository.owner.name,

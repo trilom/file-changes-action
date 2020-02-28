@@ -30,26 +30,26 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: make run
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+      - name: label issue
+        uses: actions/github-script@0.6.0
+        id: pr
+        # if: github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
-          args: label builds
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: unlabel "doesnt build"
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: label "doesnt build"
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: unlabel builds
+          github-token: ${{env.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: (${{ success() }} ? 'builds' : 'doesnt build')
+            })
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: (!(${{ success() }}) ? 'builds' : 'doesnt build')
+            })
   # test with jest
   test:
     name: jest
@@ -61,26 +61,26 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - run: make run COMMAND=test
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+      - name: label issue
+        uses: actions/github-script@0.6.0
+        id: pr
+        # if: github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
-          args: label tested
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: unlabel untested
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: label untested
-      - uses: actions/github@v1.0.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          args: unlabel tested
+          github-token: ${{env.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: (${{ success() }} ? 'tested' : 'untested')
+            })
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: (!(${{ success() }}) ? 'tested' : 'untested')
+            })
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)
@@ -110,22 +110,24 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
       - run: make run
       - run: make run COMMAND=format-check
-      - uses: actions/github@v1.0.0
-        if: success()
+      - name: label issue
+        uses: actions/github-script@0.6.0
+        id: pr
         with:
-          args: label pretty
-      - uses: actions/github@v1.0.0
-        if: success()
-        with:
-          args: unlabel ugly
-      - uses: actions/github@v1.0.0
-        if: failure()
-        with:
-          args: label ugly
-      - uses: actions/github@v1.0.0
-        if: failure()
-        with:
-          args: unlabel pretty
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: (${{ success() }} ? 'pretty' : 'ugly')
+            })
+            github.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: (!(${{ success() }}) ? 'pretty' : 'ugly')
+            })
       - name: make run COMMAND=format and push code if check failed
         if: failure() && github.actor != 'trilom-bot'
         run: |
