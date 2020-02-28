@@ -72,7 +72,7 @@ jobs:
       - name: Lint and report
         uses: reviewdog/action-eslint@v1
         with:
-          github_token: ${{ secrets.TRILOM_BOT_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           eslint_flags: 'src/**/*.ts'
   # format and push code back
