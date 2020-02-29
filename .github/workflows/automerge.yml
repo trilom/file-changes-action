@@ -10,6 +10,7 @@ env:
   builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
   tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') || contains(github.event.issue.labels.*.name, 'tested') }}
   merged: ${{ contains(github.event.pull_request.labels.*.name, 'automated merge') || contains(github.event.issue.labels.*.name, 'automated merge') }}
+  hold: ${{ contains(github.event.pull_request.labels.*.name, 'hold merge') || contains(github.event.issue.labels.*.name, 'hold merge') }}
 # env.release_branch - bool - PR is from a branch to be released
 # this currently includes
 # BASE: releases/v* from HEAD master - production release
@@ -58,7 +59,7 @@ jobs:
     steps:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: (!env.merged) && env.pretty && env.builds && env.tested
+        if: (!env.hold) && (!env.merged) && env.pretty && env.builds && env.tested
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
