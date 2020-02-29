@@ -36,10 +36,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['doesnt build']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'builds'
             })
       - uses: actions/github-script@0.6.0
@@ -48,10 +48,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['builds']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'doesnt build'
             })
   # test with jest
@@ -71,10 +71,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['untested']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'tested'
             })
       - uses: actions/github-script@0.6.0
@@ -83,10 +83,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['tested']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'untested'
             })
   # lint code and comment back if possible
@@ -123,10 +123,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['ugly']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'pretty'
             })
       - uses: actions/github-script@0.6.0
@@ -134,10 +134,10 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['pretty']
             })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'ugly'
             })
       - name: make run COMMAND=format and push code if check failed
