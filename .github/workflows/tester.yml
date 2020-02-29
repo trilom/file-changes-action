@@ -1,7 +1,6 @@
 # this will tag PRs that are ready for release and automerge them
 name: Automerge passing PR
-env:
-  pr_number: ${{ format('{0}{1}', github.event.issue.number, github.event.pull_request.number) }}
+
 on:
   issue_comment:
     types: [created]
