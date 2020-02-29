@@ -1,0 +1,28 @@
+# this will tag PRs that are ready for release and automerge them
+name: Automerge passing PR
+env:
+  pr_number: ${{ join(github.event.pull_request.number, github.event.issue.number) }}
+on:
+  issue_comment:
+    types: [created]
+  pull_request:
+    branches:
+      - '*/v[12]*'
+      - master
+      - develop
+    types:
+      - labeled
+      - closed
+jobs:
+  # when /release is typed from trilom or when a PR is tagged
+  automerge:
+    name: automerge a PR
+    runs-on: ubuntu-latest
+    steps:
+        - run: echo $pr_number
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Always run
+        run: echo "This job is used to prevent the workflow to fail when all other jobs are skipped."
