@@ -83,7 +83,7 @@ jobs:
       - name: if failure, set pr payload outputs
         id: pr
         run: |
-          echo '${{ steps.pr_json.outputs.result }}' > pr.json
+          echo${{ steps.pr_json.outputs.result }}' > pr.json
           echo "::set-output name=user::$( jq -r '.user.login' pr.json )"
           echo "::set-output name=head::$( jq -r '.head.repo.full_name' pr.json )"
           echo "::set-output name=head_url::$( jq -r '.head.repo.html_url' pr.json )"
@@ -94,11 +94,11 @@ jobs:
         # if: failure()
         with:
           token: ${{ env.GITHUB_TOKEN }}
-          issue-number: ${{ steps.pr.outputs.result.number }}
+          issue-number: ${{ env.pr_number }}
           body: |
-            @${{ steps.pr.outputs.result.user }}, @trilom - it appears that there was an issue with the merge.
+            @${{ steps.pr.outputs.user }}, @trilom - it appears that there was an issue with the merge.
 
-            Head Repo/Branch: **[${{ steps.pr.outputs.result.head }}]**(${{ steps.pr.outputs.result.head_url }}) merge into **[${{ steps.pr.outputs.result.base }}]**(${{ steps.pr.outputs.result.base_url }})
+            Head Repo/Branch: **[${{ steps.pr.outputs.head }}]**(${{ steps.pr.outputs.head_url }}) merge into **[${{ steps.pr.outputs.base }}]**(${{ steps.pr.outputs.base_url }})
             
             ## Event JSON
             ```json
