@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo $pr_number
-      - run: echo ${{github.event}}
+      - run: echo ${{toJSON(github.event)}}
   automerge:
     name: automerge PR
     runs-on: ubuntu-latest
