@@ -20,9 +20,9 @@ env:
   #   || (startsWith(github.head_ref, 'test/v') && github.base_ref == 'develop')
   #   || contains(github.head_ref, join(github.base_ref, '/'))}}
 on:
-  issue_comment:
-    types: 
-      - created
+  # issue_comment:
+  #   types: 
+  #     - created
   pull_request:
     branches:
       - '*/v[12]*'
@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: (!env.merged) && env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
+        if: (!env.merged) && env.pretty && env.builds && env.tested
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
           UPDATE_LABELS: ''
       - uses: actions/github-script@0.6.0
-        if: success() && (!env.merged) && env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
+        if: success() && (!env.merged) && env.pretty && env.builds && env.tested
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
