@@ -36,24 +36,28 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['doesnt build']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'builds'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'builds') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'builds'
+              })
+            }
       - uses: actions/github-script@0.6.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['builds']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'doesnt build'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'doesnt build') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'doesnt build'
+              })
+            }
   # test with jest
   test:
     name: jest
@@ -71,24 +75,28 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['untested']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'tested'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'tested') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'tested'
+              })
+            }
       - uses: actions/github-script@0.6.0
         # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['tested']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'untested'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'untested') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'untested'
+              })
+            }
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)
@@ -123,23 +131,27 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['ugly']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'pretty'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'pretty') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'pretty'
+              })
+            }
       - uses: actions/github-script@0.6.0
         if: success()
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            await github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['pretty']
             })
-            await github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'ugly'
-            })
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'ugly') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'ugly'
+              })
+            }
       - name: make run COMMAND=format and push code if check failed
         if: failure() && github.actor != 'trilom-bot'
         run: |
