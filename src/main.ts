@@ -4,11 +4,11 @@ import * as fs from 'fs'
 import * as gh from '@actions/github'
 import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
-async function getChangedPRFiles( client: gh.GitHub, prNumber: number
+async function getChangedPRFiles( repo: string, client: gh.GitHub, prNumber: number
 ): Promise<ChangedFiles> {
   const options = client.pulls.listFiles.endpoint.merge({
-    owner: gh.context.repo.owner,
-    repo: gh.context.repo.repo,
+    owner: repo.split('/')[0],
+    repo: repo.split('/')[1],
     pull_number: prNumber
   })
   return sortChangedFiles(
@@ -18,20 +18,15 @@ async function getChangedPRFiles( client: gh.GitHub, prNumber: number
   )
 }
 
-async function getChangedPushFiles( client: gh.GitHub, base: string, head: string
+async function getChangedPushFiles( repo: string, client: gh.GitHub, base: string, head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
-    owner: gh.context.repo.owner,
-    repo: gh.context.repo.repo,
+    owner: repo.split('/')[0],
+    repo: repo.split('/')[1],
     base,
     head
   })
   return sortChangedFiles(response.data.files)
-}
-
-function getPrNumber(): number | null {
-  const pr = gh.context.payload.pull_request
-  return pr ? pr.number : null
 }
 
 function writeFiles(format: string, changedFiles: ChangedFiles): void {
@@ -81,33 +76,38 @@ function writeOutput(format: string, changedFiles: ChangedFiles): void {
 async function run(): Promise<void> {
   try {
     const github: any = gh.context
+    const repo: string = core.getInput('githubRepo')
     const token: string = core.getInput('githubToken')
     const output: string = core.getInput('output')
     const fileOutput: string = core.getInput('fileOutput')
+    const pushBefore: string = core.getInput('pushBefore')
+    const pushAfter: string = core.getInput('pushAfter')
+    const prNumber: string = core.getInput('prNumber')
+    const isPush = pushBefore !== '' && pushAfter !== ''
+    const isPR = prNumber !== ''
     const client = new gh.GitHub(token)
     let changedFiles = new ChangedFiles()
-    if (github.eventName === 'push') {
-      // do push actions
-      changedFiles = await getChangedPushFiles(
-        client,
-        github.payload.before,
-        github.payload.after
+    if (isPush && isPR) {
+      core.setFailed(
+        `You can't pick PR and Push, I don't know which one to do.`
       )
-    } else if (github.eventName === 'pull_request') {
+    } else if (isPR) {
       // do PR actions
-      const prNumber = getPrNumber()
       if (prNumber != null) {
-        changedFiles = await getChangedPRFiles(client, prNumber)
+        changedFiles = await getChangedPRFiles(repo, client, parseInt(prNumber))
       } else {
         core.setFailed(
           'Could not get pull request number from context, exiting'
         )
         return
       }
+    } else if (isPush) {
+      // do push actions
+      changedFiles = await getChangedPushFiles(repo, client, pushBefore, pushAfter)
     } else {
       core.setFailed(
         `Change not initiated by a PR or Push, it was ${
-          github.eventName
+        github.eventName
         } instead.  Github:${JSON.stringify(github)}`
       )
       return

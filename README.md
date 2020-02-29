@@ -4,9 +4,13 @@ This action will take the information from the Push/Pull Request and output some
 
 ## Inputs
 
+### githubRepo
+
+_Optional_  - `string` - the github repository you want to compare changes from, defaults to the github.repository.
+
 ### githubToken
 
-**Required**  - `string` - your github token
+_Optional_  - `string` - specific github token, github.token is used by default (Github Action Runner)
 
 ### output
 
@@ -20,31 +24,73 @@ _Optional_  - `string` - type of output for file output, default is json.  Use '
 
 If you select json then the file format will be .json, if you select ',' then the file format will be .csv, anything else will output the files as .txt
 
+### pushBefore
+
+_Optional_  - `string` - pass in a specific sha to compare to as a before, required if using pushAfter. (push payload after github.payload.before)
+
+### pushAfter
+
+_Optional_  - `string` - pass in a specific sha to compare to as an after, required if using pushBefore. (push payload after github.payload.after)
+
+### prNumber
+
+_Optional_  - `string` - pass in a specific PR number to get file changes from.
+
 ## Outputs
 
 ### files
 
-**Required** - `string` - The names all new, updated, and deleted files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files - `string` - The names all new, updated, and deleted files.  The output is dependant on the output input, default is a json string.
 
 ### files_added
 
-**Required** - `string` - The names of the newly created files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files_added - `string` - The names of the newly created files.  The output is dependant on the output input, default is a json string.
 
 ### files_modified
 
-**Required** - `string` - The names of the updated files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files_modified - `string` - The names of the updated files.  The output is dependant on the output input, default is a json string.
 
 ### files_deleted
 
-**Required** - `string` - The names of the deleted files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files_deleted - `string` - The names of the deleted files.  The output is dependant on the output input, default is a json string.
 
 ## Example usage
 
 ```yaml
-id: file_changes
-uses: trilom/file-changes-action@v1
-with:
-  githubToken: ${{ secrets.GITHUB_TOKEN }}
+# bare minimal
+name: changes
+on: push
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1
+
+### full
+name: changes
+on: [push, pull_request] # push or pull, or any event with custom pr number or before/after commit sha
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1
+        with:
+          # optional target repo
+          githubRepo: trilom/file-changes-action
+          # optional token
+          githubToken: ${{ secrets.BOT_TOKEN }}
+          # optional output format
+          output: 'json'
+          # optional fileoutput format
+          fileOutput: 'csv'
+          # optional push before SHA (need both before and after)
+          pushBefore: 79eeec74aebc3deb0a2f6234c5ac13142e9224e5
+          # optional push after SHA (need both before and after)
+          pushAfter: 1c5a2bfde79e2c9cffb75b9a455391350fe69a40
+          # optional PR number to compare
+          prNumber: 36
 ```
 
 ## How to Use
@@ -52,7 +98,7 @@ with:
 In order to make those decisions we need to know what files have changed and that is where this action comes in.  In the example below we are checking out our repository code, and then running the `trilom/file-changes-action@v1` action.  The only thing you need to provide is a GITHUB_TOKEN so that Octokit can make it's API calls.
 
 If a PR is made then it will look at all of the files included in the PR.
-If a push is made then it will compare commits from the SHA `github.context.payload.before` to the SHA `github.context.payload.after` of the push.
+If a push is made then it will compare commits from the SHA `github.payload.before` to the SHA `github.payload.after` of the push.
 
 After gathering this information it will output the files in 2 ways.  
   
@@ -76,24 +122,15 @@ Another case is if the **mappings/wordpress.mappings.yml** changes, we want to d
 
 ```yaml
 name: push-develop
-
-on:
-  push:
-    branches:
-      - develop
-  
+on: [push]
 jobs:
-  build:
+  changes:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - id: file_changes
         uses: trilom/file-changes-action@v1
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: test
         run: |
-          ls $HOME
           cat $HOME/files.json
           cat $HOME/files_modified.json
           cat $HOME/files_added.json
@@ -108,25 +145,14 @@ You can set the output and fileOutput to ',' for csv output.
 
 ```yaml
 name: push-develop
-
-on:
-  push:
-    branches:
-      - develop
-    paths:
-      - 'cloudformation/templates/*.yml'
-      - 'cloudformation/mappings/*.yml'
-      - 'functions/*'
-  
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
       - id: file_changes
         uses: trilom/file-changes-action@v1
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
           output: ','
           fileOutput: ','
       - name: test
@@ -134,29 +160,32 @@ jobs:
           cat $HOME/files.csv
 ```
 
-You can set the output and fileOutput to ' ' for txt output.
+You can set the output and fileOutput to ' ' for txt output.  We also used a specific token, and got info for the PR that this push came from.
 
 ```yaml
 name: push-develop
-
-on:
-  push:
-    branches:
-      - develop
-    paths:
-      - 'cloudformation/templates/*.yml'
-      - 'cloudformation/mappings/*.yml'
-      - 'functions/*'
-  
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/github-script@0.6.0
+        id: pr
+        with:
+          github-token: ${{env.BOT_USER_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.head_commit.id
+            })
+            return result.data[0].number;
       - id: file_changes
         uses: trilom/file-changes-action@v1
         with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ env.BOT_USER_TOKEN }}
+          prNumber: ${{ steps.pr.outputs.results }}
           output: ' '
           fileOutput: ' '
       - name: test
