@@ -34,3 +34,6 @@
 - name: enhancement
   description: New feature or request
   color: a2eeef
+- name: "automated merge"
+  description: This was merged automatically.
+  color: c2e0c6
