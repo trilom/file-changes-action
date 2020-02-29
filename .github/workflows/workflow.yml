@@ -31,18 +31,6 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - uses: actions/github-script@0.6.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['builds']
-            })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'doesnt build'
-            })
-      - uses: actions/github-script@0.6.0
         # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
@@ -53,6 +41,18 @@ jobs:
             })
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'builds'
+            })
+      - uses: actions/github-script@0.6.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: ['builds']
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'doesnt build'
             })
   # test with jest
   test:
@@ -66,18 +66,6 @@ jobs:
       - run: make run
       - run: make run COMMAND=test
       - uses: actions/github-script@0.6.0
-        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
-        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['tested']
-            })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'untested'
-            })
-      - uses: actions/github-script@0.6.0
         # if: failure() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
         if: failure() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
         with:
@@ -88,6 +76,18 @@ jobs:
             })
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'tested'
+            })
+      - uses: actions/github-script@0.6.0
+        # if: success() && github.base_ref == 'master' && startsWith(github.head_ref, 'release-')
+        if: success() && github.base_ref == 'develop' && startsWith(github.head_ref, 'pre-release-')
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: ['tested']
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'untested'
             })
   # lint code and comment back if possible
   lintdog:
@@ -119,17 +119,6 @@ jobs:
       - run: make run
       - run: make run COMMAND=format-check
       - uses: actions/github-script@0.6.0
-        if: success()
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['pretty']
-            })
-            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              name: 'ugly'
-            })
-      - uses: actions/github-script@0.6.0
         if: failure()
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -139,6 +128,17 @@ jobs:
             })
             github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               name: 'pretty'
+            })
+      - uses: actions/github-script@0.6.0
+        if: success()
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: ['pretty']
+            })
+            github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              name: 'ugly'
             })
       - name: make run COMMAND=format and push code if check failed
         if: failure() && github.actor != 'trilom-bot'
