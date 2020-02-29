@@ -4,7 +4,10 @@ import * as fs from 'fs'
 import * as gh from '@actions/github'
 import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
-async function getChangedPRFiles( repo: string, client: gh.GitHub, prNumber: number
+async function getChangedPRFiles(
+  repo: string,
+  client: gh.GitHub,
+  prNumber: number
 ): Promise<ChangedFiles> {
   const options = client.pulls.listFiles.endpoint.merge({
     owner: repo.split('/')[0],
@@ -18,7 +21,11 @@ async function getChangedPRFiles( repo: string, client: gh.GitHub, prNumber: num
   )
 }
 
-async function getChangedPushFiles( repo: string, client: gh.GitHub, base: string, head: string
+async function getChangedPushFiles(
+  repo: string,
+  client: gh.GitHub,
+  base: string,
+  head: string
 ): Promise<ChangedFiles> {
   const response = await client.repos.compareCommits({
     owner: repo.split('/')[0],
@@ -36,10 +43,10 @@ function writeFiles(format: string, changedFiles: ChangedFiles): void {
       break
     case ',':
       format = '.csv'
-      break;
+      break
     default:
       format = '.txt'
-      break;
+      break
   }
   //write files to preserve original functionality
   fs.writeFileSync(
@@ -103,11 +110,16 @@ async function run(): Promise<void> {
       }
     } else if (isPush) {
       // do push actions
-      changedFiles = await getChangedPushFiles(repo, client, pushBefore, pushAfter)
+      changedFiles = await getChangedPushFiles(
+        repo,
+        client,
+        pushBefore,
+        pushAfter
+      )
     } else {
       core.setFailed(
         `Change not initiated by a PR or Push, it was ${
-        github.eventName
+          github.eventName
         } instead.  Github:${JSON.stringify(github)}`
       )
       return
