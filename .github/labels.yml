@@ -37,3 +37,6 @@
 - name: "automated merge"
   description: This was merged automatically.
   color: c2e0c6
+- name: "hold merge"
+  description: This merge will be blocked from automerging until this label is removed.
+  color: b60205
