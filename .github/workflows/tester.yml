@@ -1,7 +1,7 @@
 # this will tag PRs that are ready for release and automerge them
 name: Automerge passing PR
 env:
-  pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
+  pr_number: ${{ format('{0}{1}', github.event.issue.number, github.event.pull_request.number) }}
 on:
   issue_comment:
     types: [created]
@@ -11,7 +11,7 @@ jobs:
     name: automerge a PR
     runs-on: ubuntu-latest
     steps:
-        - run: echo $pr_number
+      - run: echo $pr_number
   always_job:
     name: Always run job
     runs-on: ubuntu-latest
