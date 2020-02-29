@@ -2,19 +2,22 @@
 name: Automerge passing PR
 env:
   GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+  lint_label: pretty
+  build_label: builds
+  test_label: tested
   pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
-  pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') }}
-  builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') }}
-  tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') }}
+  pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') || contains(github.event.issue.labels.*.name, 'pretty') }}
+  builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
+  tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') || contains(github.event.issue.labels.*.name, 'tested') }}
 # env.release_branch - bool - PR is from a branch to be released
 # this currently includes
 # BASE: releases/v* from HEAD master - production release
 # BASE: test/v* from HEAD develop - test release
 # BASE: * from HEAD 
-  release_branch: >-
-    ${{(startsWith(github.base_ref, 'releases/v') && github.head_ref == 'master')
-    || (startsWith(github.head_ref, 'test/v') && github.base_ref == 'develop')
-    || contains(github.head_ref, join(github.base_ref, '/'))}}
+  # release_branch: >-
+  #   ${{(startsWith(github.base_ref, 'releases/v') && github.head_ref == 'master')
+  #   || (startsWith(github.head_ref, 'test/v') && github.base_ref == 'develop')
+  #   || contains(github.head_ref, join(github.base_ref, '/'))}}
 on:
   issue_comment:
     types: 
@@ -32,8 +35,9 @@ jobs:
     name: Always run job
     runs-on: ubuntu-latest
     steps:
-      - run: echo $pr_number
-      - run: echo '${{toJSON(github.event)}}'
+# dump event for debugging      
+      - run: |
+          echo '${{toJSON(github.event)}}'
   automerge:
     name: automerge PR
     runs-on: ubuntu-latest
@@ -46,47 +50,44 @@ jobs:
         && contains(github.event.comment.body, '/release') 
         && github.actor == 'trilom')
     steps:
-      # get PR info if issue comment
-      - name: get PR info if github.event_name == issue_comment
+      - name: automerge pr to master if all good
+# if pretty, builds, and tested labels then merge
+        if: env.pretty && env.builds && env.tested
+        uses: pascalgn/automerge-action@v0.7.5
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
+          UPDATE_LABELS: ''
+# if failure, get payload of PR and notify
+      - name: get PR info if failure
         uses: actions/github-script@0.8.0
         id: pr
-        # if: github.event_name == 'issue_comment'
+        if: failure()
         with:
           github-token: ${{env.GITHUB_TOKEN}}
           result-encoding: string
           script: |
-            const core = require('@actions/core');
             const result = github.pulls.get({
               owner: context.payload.repository.owner.name,
               repo: context.payload.repository.name,
               pull_number: ${{ env.pr_number }}
             })
-            core.exportVariable('pull_request', result.data)
             return result.data;
-      - run: |
-          echo $pull_request
-          echo ${{ steps.pr.outputs.result }}
-      # - name: automerge pr to master if all good
-      #   uses: pascalgn/automerge-action@v0.7.5
-      #   env:
-      #     GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-      #     MERGE_METHOD: merge
-      #     MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
-      #     UPDATE_METHOD: merge
-      #     MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
-      #     UPDATE_LABELS: ''
-      # - name: notify if any problems occur
-      #   uses: peter-evans/create-or-update-comment@v1
-      #   if: failure()
-      #   with:
-      #     token: ${{ env.GITHUB_TOKEN }}
-      #     issue-number: ${{ github.event.pull_request.number }}
-      #     body: |
-      #       @${{ github.event.pull_request.user.login }}, @trilom - it appears that there was an issue with the merge.
+      - name: notify if failure
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          issue-number: ${{ steps.pr.outputs.result.number }}
+          body: |
+            @${{ steps.pr.outputs.result.user.login }}, @trilom - it appears that there was an issue with the merge.
 
-      #       Head Repo/Branch: **[${{ github.event.pull_request.head.repo.full_name }}]**(${{ github.event.pull_request.head.repo.html_url }}) merge into **[${{ github.event.pull_request.base.repo.full_name }}]**(${{ github.event.pull_request.base.repo.html_url }})
+            Head Repo/Branch: **[${{ steps.pr.outputs.result.head.repo.full_name }}]**(${{ steps.pr.outputs.result.head.repo.html_url }}) merge into **[${{ steps.pr.outputs.result.base.repo.full_name }}]**(${{ steps.pr.outputs.result.base.repo.html_url }})
             
-      #       ## Event JSON
-      #       ```json
-      #         ${{ toJSON(github.event.pull_request)}}
-      #       ```
+            ## Event JSON
+            ```json
+              ${{ toJSON(steps.pr.outputs.result)}}
+            ```
