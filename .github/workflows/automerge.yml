@@ -68,7 +68,7 @@ jobs:
           MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
           UPDATE_LABELS: ''
       - uses: actions/github-script@0.6.0
-        if: success()
+        if: success() && (!env.merged) && env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
