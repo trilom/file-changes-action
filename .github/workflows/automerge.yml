@@ -1,5 +1,5 @@
 # this will tag PRs that are ready for release and automerge them
-name: Automerge passing PR
+name: automerge pretty, builds, tested pr
 env:
   GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
   lint_label: pretty
@@ -25,34 +25,39 @@ on:
   pull_request:
     branches:
       - '*/v[12]*'
+# don't release to production automatically this has to be manually merged
+      - '!releases/v[12]*'
       - master
       - develop
     types:
       - labeled
       - closed
 jobs:
-  always_job:
-    name: Always run job
+  # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
+  debugging:
+    name: debugging info
     runs-on: ubuntu-latest
     steps:
 # dump event for debugging      
       - run: |
           echo '${{toJSON(github.event)}}'
   automerge:
-    name: automerge PR
+    name: automerge pr
     runs-on: ubuntu-latest
-# if event type is PR or comment on PR from trilom with '/release'
+# if event type is non fork PR or comment on PR from trilom with '/release'
     if: >-
-      github.event_name == 'pull_request' 
+      (
+        github.event_name == 'pull_request' 
+        && github.event.pull_request.head.repo.full_name == github.repository)
       || (
         github.event_name == 'issue_comment' 
         && github.event.issue.pull_request != '' 
         && contains(github.event.comment.body, '/release') 
         && github.actor == 'trilom')
     steps:
-      - name: automerge pr to master if all good
+      - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: env.pretty && env.builds && env.tested
+        if: env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -62,23 +67,23 @@ jobs:
           MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
           UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
-      - name: get PR info if failure
+      - name: if failure, get pr payload
         uses: actions/github-script@0.8.0
         id: pr
-        if: failure()
+        # if: failure()
         with:
           github-token: ${{env.GITHUB_TOKEN}}
           result-encoding: string
           script: |
-            const result = github.pulls.get({
+            const result = await github.pulls.get({
               owner: context.payload.repository.owner.name,
               repo: context.payload.repository.name,
               pull_number: ${{ env.pr_number }}
             })
             return result.data;
-      - name: notify if failure
+      - name: if failure, notify
         uses: peter-evans/create-or-update-comment@v1
-        if: failure()
+        # if: failure()
         with:
           token: ${{ env.GITHUB_TOKEN }}
           issue-number: ${{ steps.pr.outputs.result.number }}
