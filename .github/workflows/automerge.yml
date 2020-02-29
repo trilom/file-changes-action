@@ -48,7 +48,7 @@ jobs:
     steps:
       # get PR info if issue comment
       - name: get PR info if github.event_name == issue_comment
-        uses: actions/github-script@0.6.0
+        uses: actions/github-script@0.8.0
         id: pr
         # if: github.event_name == 'issue_comment'
         with:
