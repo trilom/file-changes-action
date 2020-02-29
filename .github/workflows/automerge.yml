@@ -58,7 +58,7 @@ jobs:
     steps:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: ! env.merged && env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
+        if: (!env.merged) && env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
