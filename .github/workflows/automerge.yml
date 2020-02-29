@@ -1,0 +1,106 @@
+# this will tag PRs that are ready for release and automerge them
+name: automerge pretty, builds, tested pr
+env:
+  GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+  lint_label: pretty
+  build_label: builds
+  test_label: tested
+  pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
+  pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') || contains(github.event.issue.labels.*.name, 'pretty') }}
+  builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
+  tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') || contains(github.event.issue.labels.*.name, 'tested') }}
+# env.release_branch - bool - PR is from a branch to be released
+# this currently includes
+# BASE: releases/v* from HEAD master - production release
+# BASE: test/v* from HEAD develop - test release
+# BASE: * from HEAD 
+  # release_branch: >-
+  #   ${{(startsWith(github.base_ref, 'releases/v') && github.head_ref == 'master')
+  #   || (startsWith(github.head_ref, 'test/v') && github.base_ref == 'develop')
+  #   || contains(github.head_ref, join(github.base_ref, '/'))}}
+on:
+  issue_comment:
+    types: 
+      - created
+  pull_request:
+    branches:
+      - '*/v[12]*'
+# don't release to production automatically this has to be manually merged
+      - '!releases/v[12]*'
+      - master
+      - develop
+    types:
+      - labeled
+      - closed
+jobs:
+  # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
+  debugging:
+    name: debugging info
+    runs-on: ubuntu-latest
+    steps:
+# dump event for debugging      
+      - run: |
+          echo '${{toJSON(github.event)}}'
+  automerge:
+    name: automerge pr
+    runs-on: ubuntu-latest
+# if event type is non fork PR or comment on PR from trilom with '/release'
+    if: >-
+      (
+        github.event_name == 'pull_request' 
+        && github.event.pull_request.head.repo.full_name == github.repository)
+      || (
+        github.event_name == 'issue_comment' 
+        && github.event.issue.pull_request != '' 
+        && contains(github.event.comment.body, '/release') 
+        && github.actor == 'trilom')
+    steps:
+      - name: if pretty, builds, tested merge automerge pr
+# if pretty, builds, and tested labels then merge
+        if: env.pretty && env.builds && env.tested && github.event_name != 'issue_comment'
+        uses: pascalgn/automerge-action@v0.7.5
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
+          UPDATE_LABELS: ''
+# if failure, get payload of PR and notify
+      - name: if failure, get pr payload
+        uses: actions/github-script@0.8.0
+        id: pr_json
+        # if: failure()
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          script: |
+            const result = await github.pulls.get({
+              owner: '${{ github.repository }}'.split('/')[0],
+              repo: '${{ github.repository }}'.split('/')[1],
+              pull_number: ${{ env.pr_number }}
+            })
+            return result.data;
+      - name: if failure, set pr payload outputs
+        id: pr
+        run: |
+          echo${{ steps.pr_json.outputs.result }}' > pr.json
+          echo "::set-output name=user::$( jq -r '.user.login' pr.json )"
+          echo "::set-output name=head::$( jq -r '.head.repo.full_name' pr.json )"
+          echo "::set-output name=head_url::$( jq -r '.head.repo.html_url' pr.json )"
+          echo "::set-output name=base::$( jq -r '.base.repo.full_name' pr.json )"
+          echo "::set-output name=base_url::$( jq -r '.base.repo.html_url' pr.json )"
+      - name: if failure, notify
+        uses: peter-evans/create-or-update-comment@v1
+        # if: failure()
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          issue-number: ${{ env.pr_number }}
+          body: |
+            @${{ steps.pr.outputs.user }}, @trilom - it appears that there was an issue with the merge.
+
+            Head Repo/Branch: **[${{ steps.pr.outputs.head }}]**(${{ steps.pr.outputs.head_url }}) merge into **[${{ steps.pr.outputs.base }}]**(${{ steps.pr.outputs.base_url }})
+            
+            ## Event JSON
+            ```json
+              ${{ toJSON(steps.pr_json.outputs.result)}}
+            ```
