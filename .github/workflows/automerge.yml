@@ -83,7 +83,7 @@ jobs:
       - name: if failure, set pr payload outputs
         id: pr
         run: |
-          echo '$${{ toJSON(steps.pr_json.outputs.result) }}' >> pr.json
+          echo '${{ steps.pr_json.outputs.result }}' >> pr.json
           echo "::set-output name=user::$( echo pr.json | jq '.user.login' )"
           echo "::set-output name=head::$( echo pr.json | jq '.head.repo.full_name' )"
           echo "::set-output name=head_url::$( echo pr.json | jq '.head.repo.html_url' )"
