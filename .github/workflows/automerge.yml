@@ -33,21 +33,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo $pr_number
-      - run: echo ${{toJSON(github.event)}}
+      - run: echo '${{toJSON(github.event)}}'
   automerge:
     name: automerge PR
     runs-on: ubuntu-latest
 # if event type is PR or comment on PR from trilom with '/release'
     if: >-
-      github.event_type == 'pull_request' 
+      github.event_name == 'pull_request' 
       || (
-        github.event_type == 'issue_comment' 
+        github.event_name == 'issue_comment' 
         && github.event.issue.pull_request != '' 
         && contains(github.event.comment.body, '/release') 
         && github.actor == 'trilom')
     steps:
       # get PR info if issue comment
-      - name: get PR info if github.event_type == issue_comment
+      - name: get PR info if github.event_name == issue_comment
         uses: actions/github-script@0.6.0
         id: pr
         # if: github.event_name == 'issue_comment'
