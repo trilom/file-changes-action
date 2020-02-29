@@ -83,12 +83,12 @@ jobs:
       - name: if failure, set pr payload outputs
         id: pr
         run: |
-          echo "${{ toJSON(steps.pr_json.outputs.result) }}" > pr.json
-          echo "::set-output name=user::$( echo pr.json | jq '.user.login' )"
-          echo "::set-output name=head::$( echo pr.json | jq '.head.repo.full_name' )"
-          echo "::set-output name=head_url::$( echo pr.json | jq '.head.repo.html_url' )"
-          echo "::set-output name=base::$( echo pr.json | jq '.base.repo.full_name' )"
-          echo "::set-output name=base_url::$( echo pr.json | jq '.base.repo.html_url' )"
+          echo "${{ steps.pr_json.outputs.result }}" > pr.json
+          echo "::set-output name=user::$( jq -r pr.json '.user.login' )"
+          echo "::set-output name=head::$( jq -r pr.json '.head.repo.full_name' )"
+          echo "::set-output name=head_url::$( jq -r pr.json '.head.repo.html_url' )"
+          echo "::set-output name=base::$( jq -r pr.json '.base.repo.full_name' )"
+          echo "::set-output name=base_url::$( jq -r pr.json '.base.repo.html_url' )"
       - name: if failure, notify
         uses: peter-evans/create-or-update-comment@v1
         # if: failure()
