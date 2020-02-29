@@ -1,0 +1,36 @@
+- name: pretty
+  description: Code that has been linted with eslint and prettier.
+  color: 76edd1
+- name: ugly
+  description: Code that has failed lint with eslint and prettier.
+  color: ed8c76
+- name: builds
+  description: Code that builds with yarn and tsc.
+  color: 39bc44
+- name: "doesnt build"
+  description: "Code that doesn't builds with yarn and tsc."
+  color: c23e3a
+- name: tested
+  description: Code that has passed test with jest.
+  color: 9520bc
+- name: untested
+  description: Code that has failed test with jest.
+  color: bfac20
+- name: "doesnt read directions"
+  description: "Doesn't know how to read directions, please PR to develop."
+  color: d876e3
+- name: automated pr
+  description: This was created by create-pull-request action.
+  color: b9ff9b
+- name: released
+  description: This has been released to NPM, Github Packages, and Actions Marketplace.
+  color: ededed
+- name: bug
+  description: Something isn't working
+  color: d73a4a
+- name: duplicate
+  description: This issue or pull request already exists
+  color: cfd3d7
+- name: enhancement
+  description: New feature or request
+  color: a2eeef
