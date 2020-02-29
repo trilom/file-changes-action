@@ -69,11 +69,10 @@ jobs:
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload
         uses: actions/github-script@0.8.0
-        id: pr
+        id: pr_json
         # if: failure()
         with:
           github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
           script: |
             const result = await github.pulls.get({
               owner: '${{ github.repository }}'.split('/')[0],
@@ -81,6 +80,15 @@ jobs:
               pull_number: ${{ env.pr_number }}
             })
             return result.data;
+      - name: if failure, set pr payload outputs
+        id: pr
+        run: |
+          echo '$${{ steps.pr_json.outputs.result }}' >> pr.json
+          echo "::set-output name=user::$( echo pr.json | jq '.user.login' )"
+          echo "::set-output name=head::$( echo pr.json | jq '.head.repo.full_name' )"
+          echo "::set-output name=head_url::$( echo pr.json | jq '.head.repo.html_url' )"
+          echo "::set-output name=base::$( echo pr.json | jq '.base.repo.full_name' )"
+          echo "::set-output name=base_url::$( echo pr.json | jq '.base.repo.html_url' )"
       - name: if failure, notify
         uses: peter-evans/create-or-update-comment@v1
         # if: failure()
@@ -88,11 +96,11 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
           issue-number: ${{ steps.pr.outputs.result.number }}
           body: |
-            @${{ steps.pr.outputs.result.user.login }}, @trilom - it appears that there was an issue with the merge.
+            @${{ steps.pr.outputs.result.user }}, @trilom - it appears that there was an issue with the merge.
 
-            Head Repo/Branch: **[${{ steps.pr.outputs.result.head.repo.full_name }}]**(${{ steps.pr.outputs.result.head.repo.html_url }}) merge into **[${{ steps.pr.outputs.result.base.repo.full_name }}]**(${{ steps.pr.outputs.result.base.repo.html_url }})
+            Head Repo/Branch: **[${{ steps.pr.outputs.result.head }}]**(${{ steps.pr.outputs.result.head_url }}) merge into **[${{ steps.pr.outputs.result.base }}]**(${{ steps.pr.outputs.result.base_url }})
             
             ## Event JSON
             ```json
-              ${{ toJSON(steps.pr.outputs.result)}}
+              ${{ toJSON(steps.pr_json.outputs.result)}}
             ```
