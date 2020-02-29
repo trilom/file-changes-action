@@ -1,7 +1,7 @@
 # this will tag PRs that are ready for release and automerge them
 name: Automerge passing PR
 env:
-  pr_number: ${{ join(join('',github.event.pull_request.number), join('', github.event.issue.number)) }}
+  pr_number: ${{ join('', join(join('', github.event.pull_request.number), join('',github.event.issue.number))) }}
 on:
   issue_comment:
     types: [created]
