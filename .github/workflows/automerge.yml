@@ -73,6 +73,7 @@ jobs:
         # if: failure()
         with:
           github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
           script: |
             const result = await github.pulls.get({
               owner: '${{ github.repository }}'.split('/')[0],
