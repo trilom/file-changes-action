@@ -18,8 +18,6 @@ on:
   pull_request:
     branches:
       - '*/v[12]*'
-# don't release to production automatically this has to be manually merged
-      - '!releases/v[12]*'
       - master
       - develop
     types:
