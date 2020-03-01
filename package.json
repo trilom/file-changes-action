@@ -47,6 +47,17 @@
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
       [
+        "semantic-release-slack-bot",
+        {
+          "notifyOnSuccess": true,
+          "notifyOnFail": true,
+          "markdownReleaseNotes": true,
+          "onSuccessTemplate": {
+            "text": "$package_name version v$npm_package_version!\n\n$release_notes"
+          }
+        }
+      ],
+      [
         "@semantic-release/changelog",
         {
           "changelogFile": "CHANGELOG.md"
