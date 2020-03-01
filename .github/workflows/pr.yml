@@ -78,6 +78,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             // get labels
+            let current = JSON.parse('${{ toJSON(github.event.pull_request.labels) }}')
             let add = []
             let delete = []
             '${{ steps.build.outputs.tag }}' === 'true' ? add.push('builds') : delete.push('builds')
@@ -86,11 +87,13 @@ jobs:
             '${{ steps.lintdog.outputs.tag }}' === 'true' ? add.push('lintdogged') : delete.push('lintdogged')
             // delete labels
             delete.forEach(label => {
-              if ('${{ contains(github.event.pull_request.labels.*.name, label) }}' == 'true') {
-                github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-                  name: label
-                })
-              }
+              current.filter(current_label => {
+                if ( label === current_label.name ) {
+                  github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                    name: label
+                  })
+                }
+              })
             });
             // add labels
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
