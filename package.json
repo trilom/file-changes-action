@@ -35,11 +35,11 @@
       "master",
       {
         "name": "develop",
-        "prerelease": "alpha"
+        "prerelease": "dev"
       },
       {
         "name": "next",
-        "prerelease": "beta"
+        "prerelease": "next"
       }
     ],
     "dryRun": false,
