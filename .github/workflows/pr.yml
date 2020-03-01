@@ -96,7 +96,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}  
     steps:
       - uses: actions/checkout@v2 # checkout for forks
-        if: env.isFork && github.event_name == 'pull_request'
+        if: contains(env.isFork 'true') && github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
       - uses: actions/checkout@v2 # checkout for pushes
