@@ -15,19 +15,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trilom/file-changes-action"
+    "url": "git+https://github.com/trilom/file-changes-action.git"
   },
   "keywords": [
     "actions",
+    "action",
+    "github-action",
+    "github-actions",
+    "github",
     "node",
-    "setup"
+    "typescript",
+    "examples"
   ],
   "author": "Bryan Killian <me@trilom.org>",
+  "homepage": "https://github.com/trilom/file-changes-action#README",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^2.0.0",
-    "@types/node": "^13.1.4"
+    "@actions/github": "^2.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
