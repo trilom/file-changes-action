@@ -1,17 +1,16 @@
 {
-  "name": "file-changes-action",
+  "name": "@trilom/file-changes-action",
   "version": "1.1.0",
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
+    "release": "yarn build && yarn run pack && yarn --prod",
+    "build": "yarn && tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack",
-    "prod": "yarn && yarn all && yarn --prod",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "clean": "rm -rf node_modules"
   },
   "repository": {
