@@ -50,7 +50,7 @@ jobs:
     steps:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: (!env.hold) && (!env.merged) && env.pretty && env.builds && env.tested
+        if: contains(env.hold, 'false') && contains(env.merged, 'false') && env.pretty && env.builds && env.tested
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -60,7 +60,7 @@ jobs:
           MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
           UPDATE_LABELS: ''
       - uses: actions/github-script@0.6.0
-        if: success() && (!env.merged) && env.pretty && env.builds && env.tested
+        if: success() && contains(env.merged, 'false') && env.pretty && env.builds && env.tested
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |

@@ -27,7 +27,7 @@ jobs:
       - run: make run
       - run: make run COMMAND=format-check
       - name: make run COMMAND=format and push code if check failed
-        if: failure() && github.actor != 'trilom-bot' && (!env.isFork)
+        if: failure() && github.actor != 'trilom-bot' contains(env.isFork, 'false')
         env:
           GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}  
         run: |
@@ -72,7 +72,7 @@ jobs:
     if: always()
     steps:
       - uses: actions/github-script@0.6.0
-        if: (!env.isFork)
+        if: contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
