@@ -1,7 +1,11 @@
 name: Contribution Workflow
 env:
   isFork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
-on: [pull_request, push]
+on: 
+  pull_request:
+  push:
+    branches:
+      - develop
 jobs:
   # make sure we can build
   build:
