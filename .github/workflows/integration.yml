@@ -1,0 +1,84 @@
+name: Integration Tests
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  pull_request:
+    branches:
+      - develop
+jobs:
+  debugging:
+    name: debugging info
+    runs-on: ubuntu-latest
+    steps:
+# dump event for debugging      
+      - run: |
+          echo '${{toJSON(github.event)}}'
+          echo '${{toJSON(steps)}}'
+  integration:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # event_type: ['push', 'pull_request']
+        # build: [true, false]
+        # output: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+        # fileOutput: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+        event_type: ['pull_request']
+        build: ['true']
+        output: ['json']
+        fileOutput: ['json']
+    steps:
+      - run: |
+          echo '${{toJSON(github.event)}}'
+          echo '${{toJSON(steps)}}'
+      - uses: actions/checkout@v2
+        if: matrix.build
+      - run: make run COMMAND=release RELEASE=TRUE
+        if: matrix.build
+      - uses: ./
+        id: file_changes_build_pr
+        if: matrix.build && matrix.event_type == 'pull_request'
+        with:
+          prNumber: 36
+          output: ${{ matrix.output }}
+          fileOutput: ${{ matrix.fileOutput }}
+      - uses: ./
+        id: file_changes_build_push
+        if: matrix.build && matrix.event_type == 'push'
+        with:
+          pushBefore: 50c179e5772e4915eb867f4db6552e50aa528591
+          pushAfter: cde426492d870040962d2c03f1921516b86fce64
+          output: ${{ matrix.output }}
+          fileOutput: ${{ matrix.fileOutput }}
+      - uses: trilom/file-changes-action@pre-release-eb0d71b
+        id: file_changes_nobuild_pr
+        if: (!matrix.build) && matrix.event_type == 'pull_request'
+        with:
+          prNumber: 36
+          output: ${{ matrix.output }}
+          fileOutput: ${{ matrix.fileOutput }}
+      - uses: trilom/file-changes-action@pre-release-eb0d71b
+        id: file_changes_nobuild_push
+        if: (!matrix.build) && matrix.event_type == 'push'
+        with:
+          pushBefore: 50c179e5772e4915eb867f4db6552e50aa528591
+          pushAfter: cde426492d870040962d2c03f1921516b86fce64
+          output: ${{ matrix.output }}
+          fileOutput: ${{ matrix.fileOutput }}
+      - uses: ./.github/actions/integration/
+        if: success() && matrix.output == 'json'
+        env:
+          fileOutput: ${{ matrix.fileOutput }}
+          output: ${{ matrix.output }}
+          files: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files), toJSON(steps.file_changes_build_push.outputs.files), toJSON(steps.file_changes_nobuild_pr.outputs.files), toJSON(steps.file_changes_nobuild_push.outputs.files)) }}
+          files_modified: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified), toJSON(steps.file_changes_nobuild_pr.outputs.files_modified), toJSON(steps.file_changes_nobuild_push.outputs.files_modified)) }}
+          files_added: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added), toJSON(steps.file_changes_nobuild_pr.outputs.files_added), toJSON(steps.file_changes_nobuild_push.outputs.files_added)) }}
+          files_deleted: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_deleted), toJSON(steps.file_changes_build_push.outputs.files_deleted), toJSON(steps.file_changes_nobuild_pr.outputs.files_deleted), toJSON(steps.file_changes_nobuild_push.outputs.files_deleted)) }}
+      - uses: ./.github/actions/integration/
+        if: success() && matrix.output != 'json'
+        env:
+          fileOutput: ${{ matrix.fileOutput }}
+          output: ${{ matrix.output }}
+          files: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files, steps.file_changes_nobuild_pr.outputs.files, steps.file_changes_nobuild_push.outputs.files) }}
+          files_modified: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified, steps.file_changes_nobuild_pr.outputs.files_modified, steps.file_changes_nobuild_push.outputs.files_modified) }}
+          files_added: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added, steps.file_changes_nobuild_pr.outputs.files_added, steps.file_changes_nobuild_push.outputs.files_added) }}
+          files_deleted: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files_deleted, steps.file_changes_nobuild_pr.outputs.files_deleted, steps.file_changes_nobuild_push.outputs.files_deleted) }}
