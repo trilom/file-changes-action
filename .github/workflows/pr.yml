@@ -166,7 +166,6 @@ jobs:
           git commit -m "Updating AUTHORS 📓" -a
       # if PR head is from pre-release-* then release
       - name: semantic-release run
-        if: startsWith(github.head_ref, 'releases/v')
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
         with:
