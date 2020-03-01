@@ -93,7 +93,11 @@ jobs:
     needs: lintdog
     steps:
       - uses: actions/checkout@v2
+        if: env.isFork
+      - uses: actions/checkout@v2
+        if: contains(env.isFork, 'false')
         with:
+          token: ${{ secrets.TRILOM_BOT_TOKEN }}  
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
       - run: make run
