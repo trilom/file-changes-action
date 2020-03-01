@@ -169,7 +169,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
         with:
-          branch: ${{ github.base_ref }}
+          branch: ${{ github.ref }}
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
