@@ -2,7 +2,7 @@
 import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as gh from '@actions/github'
-import { ChangedFiles, sortChangedFiles } from './ChangedFiles'
+import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
 
 async function getChangedPRFiles(
   repo: string,
@@ -102,9 +102,15 @@ async function run(): Promise<void> {
       // do PR actions
       if (prNumber != null) {
         try {
-          changedFiles = await getChangedPRFiles(repo, client, parseInt(prNumber))
+          changedFiles = await getChangedPRFiles(
+            repo,
+            client,
+            parseInt(prNumber)
+          )
         } catch (error) {
-          core.error(`There was an error getting Pull Request change files:${error}`)
+          core.error(
+            `There was an error getting Pull Request change files:${error}`
+          )
           throw error
         }
       } else {
@@ -129,7 +135,7 @@ async function run(): Promise<void> {
     } else {
       core.setFailed(
         `Change not initiated by a PR or Push, it was ${
-        github.eventName
+          github.eventName
         } instead.  Github:${JSON.stringify(github)}`
       )
       return

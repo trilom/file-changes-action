@@ -1,4 +1,4 @@
-import { File } from './File'
+import {File} from './File'
 
 export class ChangedFiles {
   updated: string[] = []
