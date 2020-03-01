@@ -170,6 +170,7 @@ jobs:
         id: semantic
         with:
           branch: ${{ github.ref }}
+          semantic_version: 15.14.0
           extra_plugins: |
             @semantic-release/git
             @semantic-release/changelog
