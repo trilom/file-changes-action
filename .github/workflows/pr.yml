@@ -26,7 +26,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: 'builds'
+              labels: ['builds']
             })
   # test with jest
   test:
@@ -53,7 +53,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: 'tested'
+              labels: ['tested']
             })
   # lint code and comment back if possible
   lintdog:
@@ -84,7 +84,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: 'lintdogged'
+              labels: ['lintdogged']
             })
   # format and push code back if not forked branch
   format_check_push:
@@ -125,5 +125,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: 'pretty'
+              labels: ['pretty']
             })
