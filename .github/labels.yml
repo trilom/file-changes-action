@@ -31,6 +31,6 @@
 - name: "hold merge"
   description: This merge will be blocked from automerging until this label is removed
   color: b60205
-- name: reviewdogged
+- name: lintdogged
   description: Code that has been looked at by reviewdog
   color: 5F422D
