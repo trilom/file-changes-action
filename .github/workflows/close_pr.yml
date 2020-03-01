@@ -9,7 +9,7 @@ on:
 jobs:
   # close any fork PRs not opened by trilom to anything but master
   close_pr:
-    name: close non develop/master PR
+    name: close non master PRs from fork
     runs-on: ubuntu-latest
     if:  github.actor != 'trilom' && github.event.pull_request.head.repo.full_name != github.repository
     steps:

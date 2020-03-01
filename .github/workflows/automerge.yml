@@ -9,6 +9,7 @@ env:
   pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') || contains(github.event.issue.labels.*.name, 'pretty') }}
   builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
   tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') || contains(github.event.issue.labels.*.name, 'tested') }}
+  lintdogged: ${{ contains(github.event.pull_request.labels.*.name, 'lintdogged') || contains(github.event.issue.labels.*.name, 'lintdogged') }}
   merged: ${{ contains(github.event.pull_request.labels.*.name, 'automated merge') || contains(github.event.issue.labels.*.name, 'automated merge') }}
   hold: ${{ contains(github.event.pull_request.labels.*.name, 'hold merge') || contains(github.event.issue.labels.*.name, 'hold merge') }}
 on:
@@ -20,6 +21,7 @@ on:
       - '*/v[12]*'
       - master
       - develop
+      - next
     types:
       - labeled
       - closed
@@ -49,7 +51,7 @@ jobs:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
         if: >
-          contains(env.hold, 'false') && contains(env.merged, 'false') 
+          contains(env.hold, 'false') && contains(env.merged, 'false') && contains(env.lintdogged, 'true')
           && contains(env.pretty, 'true') && contains(env.builds, 'true') && contains(env.tested, 'true')
         uses: pascalgn/automerge-action@v0.7.5
         env:
@@ -59,16 +61,6 @@ jobs:
           UPDATE_METHOD: merge
           MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
           UPDATE_LABELS: ''
-      - uses: actions/github-script@0.6.0
-        if: >
-          success() && contains(env.hold, 'false') && contains(env.merged, 'false') 
-          && contains(env.pretty, 'true') && contains(env.builds, 'true') && contains(env.tested, 'true')
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
-              labels: ['automated merge']
-            })
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload
         uses: actions/github-script@0.8.0
@@ -108,3 +100,13 @@ jobs:
             ```json
               ${{ toJSON(steps.pr_json.outputs.result)}}
             ```
+      - uses: actions/github-script@0.6.0
+        if: >
+          contains(env.hold, 'false') && contains(env.merged, 'false') && contains(env.lintdogged, 'true')
+          && contains(env.pretty, 'true') && contains(env.builds, 'true') && contains(env.tested, 'true')
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: ['automated merge']
+            })
