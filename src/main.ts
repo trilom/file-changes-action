@@ -102,6 +102,8 @@ async function run(): Promise<void> {
       // do PR actions
       if (prNumber != null) {
         try {
+          core.error(`${prNumber}`)
+          core.error(`${repo}`)
           changedFiles = await getChangedPRFiles(
             repo,
             client,
