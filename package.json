@@ -1,6 +1,6 @@
 {
   "name": "@trilom/file-changes-action",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
@@ -75,9 +75,15 @@
             }
           ],
           "successComment": "🎉🦍🎉 This <%= issue.pull_request ? 'pull request' : 'issue' %> has been resolved in version <%= nextRelease.version %> at `trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n ## Release<%=s<% _.forEach(releases, function(release) { %>\n\t\t**Release Name:** [<%= release.name %>](<%= release.url %>)<% }); %>\n\n ## Commits<% _.forEach(commits, function(commit) { %>\n\t\t@<%= commit.author %> - [_<%= commit.message %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>",
-          "labels": ["failure"],
-          "releasedLabels": ["releases/${nextRelease.gitTag}"],
-          "assigness": ["trilom"]
+          "labels": [
+            "failure"
+          ],
+          "releasedLabels": [
+            "releases/${nextRelease.gitTag}"
+          ],
+          "assigness": [
+            "trilom"
+          ]
         }
       ],
       [
