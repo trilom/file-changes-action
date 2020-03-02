@@ -68,6 +68,8 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
       - name: semantic-release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
@@ -111,6 +113,8 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
       - name: commit format changes and create authors file
         run: |
           git config --local user.email "trilom-bot@trailmix.me"
