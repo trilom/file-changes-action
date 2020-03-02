@@ -207,7 +207,7 @@ jobs:
 
             ## Commits
             ```json
-            &nbsp;&nbsp;${{ toJSON(github.event.commits)}}
+            ${{ toJSON(github.event.commits)}}
             ```
             
             ## Files
