@@ -7,12 +7,6 @@ env:
   test_label: tested
   reviewdog_label: lintdogged
   pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
-  pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') || contains(github.event.issue.labels.*.name, 'pretty') }}
-  builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
-  tested: ${{ contains(github.event.pull_request.labels.*.name, 'tested') || contains(github.event.issue.labels.*.name, 'tested') }}
-  lintdogged: ${{ contains(github.event.pull_request.labels.*.name, 'lintdogged') || contains(github.event.issue.labels.*.name, 'lintdogged') }}
-  merged: ${{ contains(github.event.pull_request.labels.*.name, 'automated merge') || contains(github.event.issue.labels.*.name, 'automated merge') }}
-  hold: ${{ contains(github.event.pull_request.labels.*.name, 'hold merge') || contains(github.event.issue.labels.*.name, 'hold merge') }}
 on:
   # issue_comment:
   #   types: 
@@ -42,17 +36,26 @@ jobs:
       (
         github.event_name == 'pull_request' 
         && github.event.pull_request.head.repo.full_name == github.repository)
+        && contains(github.event.pull_request.labels.*.name, 'pretty')
+        && contains(github.event.pull_request.labels.*.name, 'builds')
+        && contains(github.event.pull_request.labels.*.name, 'tested')
+        && contains(github.event.pull_request.labels.*.name, 'lintdogged')
+        && (!contains(github.event.pull_request.labels.*.name, 'automated merge'))
+        && (!contains(github.event.pull_request.labels.*.name, 'hold merge'))
       || (
         github.event_name == 'issue_comment' 
         && github.event.issue.pull_request != '' 
         && contains(github.event.comment.body, '/release') 
-        && github.actor == 'trilom')
+        && github.actor == 'trilom'
+        && contains(github.event.issue.labels.*.name, 'pretty')
+        && contains(github.event.issue.labels.*.name, 'builds')
+        && contains(github.event.issue.labels.*.name, 'tested')
+        && contains(github.event.issue.labels.*.name, 'lintdogged')
+        && (!contains(github.event.issue.labels.*.name, 'automated merge'))
+        && (!contains(github.event.issue.labels.*.name, 'hold merge')))
     steps:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
-        if: >
-          contains(env.hold, 'false') && contains(env.merged, 'false') && contains(env.lintdogged, 'true')
-          && contains(env.pretty, 'true') && contains(env.builds, 'true') && contains(env.tested, 'true')
         uses: pascalgn/automerge-action@v0.7.5
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
@@ -101,9 +104,6 @@ jobs:
               ${{ toJSON(steps.pr_json.outputs.result)}}
             ```
       - uses: actions/github-script@0.6.0
-        if: >
-          contains(env.hold, 'false') && contains(env.merged, 'false') && contains(env.lintdogged, 'true')
-          && contains(env.pretty, 'true') && contains(env.builds, 'true') && contains(env.tested, 'true')
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
