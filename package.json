@@ -4,12 +4,11 @@
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
-    "release": "yarn build && yarn run pack && yarn --prod",
     "build": "yarn && tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "pack": "ncc build",
+    "release-pack": "ncc build",
     "test": "echo \"Error: no test specified\" && exit 0",
     "clean": "rm -rf node_modules"
   },
