@@ -8,7 +8,7 @@ jobs:
   post-release:
     name: Perform post release tasks
     runs-on: ubuntu-latest
-    if: github.actor == 'semantic-release-bot' && startsWith(github.event.head_commit.message, 'chore(release):')
+    if: github.actor == 'semantic-release-bot' && contains(github.event.head_commit.message, 'chore(release):')
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -59,8 +59,8 @@ jobs:
     if: >
       github.actor == 'trilom-bot' 
       && (
-        startsWith(github.event.head_commit.message, 'Auto merge from 1.') 
-        || startsWith(github.event.head_commit.message, 'Auto merge from 2.'))
+        contains(github.event.head_commit.message, 'Auto merge from 1.') 
+        || contains(github.event.head_commit.message, 'Auto merge from 2.'))
     env:
       SEMANTIC_RELEASE_PACKAGE: '@${{ github.repository }}'
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,9 +105,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, test, lintdog]
     if: >
-      (!startsWith(github.event.head_commit.message, 'Auto merge from 1.')) 
-      || (!startsWith(github.event.head_commit.message, 'Auto merge from 2.'))
-      || (!startsWith(github.event.head_commit.message, 'chore(release):'))
+      (!contains(github.event.head_commit.message, 'Auto merge from 1.')) 
+      || (!contains(github.event.head_commit.message, 'Auto merge from 2.'))
+      || (!contains(github.event.head_commit.message, 'chore(release):'))
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
