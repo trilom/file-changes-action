@@ -108,7 +108,8 @@ jobs:
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           make run
-          make run COMMAND=release-pack RELEASE=TRUE
+          sudo make clean
+          make run COMMAND=release-pack
           git add -A
           git diff-index --quiet HEAD || git commit -m "Adding release changes ⚙️" -a
           make run COMMAND=format
