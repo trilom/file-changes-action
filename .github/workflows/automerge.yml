@@ -1,24 +1,11 @@
 # this will tag PRs that are ready for release and automerge them
 name: Automerge Pull Requests
-env:
-  GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-  lint_label: pretty
-  build_label: builds
-  test_label: tested
-  reviewdog_label: lintdogged
-  pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
 on:
   # issue_comment:
-  #   types: 
-  #     - created
+  #   types: [created]
   pull_request:
-    branches:
-      - master
-      - develop
-      - next
-    types:
-      - labeled
-      - closed
+    branches: [master, next, alpha, beta]
+    types: [labeled, closed]
 jobs:
   # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
   debugging:
@@ -31,6 +18,9 @@ jobs:
   automerge:
     name: automerge pr
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+      pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
 # if event type is non fork PR or comment on PR from trilom with '/release'
     if: >-
       (
@@ -62,7 +52,7 @@ jobs:
           MERGE_METHOD: merge
           MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
-          MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}},${{env.reviewdog_label}}'
+          MERGE_LABELS: 'pretty,builds,tested,lintdogged'
           UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload
