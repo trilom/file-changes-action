@@ -82,7 +82,6 @@
         "@semantic-release/git",
         {
           "assets": [
-            "AUTHORS.md",
             "CHANGELOG.md",
             "package.json",
             "yarn.lock"
