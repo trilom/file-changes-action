@@ -27,7 +27,7 @@ jobs:
         build: ['true']
         output: ['json']
         fileOutput: ['json']
-    if: (contains(github.head_ref, 'v1.') || contains(github.head_ref, 'v2.')) || github.actor == 'semantic-release-bot' || github.event_name == 'schedule'
+    if: (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.')) || contains(github.event.head_commit.message, 'Release merge from') || github.event_name == 'schedule'
     steps:
       - run: |
           echo '${{toJSON(github.event)}}'
