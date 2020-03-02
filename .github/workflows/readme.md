@@ -67,14 +67,14 @@
   - Build code with `make run` which runs `yarn` and `tsc` (**build**)
   - Test code with `make run COMMAND=test` which runs `jest` (**test**)
   - Test code with eslint reviewdog and report back with github checks(**lintdog**)
-- When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ from anyone:
+- When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ from anyone with a head_commit message **NOT** starting with 'chore(release):', 'Auto merge from 1.', or 'Auto merge from 2.':
   - Build **dist/\*\*.js** files, update **AUTHORS**, format **src/\*\*.ts** files and commit.
   - Test [semantic-release](https://github.com/semantic-release/semantic-release) if a release is ready then create a **Pull Request**
     - Echo release outputs
     - Get changed files with [file-changes-action](https://github.com/trilom/file-changes-action) and build a message to post to new **Pull Request**
     - Comment on the original **Pull Request** with the new details of the release.
   - If no release, then **Push** changes directly back to master.
-- When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ from trilom-bot with a head_commit message starting with 'Auto merge PR':
+- When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ from trilom-bot with a head_commit message starting with 'Auto merge from 1.' or 'Auto merge from 2.':
   - Run [semantic-release](https://github.com/semantic-release/semantic-release) to prepare Github Release, release notes, changelog, notify Slack, package and deploy to NPM and Github Package Repo, label the release, and notify any issues of it's deployment.
 - When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ from semantic-release-bot with a head_commit message starting with 'chore(release):':
   - Get the **Pull Request** number from the **Push** and push the semantic-release changes to the tagged release branch.
