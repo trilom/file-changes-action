@@ -47,18 +47,6 @@ jobs:
           UPDATE_METHOD: merge
           MERGE_LABELS: 'pretty,builds,tested,lintdogged'
           UPDATE_LABELS: ''
-      - name: if pretty, builds, tested, released release merge automerge pr
-        uses: pascalgn/automerge-action@v0.7.5
-# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
-        if: contains(github.event.pull_request.labels.*.name, 'released')
-        env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          MERGE_METHOD: merge
-# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
-          MERGE_COMMIT_MESSAGE: 'Release merge from ${{ github.event.pull_request.head.ref }} PR#{pullRequest.number}: {pullRequest.title}'
-          UPDATE_METHOD: merge
-          MERGE_LABELS: 'pretty,builds,tested,lintdogged,released,releases/v${{ github.event.pull_request.head.ref }}'
-          UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload
         uses: actions/github-script@0.8.0
