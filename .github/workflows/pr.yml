@@ -122,7 +122,8 @@ jobs:
           sudo make clean
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
-          git diff-index --quiet HEAD || git commit -m "Add format changes 🤖" -a
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "Adding format changes 🤖" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
