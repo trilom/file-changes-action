@@ -2,7 +2,7 @@
 name: Push to release branches
 on:
   push:
-    branches: [master, develop, next]
+    branches: [master, next, alpha, beta]
     tags-ignore: ['**']
 jobs:
   post-release:
@@ -41,7 +41,7 @@ jobs:
             })
             let rLabel = 'no-label'
             result.data.labels.filter(label => {
-              (label.name.includes('releases/v')) ? rLabel = label.name : false
+              (label.name.includes('releases/v')) ? rLabel = label.name.replace('releases/v','') : false
             })
             return rLabel;
       - uses: actions/checkout@v2
@@ -68,7 +68,7 @@ jobs:
           branch: ${{ github.ref }}
           semantic_version: 15.14.0
           extra_plugins: |
-            @semantic-release/git
+            @semantic-release/git@8.0.0
             @semantic-release/changelog
             semantic-release-slack-bot
           dry_run: false
@@ -91,7 +91,7 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
-  # create automerge release PR from releases/v** to master
+  # create automerge release PR from release version branch to master
   check-release:
     name: Check if we need to release
     runs-on: ubuntu-latest
@@ -122,7 +122,7 @@ jobs:
           branch: ${{ github.ref }}
           semantic_version: 15.14.0
           extra_plugins: |
-            @semantic-release/git
+            @semantic-release/git@8.0.0
             @semantic-release/changelog
             semantic-release-slack-bot
           dry_run: true
@@ -211,7 +211,7 @@ jobs:
           labels: 'automated pr'
           assignees: '${{ steps.login.outputs.result }},trilom'
           reviewers: trilom
-          branch: 'releases/v${{ steps.semantic.outputs.new_release_version }}'
+          branch: '${{ steps.semantic.outputs.new_release_version }}'
       - name: notify initial commiter of change
         uses: peter-evans/create-or-update-comment@v1
         if: steps.login.outputs.result != '' && steps.semantic.outputs.new_release_published == 'true'
