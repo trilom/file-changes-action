@@ -39,8 +39,6 @@ jobs:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
         uses: pascalgn/automerge-action@v0.7.5
-# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
-        if: (!contains(github.event.pull_request.labels.*.name, 'released'))
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           MERGE_METHOD: merge
