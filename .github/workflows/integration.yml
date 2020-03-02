@@ -4,7 +4,10 @@ on:
     - cron: '0 0 * * *'
   pull_request:
     branches:
-      - develop
+      - master
+  push:
+    branches:
+      - master
 jobs:
   debugging:
     name: debugging info
@@ -26,6 +29,7 @@ jobs:
         build: ['true']
         output: ['json']
         fileOutput: ['json']
+    if: contains(github.head_ref, 'releases/v') || github.actor == 'semantic-release-bot' || github.event_name == 'schedule'
     steps:
       - run: |
           echo '${{toJSON(github.event)}}'
