@@ -62,8 +62,8 @@ jobs:
         contains(github.event.head_commit.message, 'Auto merge from 1.') 
         || contains(github.event.head_commit.message, 'Auto merge from 2.'))
     env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       SEMANTIC_RELEASE_PACKAGE: '@${{ github.repository }}'
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     steps:
