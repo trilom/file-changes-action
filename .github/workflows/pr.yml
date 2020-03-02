@@ -1,11 +1,7 @@
 name: Contribution Workflow
 env:
   isFork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
-on: 
-  pull_request:
-  push:
-    branches:
-      - develop
+on: [pull_request]
 jobs:
   # make sure we can build
   build:
@@ -15,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: make run
       - uses: actions/github-script@0.6.0
-        if: failure() && contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: failure() && contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -25,7 +21,7 @@ jobs:
               })
             }
       - uses: actions/github-script@0.6.0
-        if: contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -42,7 +38,7 @@ jobs:
       - run: make run
       - run: make run COMMAND=test
       - uses: actions/github-script@0.6.0
-        if: failure() && contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: failure() && contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -52,7 +48,7 @@ jobs:
               })
             }
       - uses: actions/github-script@0.6.0
-        if: contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -100,13 +96,11 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}  
     steps:
       - uses: actions/checkout@v2 # checkout for forks
-        if: contains(env.isFork, 'true') && github.event_name == 'pull_request'
+        if: contains(env.isFork, 'true')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-      - uses: actions/checkout@v2 # checkout for pushes
-        if: github.event_name == 'push'
       - uses: actions/checkout@v2 # checkout for PR
-        if: contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: contains(env.isFork, 'false')
         with:
           token: ${{ secrets.TRILOM_BOT_TOKEN }}  
           repository: ${{ github.event.pull_request.head.repo.full_name }}
@@ -114,7 +108,7 @@ jobs:
       - run: make run
       - run: make run COMMAND=format-check
       - name: make run COMMAND=format and push code if check failed
-        if: failure() && github.actor != 'trilom-bot' && (contains(env.isFork, 'false') || github.event_name == 'push')
+        if: failure() && github.actor != 'trilom-bot' && contains(env.isFork, 'false')
         env:
           GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}  
         run: |
@@ -123,9 +117,9 @@ jobs:
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
           git commit -m "Add format changes 🤖" -a
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref || github.ref }} && exit 0
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
       - uses: actions/github-script@0.6.0
-        if: failure() && contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: failure() && contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -135,7 +129,7 @@ jobs:
               })
             }
       - uses: actions/github-script@0.6.0
-        if: contains(env.isFork, 'false') && github.event_name == 'pull_request'
+        if: contains(env.isFork, 'false')
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
