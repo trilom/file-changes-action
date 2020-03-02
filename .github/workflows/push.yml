@@ -127,7 +127,7 @@ jobs:
           git add -A
           git diff-index --quiet HEAD || git commit -m "Adding format changes 🤖" -a
           git log --format='%aN <%aE>%n%cN <%cE>' | sort -u > AUTHORS
-          echo "\n$(date)" >> AUTHORS
+          echo "\r\n$(date)" >> AUTHORS
           git add -A
           git diff-index --quiet HEAD || git commit -m "Updating AUTHORS 📓" -a
       # see if we need to release, if so create a automerge release PR and notify the original creator
