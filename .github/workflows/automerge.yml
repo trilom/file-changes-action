@@ -8,13 +8,13 @@ on:
     types: [labeled, closed]
 jobs:
   # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
-  debugging:
-    name: debugging info
-    runs-on: ubuntu-latest
-    steps:
-# dump event for debugging      
-      - run: |
-          echo '${{toJSON(github.event)}}'
+#   debugging:
+#     name: debugging info
+#     runs-on: ubuntu-latest
+#     steps:
+# # dump event for debugging      
+#       - run: |
+#           echo '${{toJSON(github.event)}}'
   automerge:
     name: automerge pr
     runs-on: ubuntu-latest
