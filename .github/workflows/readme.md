@@ -67,7 +67,7 @@
   - Build code with `make run` which runs `yarn` and `tsc` (**build**)
   - Test code with `make run COMMAND=test` which runs `jest` (**test**)
   - Test code with eslint reviewdog and report back with github checks(**lintdog**)
-- When any **Push** type runs to _develop_, _master_, or _next_ from anyone other than semantic-release-bot and trilom-bot:
+- When any **Push** type runs to _develop_, _master_, or _next_ from anyone:
   - Build **dist/\*\*.js** files, update **AUTHORS**, format **src/\*\*.ts** files and commit.
   - Test [semantic-release](https://github.com/semantic-release/semantic-release) if a release is ready then create a **Pull Request**
     - Echo release outputs
