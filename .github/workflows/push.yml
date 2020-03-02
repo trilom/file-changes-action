@@ -60,6 +60,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     steps:
       - uses: actions/checkout@v2
       - name: semantic-release
@@ -119,6 +120,8 @@ jobs:
       - name: semantic-release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         with:
           semantic_version: 15.14.0
           extra_plugins: |
