@@ -34,7 +34,7 @@ jobs:
           github-token: ${{env.GITHUB_TOKEN}}
           result-encoding: string
           script: |
-            const result = github.pulls.get({
+            const result = await github.pulls.get({
               owner: context.payload.repository.owner.name,
               repo: context.payload.repository.name,
               pull_number: ${{ steps.pr.outputs.result }}
@@ -173,7 +173,7 @@ jobs:
           github-token: ${{env.GITHUB_TOKEN}}
           result-encoding: string
           script: |
-            const result = github.pulls.get({
+            const result = await github.pulls.get({
               owner: context.payload.repository.owner.name,
               repo: context.payload.repository.name,
               pull_number: ${{ steps.pr.outputs.result }}
