@@ -3,6 +3,12 @@ env:
   isFork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
 on: [pull_request]
 jobs:
+  add-reviews:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kentaro-m/auto-assign-action@v1.1.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
   # make sure we can build
   build:
     name: yarn install && tsc

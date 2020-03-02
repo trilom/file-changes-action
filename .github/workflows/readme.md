@@ -42,6 +42,7 @@
       - If failure, put some output on the original PR.
 
 - When any `opened`, `reopened`, or `synchronize` **Pull Request** type runs(**pr.yml**):
+  - Assign it to trilom (**add-reviews**)
   - Build code with `make run` which runs `yarn` and `tsc` (**build**)
     - Label with builds if passing and on inner workspace
   - Test code with `make run COMMAND=test` which runs `jest` (**test**)
