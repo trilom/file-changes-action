@@ -11,7 +11,7 @@ jobs:
   close_pr:
     name: close non master PRs from fork
     runs-on: ubuntu-latest
-    if:  github.actor != 'trilom' && github.event.pull_request.head.repo.full_name != github.repository
+    if:  (github.actor != 'trilom' || github.actor != 'trilom-bot') && github.event.pull_request.head.repo.full_name != github.repository
     steps:
       - uses: superbrothers/close-pull-request@v2
         with:
