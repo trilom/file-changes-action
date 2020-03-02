@@ -7,14 +7,6 @@ on:
     branches: [master, next, alpha, beta]
     types: [labeled, closed]
 jobs:
-  # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
-#   debugging:
-#     name: debugging info
-#     runs-on: ubuntu-latest
-#     steps:
-# # dump event for debugging      
-#       - run: |
-#           echo '${{toJSON(github.event)}}'
   automerge:
     name: automerge pr
     runs-on: ubuntu-latest
@@ -25,14 +17,14 @@ jobs:
     if: >-
       (
         github.event_name == 'pull_request' 
-        && github.event.pull_request.head.repo.full_name == github.repository)
+        && github.event.pull_request.head.repo.full_name == github.repository
         && contains(github.event.pull_request.labels.*.name, 'pretty')
         && contains(github.event.pull_request.labels.*.name, 'builds')
         && contains(github.event.pull_request.labels.*.name, 'tested')
         && contains(github.event.pull_request.labels.*.name, 'lintdogged')
         && (!contains(github.event.pull_request.labels.*.name, 'automated merge'))
         && (!contains(github.event.pull_request.labels.*.name, 'hold merge'))
-      || (
+      ) || (
         github.event_name == 'issue_comment' 
         && github.event.issue.pull_request != '' 
         && contains(github.event.comment.body, '/release') 
@@ -47,6 +39,8 @@ jobs:
       - name: if pretty, builds, tested merge automerge pr
 # if pretty, builds, and tested labels then merge
         uses: pascalgn/automerge-action@v0.7.5
+# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
+        if: (!contains(github.event.pull_request.labels.*.name, 'released'))
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           MERGE_METHOD: merge
@@ -54,6 +48,18 @@ jobs:
           MERGE_COMMIT_MESSAGE: 'Auto merge from ${{ github.event.pull_request.head.ref }} PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
           MERGE_LABELS: 'pretty,builds,tested,lintdogged'
+          UPDATE_LABELS: ''
+      - name: if pretty, builds, tested, released release merge automerge pr
+        uses: pascalgn/automerge-action@v0.7.5
+# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
+        if: contains(github.event.pull_request.labels.*.name, 'released')
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          MERGE_METHOD: merge
+# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
+          MERGE_COMMIT_MESSAGE: 'Release merge from ${{ github.event.pull_request.head.ref }} PR#{pullRequest.number}: {pullRequest.title}'
+          UPDATE_METHOD: merge
+          MERGE_LABELS: 'pretty,builds,tested,lintdogged,released,releases/v${{ github.event.pull_request.head.ref }}'
           UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload

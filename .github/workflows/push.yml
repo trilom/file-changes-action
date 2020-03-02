@@ -5,109 +5,12 @@ on:
     branches: [master, next, alpha, beta]
     tags-ignore: ['**']
 jobs:
-  post-release:
-    name: Perform post release tasks
-    runs-on: ubuntu-latest
-    if: github.actor == 'semantic-release-bot' && contains(github.event.head_commit.message, 'chore(release):')
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-    steps:
-      - name: get original PR number
-        uses: actions/github-script@0.6.0
-        id: pr
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const result = await github.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.payload.repository.owner.name,
-              repo: context.payload.repository.name,
-              commit_sha: context.payload.head_commit.id
-            })
-            return result.data[0].number || 40;
-      - name: get original PR user
-        uses: actions/github-script@0.6.0
-        id: label
-        if: steps.pr.outputs.result != 0
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const result = await github.pulls.get({
-              owner: context.payload.repository.owner.name,
-              repo: context.payload.repository.name,
-              pull_number: ${{ steps.pr.outputs.result }}
-            })
-            let rLabel = 'no-label'
-            result.data.labels.filter(label => {
-              (label.name.includes('releases/v')) ? rLabel = label.name.replace('releases/v','') : false
-            })
-            return rLabel;
-      - uses: actions/checkout@v2
-      - run: |
-          git config --local user.email "trilom-bot@trailmix.me"
-          git config --local user.name "trilom-bot"
-          git add --all
-          git diff-index --quiet HEAD || git commit -m "${{ github.event.head_commit.message }}" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ steps.label.outputs.result }}
-  # semantic release an auto-merged branch to github package repo, npm, github actions
-  release:
-    name: Release to NPM, Github, Github Actions Marketplace
-    runs-on: ubuntu-latest
-    needs: [build, test, lintdog]
-    if: >
-      github.actor == 'trilom-bot' 
-      && (
-        contains(github.event.head_commit.message, 'Auto merge from 1.') 
-        || contains(github.event.head_commit.message, 'Auto merge from 2.'))
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-      SEMANTIC_RELEASE_PACKAGE: '@${{ github.repository }}'
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: semantic-release
-        uses: cycjimmy/semantic-release-action@v2
-        id: semantic
-        with:
-          semantic_version: 15.14.0
-          extra_plugins: |
-            @semantic-release/git@7.0.18
-            @semantic-release/changelog
-            semantic-release-slack-bot
-          dry_run: false
-      - name: echo release outputs
-        if: steps.semantic.outputs.new_release_published == 'true'
-        run: |
-          echo ${{ steps.semantic.outputs.new_release_version }}
-          echo ${{ steps.semantic.outputs.new_release_major_version }}
-          echo ${{ steps.semantic.outputs.new_release_minor_version }}
-          echo ${{ steps.semantic.outputs.new_release_patch_version }}
-      - name: Setup Node.js with GitHub Package Registry
-        if: steps.semantic.outputs.new_release_published == 'true'
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: 'https://npm.pkg.github.com'
-          scope: trilom
-      - name: Publish To GitHub Package Registry
-        if: steps.semantic.outputs.new_release_published == 'true'
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
   # create PR from release branch to master to prepare for release
   check-release:
     name: Check if we need to release
     runs-on: ubuntu-latest
     needs: [build, test, lintdog]
-    if: >
-      (!contains(github.event.head_commit.message, 'Auto merge from 1.')) 
-      && (!contains(github.event.head_commit.message, 'Auto merge from 2.'))
-      && (!contains(github.event.head_commit.message, 'chore(release):'))
+    if: (!contains(github.event.head_commit.message, 'Release merge from'))
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

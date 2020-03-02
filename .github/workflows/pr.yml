@@ -157,3 +157,73 @@ jobs:
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['pretty']
             })
+  # semantic release an auto-merged branch to github package repo, npm, github actions
+  release:
+    name: Release to NPM, Github, Github Actions Marketplace
+    runs-on: ubuntu-latest
+    needs: [build, test, lintdog, format_check_push]
+    if: >
+      github.event.pull_request.head.repo.full_name == github.repository
+      && (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.'))
+      && (github.base_ref == 'master'
+        || github.base_ref == 'next'
+        || github.base_ref == 'alpha'
+        || github.base_ref == 'beta')
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+      SEMANTIC_RELEASE_PACKAGE: '@${{ github.repository }}'
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+          fetch-depth: 0
+      - name: semantic-release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          ref: ${{ github.head_ref }}
+          semantic_version: 15.14.0
+          extra_plugins: |
+            @semantic-release/git@7.0.18
+            @semantic-release/changelog
+            semantic-release-slack-bot
+          dry_run: false
+      - name: echo release outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: Setup Node.js with GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: trilom
+      - name: Publish To GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+      - uses: actions/github-script@0.6.0
+        if: failure() && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
+          script: |
+            if ('${{ contains(github.event.pull_request.labels.*.name, 'released') }}' == 'true') {
+              github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+                name: 'released'
+              })
+            }
+      - uses: actions/github-script@0.6.0
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
+          script: |
+            github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+              labels: ['released']
+            })
