@@ -31,14 +31,16 @@
   "license": "MIT",
   "release": {
     "branches": [
+      "+([1-9])?(.{+([1-9]),x}).x",
       "master",
+      "next",
       {
-        "name": "develop",
-        "prerelease": "dev"
+        "name": "alpha",
+        "prerelease": true
       },
       {
-        "name": "next",
-        "prerelease": "next"
+        "name": "beta",
+        "prerelease": true
       }
     ],
     "dryRun": false,
