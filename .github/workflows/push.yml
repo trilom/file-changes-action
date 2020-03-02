@@ -95,7 +95,6 @@ jobs:
   check-release:
     name: Check if we need to release
     runs-on: ubuntu-latest
-    if: github.actor != 'semantic-release-bot' && github.actor != 'trilom-bot'
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
