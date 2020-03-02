@@ -5,6 +5,7 @@ env:
   lint_label: pretty
   build_label: builds
   test_label: tested
+  reviewdog_label: lintdogged
   pr_number: ${{ format('{0}{1}', github.event.pull_request.number, github.event.issue.number) }}
   pretty: ${{ contains(github.event.pull_request.labels.*.name, 'pretty') || contains(github.event.issue.labels.*.name, 'pretty') }}
   builds: ${{ contains(github.event.pull_request.labels.*.name, 'builds') || contains(github.event.issue.labels.*.name, 'builds') }}
@@ -18,7 +19,6 @@ on:
   #     - created
   pull_request:
     branches:
-      - '*/v[12]*'
       - master
       - develop
       - next
@@ -59,7 +59,7 @@ jobs:
           MERGE_METHOD: merge
           MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
-          MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}}'
+          MERGE_LABELS: '${{env.lint_label}},${{env.build_label}},${{env.test_label}},${{env.reviewdog_label}}'
           UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload
