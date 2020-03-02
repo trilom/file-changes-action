@@ -46,8 +46,8 @@ jobs:
             return rLabel;
       - uses: actions/checkout@v2
       - run: |
-          git config --local user.email "trilom-bot"
-          git config --local user.name "trilom-bot@trailmix.me"
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
           git add --all
           git diff-index --quiet HEAD || git commit -m "${{ github.event.head_commit.message }}" -a
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ steps.label.outputs.result }}
@@ -113,8 +113,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: commit format changes and create authors file
         run: |
-          git config --local user.email "trilom-bot"
-          git config --local user.name "trilom-bot@trailmix.me"
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
           make run
           sudo make clean
           make run COMMAND=release-pack
@@ -150,8 +150,8 @@ jobs:
       - name: push potential formatting changes since there is no release
         if: steps.semantic.outputs.new_release_published == 'false'
         run: |
-          git config --local user.email "trilom-bot"
-          git config --local user.name "trilom-bot@trailmix.me"
+          git config --local user.email "trilom-bot@trailmix.me"
+          git config --local user.name "trilom-bot"
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.ref }}
       - name: get changed files and format for automerge PR body
         id: file_changes
