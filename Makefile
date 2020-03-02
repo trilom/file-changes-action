@@ -30,7 +30,7 @@ run:
 		$(DOCKER) \
 		/bin/sh -c 'cd /code && make .yarn COMMAND=$(CMD)' && \
 	if [ "$(CI)" = "TRUE" ]; then \
-		rm -rf dist/.gitignore && rm -rf /tmp/node_modules/.gitignore; \
+		rm -rf dist/.gitignore; \
 	fi
 
 .yarn:
