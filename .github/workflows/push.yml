@@ -108,9 +108,9 @@ jobs:
     needs: [build, test, lintdog]
     if: >
       github.actor != 'semantic-release-bot'
-      && ( ! contains(github.event.head_commit.message, 'trilom/1.')
-        || ! contains(github.event.head_commit.message, 'trilom/2.')
-        || ! contains(github.event.head_commit.message, 'chore(release):'))
+      && ! contains(github.event.head_commit.message, 'trilom/1.')
+      && ! contains(github.event.head_commit.message, 'trilom/2.')
+      && ! contains(github.event.head_commit.message, 'chore(release):')
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
