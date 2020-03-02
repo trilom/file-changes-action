@@ -50,7 +50,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           MERGE_METHOD: merge
-          MERGE_COMMIT_MESSAGE: 'Auto merge PR#{pullRequest.number}: {pullRequest.title}'
+# this breaks the /release on issue_comment portion unless I get the head.ref from github-script
+          MERGE_COMMIT_MESSAGE: 'Auto merge from ${{ github.event.pull_request.head.ref }} PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
           MERGE_LABELS: 'pretty,builds,tested,lintdogged'
           UPDATE_LABELS: ''

@@ -56,7 +56,11 @@ jobs:
     name: Release to NPM, Github, Github Actions Marketplace
     runs-on: ubuntu-latest
     needs: [build, test, lintdog]
-    if: github.actor == 'trilom-bot' && startsWith(github.event.head_commit.message, 'Auto merge PR')
+    if: >
+      github.actor == 'trilom-bot' 
+      && (
+        startsWith(github.event.head_commit.message, 'Auto merge from 1.') 
+        || startsWith(github.event.head_commit.message, 'Auto merge from 2.'))
     env:
       SEMANTIC_RELEASE_PACKAGE: '@${{ github.repository }}'
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -93,11 +97,15 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
-  # create automerge release PR from release version branch to master
+  # create PR from release branch to master to prepare for release
   check-release:
     name: Check if we need to release
     runs-on: ubuntu-latest
     needs: [build, test, lintdog]
+    if: >
+      (!startsWith(github.event.head_commit.message, 'Auto merge from 1.')) 
+      || (!startsWith(github.event.head_commit.message, 'Auto merge from 2.'))
+      || (!startsWith(github.event.head_commit.message, 'chore(release):'))
     env:
       GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
