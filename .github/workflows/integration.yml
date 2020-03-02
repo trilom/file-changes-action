@@ -34,7 +34,7 @@ jobs:
           echo '${{toJSON(steps)}}'
       - uses: actions/checkout@v2
         if: matrix.build
-      - run: make run COMMAND=release
+      - run: make run
         if: matrix.build
       - uses: ./
         id: file_changes_build_pr
