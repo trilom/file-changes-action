@@ -18,6 +18,7 @@ on:
   #     - created
   pull_request:
     branches:
+      - '*/v[12]*'
       - master
       - develop
       - next
