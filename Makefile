@@ -15,7 +15,7 @@ run:
 	docker run \
 		--mount type=bind,source="$(MKFILEPATH)",target=/code \
 		$(DOCKER) \
-		/bin/sh -c 'cd /code && make .yarn COMMAND=$(CMD)' && \
+		/bin/sh -c 'cd /code && make .yarn COMMAND=$(CMD)'
 
 .yarn:
 	yarn $(CMD)
