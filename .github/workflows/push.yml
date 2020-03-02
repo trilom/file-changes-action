@@ -69,7 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.ref }}
+          fetch-depth: 0
       - name: semantic-release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
@@ -114,7 +114,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.ref }}
+          fetch-depth: 0
       - name: commit format changes and create authors file
         run: |
           git config --local user.email "trilom-bot@trailmix.me"
