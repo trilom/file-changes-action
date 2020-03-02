@@ -1,0 +1,255 @@
+ # if a push comes in then this will test it for a release and create a release PR if needed
+name: Push to release branches
+on:
+  push:
+    branches: [master, develop, next]
+    tags-ignore: ['**']
+jobs:
+  post-release:
+    name: Perform post release tasks
+    runs-on: ubuntu-latest
+    if: github.actor == 'semantic-release-bot' && startsWith(github.event.head_commit.message, 'chore(release):')
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: get original PR number
+        uses: actions/github-script@0.6.0
+        id: pr
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.head_commit.id
+            })
+            return result.data[0].number || 40;
+      - name: get original PR user
+        uses: actions/github-script@0.6.0
+        id: label
+        if: steps.pr.outputs.result != 0
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = github.pulls.get({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              pull_number: ${{ steps.pr.outputs.result }}
+            })
+            let rLabel = 'no-label'
+            result.data.labels.filter(label => {
+              (label.name.includes('releases/v')) ? rLabel = label.name : false
+            })
+            return rLabel;
+      - uses: actions/checkout@v2
+      - run: |
+          git config --local user.email "trilom-bot"
+          git config --local user.name "trilom-bot@trailmix.me"
+          git add --all
+          git commit -m "${{ github.event.head_commit.message }}" -a
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ steps.label.outputs.result }}
+  # semantic release an auto-merged branch to github package repo, npm, github actions
+  release:
+    name: Release to NPM, Github, Github Actions Marketplace
+    runs-on: ubuntu-latest
+    if: github.actor == 'trilom-bot' && startsWith(github.event.head_commit.message, 'Auto merge PR')
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: semantic-release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          branch: ${{ github.ref }}
+          semantic_version: 15.14.0
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+            semantic-release-slack-bot
+          dry_run: false
+      - name: echo release outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: Setup Node.js with GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          scope: trilom
+      - name: Publish To GitHub Package Registry
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ env.GITHUB_TOKEN }}
+  # create automerge release PR from releases/v** to master
+  check-release:
+    name: Check if we need to release
+    runs-on: ubuntu-latest
+    if: github.actor != 'semantic-release-bot' && github.actor != 'trilom-bot'
+    env:
+      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: commit format changes and create authors file
+        run: |
+          make run
+          make run COMMAND=format
+          sudo make clean
+          git config --local user.email "trilom-bot"
+          git config --local user.name "trilom-bot@trailmix.me"
+          git add src/\*.ts
+          git commit -m "Add format changes 🤖" -a
+          git log --format='%aN <%aE>%n%cN <%cE>' | sort -u > AUTHORS
+          git add AUTHORS
+          git commit -m "Updating AUTHORS 📓" -a
+          make run COMMAND=release-pack RELEASE=TRUE
+          git add dist/\*.js
+          git commit -m "Add release changes ⚙️" -a
+      # see if we need to release, if so create a automerge release PR and notify the original creator
+      - name: semantic-release
+        uses: cycjimmy/semantic-release-action@v2
+        id: semantic
+        with:
+          branch: ${{ github.ref }}
+          semantic_version: 15.14.0
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/changelog
+            semantic-release-slack-bot
+          dry_run: true
+      - name: echo release outputs
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+      - name: push potential formatting changes since there is no release
+        if: steps.semantic.outputs.new_release_published == 'false'
+        run: |
+          git config --local user.email "trilom-bot"
+          git config --local user.name "trilom-bot@trailmix.me"
+          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.ref }}
+      - name: get changed files and format for automerge PR body
+        id: file_changes
+        uses: trilom/file-changes-action@test/v1
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          githubToken: ${{ env.GITHUB_TOKEN }}
+          output: '_<br />&nbsp;&nbsp;_'
+      - name: get original PR number
+        uses: actions/github-script@0.6.0
+        id: pr
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = await github.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              commit_sha: context.payload.head_commit.id
+            })
+            return result.data[0].number || 40;
+      - name: get original PR user
+        uses: actions/github-script@0.6.0
+        id: login
+        if: steps.pr.outputs.result != 0 && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          github-token: ${{env.GITHUB_TOKEN}}
+          result-encoding: string
+          script: |
+            const result = github.pulls.get({
+              owner: context.payload.repository.owner.name,
+              repo: context.payload.repository.name,
+              pull_number: ${{ steps.pr.outputs.result }}
+            })
+            return result.data.user.login || 'nope';
+      - name: create release PR
+        id: create-pr
+        uses: peter-evans/create-pull-request@v2
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          commit-message: '${{ github.event.head_commit.message }}'
+          committer: trilom-bot <trilom-bot@trailmix.me>
+          author: ${{ steps.login.outputs.result }} <${{ steps.login.outputs.result }}@users.noreply.github.com>
+          title: '${{ steps.semantic.outputs.new_release_version }}[@${{ steps.login.outputs.result }}] - ${{ github.event.head_commit.message }}'
+          body: |
+            # @${{ steps.login.outputs.result }} would like to merge into file-changes-action
+            [**compare link**](${{ github.event.compare }})
+
+            ## Commits
+            ```json
+            &nbsp;&nbsp;${{ toJSON(github.event.commits)}}
+            ```
+            
+            ## Files
+            
+            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files}}_
+            
+            ## Files modified
+            
+            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_modified}}_
+            
+            ## Files added
+            
+            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_added}}_
+            
+            ## Files deleted
+            
+            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_deleted}}_
+          labels: 'automated pr'
+          assignees: '${{ steps.login.outputs.result }},trilom'
+          reviewers: trilom
+          branch: 'releases/v${{ steps.semantic.outputs.new_release_version }}'
+      - name: notify initial commiter of change
+        uses: peter-evans/create-or-update-comment@v1
+        if: steps.login.outputs.result != '' && steps.semantic.outputs.new_release_published == 'true'
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          issue-number: ${{ steps.pr.outputs.result }}
+          body: |
+            Hey @${{ steps.login.outputs.result }},
+
+            [I will create a new PR that you can follow with this link that details the release.](https://github.com/trilom/file-changes-action/pull/${{ steps.create-pr.outputs.pr_number }})
+
+            Please use this new PR if there are any issues to communicate further.
+  # make sure we can build
+  build:
+    name: yarn install && tsc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make run
+  # test with jest
+  test:
+    name: jest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make run
+      - run: make run COMMAND=test
+  # lint code and comment back if possible
+  lintdog:
+    name: eslintdog (reviewdog)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint and report push
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.TRILOM_BOT_TOKEN }}
+          reporter: github-check
+          eslint_flags: 'src/**/*.ts'

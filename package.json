@@ -1,34 +1,99 @@
 {
-  "name": "file-changes-action",
+  "name": "@trilom/file-changes-action",
   "version": "1.1.0",
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "yarn && tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "pack": "ncc build",
-    "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack",
-    "prod": "yarn && yarn all && yarn --prod",
+    "release-pack": "ncc build",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "clean": "rm -rf node_modules"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trilom/file-changes-action"
+    "url": "git+https://github.com/trilom/file-changes-action.git"
   },
   "keywords": [
     "actions",
+    "action",
+    "github-action",
+    "github-actions",
+    "github",
     "node",
-    "setup"
+    "typescript",
+    "examples"
   ],
   "author": "Bryan Killian <me@trilom.org>",
+  "homepage": "https://github.com/trilom/file-changes-action#README",
   "license": "MIT",
+  "release": {
+    "branches": [
+      "master",
+      {
+        "name": "develop",
+        "prerelease": "dev"
+      },
+      {
+        "name": "next",
+        "prerelease": "next"
+      }
+    ],
+    "dryRun": false,
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "semantic-release-slack-bot",
+        {
+          "notifyOnSuccess": true,
+          "notifyOnFail": true,
+          "markdownReleaseNotes": true,
+          "onSuccessTemplate": {
+            "text": "$package_name version v$npm_package_version!\n\n$release_notes"
+          }
+        }
+      ],
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      "@semantic-release/npm",
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "dist/**/*.js",
+              "label": "Packaged JS Code"
+            }
+          ],
+          "successComment": "🎉🦍🎉 This <%= issue.pull_request ? 'pull request' : 'issue' %> has been resolved in version <%= nextRelease.version %> at `trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n ## Release<%=s<% _.forEach(releases, function(release) { %>\n\t\t**Release Name:** [<%= release.name %>](<%= release.url %>)<% }); %>\n\n ## Commits<% _.forEach(commits, function(commit) { %>\n\t\t@<%= commit.author %> - [_<%= commit.message %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>",
+          "labels": ["failure"],
+          "releasedLabels": ["releases/${nextRelease.gitTag}"],
+          "assigness": ["trilom"]
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json",
+            "yarn.lock"
+          ],
+          "message": "chore(release): 🎉🦍🎉 Release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n<%= nextRelease.notes %>"
+        }
+      ]
+    ]
+  },
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@actions/github": "^2.0.0",
-    "@types/node": "^13.1.4"
+    "@actions/github": "^2.0.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
