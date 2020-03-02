@@ -49,7 +49,7 @@ jobs:
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           git add --all
-          git commit -m "${{ github.event.head_commit.message }}" -a
+          git diff-index --quiet HEAD || git commit -m "${{ github.event.head_commit.message }}" -a
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ steps.label.outputs.result }}
   # semantic release an auto-merged branch to github package repo, npm, github actions
   release:
@@ -109,13 +109,13 @@ jobs:
           git config --local user.email "trilom-bot"
           git config --local user.name "trilom-bot@trailmix.me"
           git add src/\*.ts
-          git commit -m "Add format changes 🤖" -a
+          git diff-index --quiet HEAD || git commit -m "Add format changes 🤖" -a
           git log --format='%aN <%aE>%n%cN <%cE>' | sort -u > AUTHORS
           git add AUTHORS
-          git commit -m "Updating AUTHORS 📓" -a
+          git diff-index --quiet HEAD || git commit -m "Updating AUTHORS 📓" -a
           make run COMMAND=release-pack RELEASE=TRUE
           git add dist/\*.js
-          git commit -m "Add release changes ⚙️" -a
+          git diff-index --quiet HEAD || git commit -m "Add release changes ⚙️" -a
       # see if we need to release, if so create a automerge release PR and notify the original creator
       - name: semantic-release
         uses: cycjimmy/semantic-release-action@v2
