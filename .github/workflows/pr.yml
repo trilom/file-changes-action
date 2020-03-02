@@ -19,7 +19,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             if ('${{ contains(github.event.pull_request.labels.*.name, 'builds') }}' == 'true') {
               github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['builds']
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             if ('${{ contains(github.event.pull_request.labels.*.name, 'tested') }}' == 'true') {
               github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['tested']
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: failure()
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             if ('${{ contains(github.event.pull_request.labels.*.name, 'lintdogged') }}' == 'true') {
               github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
@@ -87,7 +87,7 @@ jobs:
             }
       - uses: actions/github-script@0.6.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['lintdogged']
@@ -122,12 +122,12 @@ jobs:
           sudo make clean
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
-          git commit -m "Add format changes 🤖" -a
+          git diff-index --quiet HEAD || git commit -m "Add format changes 🤖" -a
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:refs/heads/${{ github.head_ref }} && exit 0
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             if ('${{ contains(github.event.pull_request.labels.*.name, 'pretty') }}' == 'true') {
               github.issues.removeLabel({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
@@ -137,7 +137,7 @@ jobs:
       - uses: actions/github-script@0.6.0
         if: contains(env.isFork, 'false')
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TRILOM_BOT_TOKEN }}
           script: |
             github.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
               labels: ['pretty']
