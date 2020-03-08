@@ -1,6 +1,9 @@
 {
   "name": "@trilom/file-changes-action",
   "version": "1.1.0",
+  "engines": {
+    "node": "12.16.1"
+  },
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
@@ -9,7 +12,7 @@
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "release-pack": "ncc build",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "jest",
     "clean": "rm -rf node_modules"
   },
   "repository": {
