@@ -17,11 +17,11 @@ describe.each(testEvents)('Testing github action event %s...', event => {
   })
   // reset mocks and context object after each test
   afterEach(() => {
-    env.resetEnv()
+    env.reset()
   })
   // reset mock after each event test set
   afterAll(() => {
-    env.resetEnv({}, {}, false, false)                        
+    env.reset({}, {}, false, false)                        
   })
   it('Sets correct default input parameters.', () => {
     let data = getInputs(context)
@@ -48,21 +48,21 @@ describe.each(testEvents)('Testing github action event %s...', event => {
     expect(core.error).not.toHaveBeenCalled()
   })
   it('Throws error with no token (undefined) process.env["GITHUB_TOKEN"] or (undefined) input githubToken', () => {
-    env.resetEnv({}, {}, false, false) // no process.env token and token input
+    env.reset({}, {}, false, false) // no process.env token and token input
     expect(() => {
       getInputs(context)
     }).toThrowError('Received no token, a token is a requirement.')
   })
   it('Throws error with empty string ("") process.env["GITHUB_TOKEN"] or empty string ("") input githubToken', () => {
     // empty  process.env token
-    env.resetEnv({ GITHUB_TOKEN: '' }, { githubToken: '' }, true, true) // empty process.env token and token input
+    env.reset({ GITHUB_TOKEN: '' }, { githubToken: '' }, true, true) // empty process.env token and token input
     expect(() => {
       getInputs(context)
     }).toThrowError('Received no token, a token is a requirement.')
   })
   // test getInputs function
   it.each(getTestEvents(inputTestInputs, event))('Sets %s input "%s" should be %p', (inputName, input, expected) => {
-    env.resetEnv({}, { [inputName]: input })
+    env.reset({}, { [inputName]: input })
     let data = getInputs(context)
     // evaluate outputs
     if (event.includes('push')) {
