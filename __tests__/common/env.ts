@@ -71,10 +71,12 @@ export const ChangedFilesInputs: any[] = [
         { format: 'json', changedFiles: normalFileArray },
         { format: ' ', changedFiles: normalFileArray },
         { format: ',', changedFiles: normalFileArray },
-        { format: 'json', changedFiles: normalFileArray },
-      { format: 'json'}],
-    events: "push"
-  }
+        { format: 'json', changedFiles: normalFileArray }
+      ],
+      [
+        { format: 'json'}
+      ]],
+      events: "push" }
 ]
 export const writeOutputInputs: any[] = [
   { inputs: ['Sets core.setOutput outputs with specified format', 
