@@ -1,11 +1,15 @@
 module.exports = {
-  clearMocks: true,
-  moduleFileExtensions: ['js', 'ts'],
-  testEnvironment: 'node',
-  testMatch: ['<rootDir>/__tests__/*.test.ts'],
+  preset: 'ts-jest',
+  testEnvironment: "node",
   testRunner: 'jest-circus/runner',
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  },
-  verbose: true
+  clearMocks: true,
+  collectCoverage: true,
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 80,
+      lines: 75,
+      statements: 75
+    }
+  }
 }
