@@ -1,17 +1,7 @@
 import {GitHub} from '@actions/github'
-import type { Inferred } from './InputHelper'
 import { getErrorString } from './UtilsHelper'
-
-export interface GithubFile {
-  added: string
-  modified: string
-  removed: string
-  filename: string
-  status: string
-  previous_filename: string
-  distinct: boolean
-}
-
+import type { Inferred } from "./typings/Inferred"
+import type {GitHubFile} from './typings/GitHubFile'
 /**
  * @function initClient
  * @throws {Error} not sure what might trigger this, but it will throw an error.
@@ -43,12 +33,12 @@ export async function getChangedPRFiles(
   repo: string,
   owner: string,
   pullNumber: number
-): Promise<GithubFile[]> {
+): Promise<GitHubFile[]> {
   try {
     const options = client.pulls.listFiles.endpoint.merge({
       owner, repo, pull_number: pullNumber
     })
-    const files: GithubFile[] = await client.paginate(
+    const files: GitHubFile[] = await client.paginate(
       options,
       response => response.data
     )
@@ -78,12 +68,12 @@ export async function getChangedPushFiles(
   owner: string,
   base: string,
   head: string
-): Promise<GithubFile[]> {
+): Promise<GitHubFile[]> {
   try {
     const options = client.repos.compareCommits.endpoint.merge({
       owner, repo, base, head
     })
-    const files:GithubFile[] = await client.paginate(
+    const files:GitHubFile[] = await client.paginate(
       options,
       response => response.data.files
     )
@@ -108,13 +98,13 @@ export async function getChangedFiles(
   client: GitHub,
   repoFull: string,
   { before, after, pr = NaN }: Inferred
-): Promise<GithubFile[]> {
+): Promise<GitHubFile[]> {
   try {
     if (repoFull.split('/').length > 2) 
       throw new Error(getErrorString(`Bad-Repo`, 500, getChangedFiles.name, `Repo input of ${repoFull} has more than 2 length after splitting.`))
     const owner = repoFull.split('/')[0]
     const repo = repoFull.split('/')[1]
-    let files:GithubFile[] = []
+    let files:GitHubFile[] = []
     if (Number.isNaN(pr)) 
       files = await getChangedPushFiles(client, repo, owner, before || '', after || '')
     else 

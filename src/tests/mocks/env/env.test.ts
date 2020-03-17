@@ -1,17 +1,17 @@
-import { Env, p } from './mocks/env/env'
+/* eslint global-require: 0, @typescript-eslint/no-var-requires: 0 */
+import {Env, p} from '.'
+
 let env: Env // env object
 
 describe('Testing Env object with pull_request event', () => {
   // create a brand new context object for each event test set
-  beforeAll(() => {
-    env = new Env({}, {}, 'pull_request_synchronize')
-  })
+  beforeAll(() => { env = new Env({}, {}, 'pull_request_synchronize') })
   it('Env mocks Octokit.pulls.listFiles', () => {
     const request = p.OctokitPullsListFilesRequest
     const response = p.OctokitPullsListFilesResponse
     return env.githubMock.pulls.listFiles(request).then(data => {
       expect(data.data).toBe(response)
-      expect(data.data.length).toBe(7)
+      return expect(data.data.length).toBe(7)
     })
   })
   it('Env mocks Octokit.pulls.listFiles.endpoint.merge', () => {
@@ -25,17 +25,17 @@ describe('Testing Env object with pull_request event', () => {
     const response = p.OctokitPaginatePrResponse
     return env.githubMock.paginate(request).then(data => {
       expect(data).toStrictEqual(response)
-      expect(data.length).toBe(7)
+      return expect(data.length).toBe(7)
     })
   })
   it('Env mocks Octokit.repos.paginate for pr with custom callback', async () => {
     const request = p.OctokitPaginatePrRequest
     const response = p.OctokitPaginatePrResponse
-    return env.githubMock.paginate(request, response => {
-      return response.data
+    return env.githubMock.paginate(request, res => {
+      return res.data
     }).then(data => {
       expect(data).toStrictEqual(response)
-      expect(data.length).toBe(7)
+      return expect(data.length).toBe(7)
     })
   })
 })
@@ -50,7 +50,7 @@ describe('Testing Env object with push event', () => {
     const response = p.OctokitReposCompareCommitsResponse
     return env.githubMock.repos.compareCommits(request).then(data => {
       expect(data.data.files).toBe(response)
-      expect(data.data.files.length).toBe(7)
+      return expect(data.data.files.length).toBe(7)
     })
   })
   it('Env mocks Octokit.repos.compareCommits.endpoint.merge', () => {
@@ -62,15 +62,17 @@ describe('Testing Env object with push event', () => {
   it('Env mocks Octokit.repos.paginate for push', async () => {
     const request = p.OctokitPaginatePushRequest
     const response = p.OctokitPaginatePushResponse
-    return env.githubMock.paginate(request).then(data => {
+    expect.assertions(1)
+    const files = await env.githubMock.paginate(request).then(data => {
       return data.map(commit => commit.files)
     })
+    expect(files).toStrictEqual([response])
   })
   it('Env mocks Octokit.repos.paginate for push with custom callback', async () => {
     const request = p.OctokitPaginatePushRequest
     const response = p.OctokitPaginatePushResponse
-    let files = await env.githubMock.paginate(request, response => {
-      return response.data.files
+    const files = await env.githubMock.paginate(request, res => {
+      return res.data.files
     })
     expect(files).toStrictEqual(response)
     expect(files.length).toBe(7)

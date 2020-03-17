@@ -1,12 +1,13 @@
 // Import Request and Response Objects
+import type { EndpointOptions, OctokitResponse } from '@octokit/types'
 import {
-  OctokitPullsListFilesRequest,
+  // OctokitPullsListFilesRequest,
   OctokitPullsListFilesResponse
-} from '../../../payloads/octokit'
-import { EndpointOptions, OctokitResponse } from '@octokit/types'
+} from '../payloads'
 // Form and export Response Objects
 export { OctokitPullsListFilesResponse as response }
 // Export mock function
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const fn = jest.fn((data: EndpointOptions) => {
   return Promise.resolve({
     data: OctokitPullsListFilesResponse

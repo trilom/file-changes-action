@@ -1,25 +1,22 @@
 import { writeFileSync } from 'fs'
 import { setOutput as coreSetOutput, debug as coreDebug } from '@actions/core'
-import type { GithubFile } from './GithubHelper'
+import type {ChangedFiles} from 'typings/ChangedFiles'
+import type { GitHubFile } from './typings/GitHubFile'
 import {getErrorString} from './UtilsHelper'
-
-export interface ChangedFiles {
-  [key: string]: string[]
-}
 
 /**
  * @function sortChangedFiles
  * @param files pass in array of GithubFile's to be sorted
  * @returns ChangedFiles object that has .files, .added, .modified, and .deleted
  */
-export function sortChangedFiles(files: GithubFile[]): ChangedFiles {
+export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
   try {
-    coreDebug(JSON.stringify(files, null, 2))
-    const changedFiles: ChangedFiles = files.reduce((acc: ChangedFiles, f: GithubFile) => {
-      acc[f.status].push(f.filename || (f.added || f.removed || f.modified))
-      acc.files.push(f.filename || (f.added || f.removed || f.modified))
-      return acc
-    }, {} as ChangedFiles)
+    coreDebug(`Here are the files I am changing: ${JSON.stringify(files, null, 2)}`)
+    const changedFiles = {files: [], added: [], removed: [], modified:[]} as ChangedFiles
+    files.forEach(f => {
+      changedFiles[f.status].push(f.filename || (f.added || f.removed || f.modified))
+      changedFiles.files.push(f.filename || (f.added || f.removed || f.modified))
+    })
     return changedFiles
   } catch (error) {    
     const eString = `There was an issue sorting files changed files.`

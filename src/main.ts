@@ -1,9 +1,8 @@
 // External Dependencies
 import {error as coreError, setFailed as coreSetFailed} from '@actions/core'
-import { writeOutput, writeFiles, sortChangedFiles} from './FilesHelper'
 import {getInputs, inferInput} from './InputHelper'
+import { writeOutput, writeFiles, sortChangedFiles} from './FilesHelper'
 import { getChangedFiles, initClient} from './GithubHelper'
-
 
 // figure out if it is a PR or Push
 export async function run(): Promise<void> {

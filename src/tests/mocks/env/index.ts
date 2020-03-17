@@ -3,17 +3,16 @@ import * as core from '@actions/core'
 import { GitHub } from '@actions/github'
 import { Context } from '@actions/github/lib/context'
 import { resolve as _resolve } from 'path'
-import {mocked} from 'ts-jest/utils'
-import { octokitMock } from '../octokit/octokit'
 // join all payloads
-import * as octokitPayloads from '../../payloads/octokit'
-import * as envPayloads from '../../payloads/env'
+import * as octokitPayloads from '../octokit/payloads'
+import * as envPayloads from './payloads'
+import { octokitMock } from '../octokit'
 
 const payloads = {...octokitPayloads, ...envPayloads}
 // export payloads and class
 export { payloads, payloads as p }
 
-function eventName(e:string):string {
+export function eventName(e:string):string {
   if (e.includes('push')) return 'push'
   if (e.includes('pull_request')) return 'pull_request'
   if (e.includes('issue_comment')) return 'issue_comment'
@@ -66,7 +65,7 @@ export class Env
     inputs: {[key:string]: string}):void
   {
     this.event = event
-    const eventPayload = _resolve(__dirname, `../../payloads/events/${this.event}.json`)
+    const eventPayload = _resolve(__dirname, `../../../../tests/events/${this.event}.json`)
     this.setInput({
       ...this.envDefault, // / add default vars
       ...{
@@ -95,6 +94,7 @@ export class Env
 
   setCoreMock():void {
     this.coreMock = {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       getInput: jest.fn((name: string, options?: core.InputOptions) => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`]),
       debug: jest.fn(),
       warning: jest.fn(),

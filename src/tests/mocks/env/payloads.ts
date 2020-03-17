@@ -1,6 +1,7 @@
 // Imports
-import { Inferred } from '../../src/InputHelper'
-import * as p from './octokit'
+import { Inferred } from 'typings/Inferred'
+import { TestInput } from 'typings/TestInput'
+import * as p from '../octokit/payloads'
 
 export function getTestEvents(inputs: any, event: string): any[][] {
   const ret: any[][] = []
@@ -24,15 +25,7 @@ export const testEvents: string[] = [
   'push',
   'schedule'
 ]
-/**
- * @interface TestInput
- * @param inputs test input to parse.  Can be a string array or an array of objects
- * @param event event to parse input for.
- */
-interface TestInput {
-  inputs: string[] | object | Inferred[]
-  events: string | string[]
-}
+
 /**
  * main Test inputs
  */
@@ -168,6 +161,12 @@ export const inferTestInputs: TestInput[] = [
 /**
  * FilesHelper Test inputs
  */
+export const sortChangedFilesInputs: TestInput[] = [
+  { inputs: ['json', 'json', '.json'], events: 'push' },
+  { inputs: ['csv', ',', '.csv'], events: 'push' },
+  { inputs: ['txt', ' ', '.txt'], events: 'push' },
+  { inputs: ['txt', '_<br />&nbsp;&nbsp;_', '.txt'], events: 'push' }
+]
 export const getOutputInputs: TestInput[] = [
   {
     inputs: ['set output string to specified output format for ChangedFiles Object',
@@ -201,3 +200,22 @@ export const writeOutputInputs: TestInput[] = [
     events: "push"
   }
 ]
+export const getFormatExtInputs: TestInput[] = [
+  { inputs: ['json', 'json', '.json'], events: 'push' },
+  { inputs: ['csv', ',', '.csv'], events: 'push' },
+  { inputs: ['txt', ' ', '.txt'], events: 'push' },
+  { inputs: ['txt', '_<br />&nbsp;&nbsp;_', '.txt'], events: 'push' }
+]
+export const formatChangedFilesInput : TestInput[] = [
+  { inputs: [ {type:'normal',  format:'json'}, p.normalFileArray, JSON.stringify(p.normalFileArray)], events: 'push' },
+  { inputs: [ {type:'normal',  format:','}, p.normalFileArray, p.normalFileArray.join(',')], events: 'push' },
+  { inputs: [ {type:'normal',  format:' '}, p.normalFileArray, p.normalFileArray.join(' ')], events: 'push' },
+  { inputs: [ {type:'normal',  format:'_<br />&nbsp;&nbsp;_'}, p.normalFileArray, p.normalFileArray.join('_<br />&nbsp;&nbsp;_')], events: 'push' },
+  { inputs: [ {type:'weird',  format:'json'}, p.weirdFileArray, JSON.stringify(p.weirdFileArray)], events: 'push' },
+  { inputs: [ {type:'weird',  format:','}, p.weirdFileArray, p.weirdFileArray.join(',')], events: 'push' },
+  { inputs: [ {type:'weird',  format:' '}, p.weirdFileArray, p.weirdFileArray.join(' ')], events: 'push' },
+  { inputs: [ {type:'weird',  format:'_<br />&nbsp;&nbsp;_'}, p.weirdFileArray, p.weirdFileArray.join('_<br />&nbsp;&nbsp;_')], events: 'push' }
+]
+/**
+ * UtilsHelper Test inputs
+ */

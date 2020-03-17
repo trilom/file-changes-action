@@ -1,35 +1,4 @@
 import type { EndpointOptions } from '@octokit/types'
-
-/**
- * REQUESTS
- */
-// Octokit.pulls.listFiles
-export { prRequest as OctokitPullsListFilesRequest }
-// Octokit.pulls.listFiles.endpoint.merge
-export { prRequest as OctokitPullsListFilesEndpointMergeRequest }
-// Octokit.repos.compareCommits
-export { pushRequest as OctokitReposCompareCommitsRequest }
-// Octokit.repos.compareCommits.endpoint.merge
-export { pushRequest as OctokitReposCompareCommitsEndpointMergeRequest }
-// Octokit.paginate
-export { prEndpointOptions as OctokitPaginatePrRequest } // pr
-export { pushEndpointOptions as OctokitPaginatePushRequest } // push
-
-/**
- * RESPONSES
- */
-// Octokit.pulls.listFiles
-export { listFilesResponse as OctokitPullsListFilesResponse }
-// Octokit.pulls.listFiles.endpoint.merge
-export { prEndpointOptions as OctokitPullsListFilesEndpointMergeResponse }
-// Octokit.repos.compareCommits
-export { listFilesResponse as OctokitReposCompareCommitsResponse }
-// Octokit.repos.compareCommits.endpoint.merge
-export { pushEndpointOptions as OctokitReposCompareCommitsEndpointMergeResponse }
-// Octokit.paginate
-export { listFilesResponse as OctokitPaginatePrResponse } // pr
-export { listFilesResponse as OctokitPaginatePushResponse } // push
-
 /**
  * FILES
  */
@@ -127,7 +96,44 @@ export const normalFileArray: string[] = [
   "functions/twitch-sadako/webhookSubscribeLambda/handler.py",
   "functions/twitch-sadako/webhookSubscribeLambda/requirements.txt",
   "functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda.json",
-  "functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json"
+  "functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json",
+  ".github/ISSUE_TEMPLATE/bug_report.md",
+  ".github/ISSUE_TEMPLATE/feature_request.md",
+  ".github/workflows/nodejs.yml",
+  ".gitignore",
+  ".npmignore",
+  ".vscode/launch.json",
+  "README-template.md",
+  "README.md",
+  "jest.config.js",
+  "package-lock.json",
+  "package.json",
+  "src/boolean-serializer.ts",
+  "src/date-serializer.ts",
+  "src/deserialize.ts",
+  "src/index.ts",
+  "src/model.ts",
+  "src/serialize-set.ts",
+  "src/serialize.ts",
+  "src/utilities.ts",
+  "src/validation.ts",
+  "test/unit/_ramda.sp.ts",
+  "test/unit/benchmark.spec.ts",
+  "test/unit/boolean-serializer.spec.ts",
+  "test/unit/data/generators.ts",
+  "test/unit/date-serializer.spec.ts",
+  "test/unit/deserialize.spec.ts",
+  "test/unit/sandbox.spec.ts",
+  "test/unit/sap/input.ts",
+  "test/unit/sap/json-object-mapper.ts",
+  "test/unit/sap/output.ts",
+  "test/unit/sap/serializers.ts",
+  "test/unit/serialize.spec.ts",
+  "test/unit/setup.ts",
+  "test/unit/test-typings.ts",
+  "test/unit/test-typings2.ts",
+  "tsconfig.build.json",
+  "tsconfig.json"
 ]
 export const weirdFileArray: string[] = [
   ".cfnlintrc",
@@ -140,3 +146,32 @@ export const weirdFileArray: string[] = [
   "cloudformation/Makefile",
   "cloudformation/mappings/mappings.awsaccount.yml"
 ]
+/**
+ * REQUESTS
+ */
+// Octokit.pulls.listFiles
+export { prRequest as OctokitPullsListFilesRequest }
+// Octokit.pulls.listFiles.endpoint.merge
+export { prRequest as OctokitPullsListFilesEndpointMergeRequest }
+// Octokit.repos.compareCommits
+export { pushRequest as OctokitReposCompareCommitsRequest }
+// Octokit.repos.compareCommits.endpoint.merge
+export { pushRequest as OctokitReposCompareCommitsEndpointMergeRequest }
+// Octokit.paginate
+export { prEndpointOptions as OctokitPaginatePrRequest } // pr
+export { pushEndpointOptions as OctokitPaginatePushRequest } // push
+
+/**
+ * RESPONSES
+ */
+// Octokit.pulls.listFiles
+export { listFilesResponse as OctokitPullsListFilesResponse }
+// Octokit.pulls.listFiles.endpoint.merge
+export { prEndpointOptions as OctokitPullsListFilesEndpointMergeResponse }
+// Octokit.repos.compareCommits
+export { listFilesResponse as OctokitReposCompareCommitsResponse }
+// Octokit.repos.compareCommits.endpoint.merge
+export { pushEndpointOptions as OctokitReposCompareCommitsEndpointMergeResponse }
+// Octokit.paginate
+export { listFilesResponse as OctokitPaginatePrResponse } // pr
+export { listFilesResponse as OctokitPaginatePushResponse } // push

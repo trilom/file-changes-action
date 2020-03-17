@@ -3,25 +3,8 @@ import {
   getInput as coreGetInput } from '@actions/core'
 import { context } from '@actions/github'
 import { getErrorString } from './UtilsHelper'
-
-export interface Inferred {
-  pr?: number
-  before?: string
-  after?: string
-  [key: string]: string|number|undefined;
-}
-
-export interface Inputs {
-  githubRepo: string
-  githubToken: string
-  pushBefore: string
-  pushAfter: string
-  prNumber: number
-  output: string
-  fileOutput: string
-  event: string
-  [key: string]: string|number;
-}
+import {Inputs} from './typings/Inputs'
+import {Inferred} from './typings/Inferred'
 
 /**
  * @function getInputs
