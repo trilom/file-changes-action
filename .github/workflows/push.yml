@@ -122,14 +122,18 @@ jobs:
         run: |
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
-          make run
-          make run COMMAND=release-pack
-          git add -A
-          git diff-index --quiet HEAD || git commit -m "Adding release changes ⚙️" -a
-          make run COMMAND=format
+          yarn build
+          yarn format
           git add -A
           git diff-index --quiet HEAD || git commit -m "Adding format changes 🤖" -a
+          yarn build-release
+          git add -A
+          git diff-index --quiet HEAD || git commit -m "Adding release changes ⚙️" -a
           git log --format='%aN <%aE>%n%cN <%cE>' | sort -u > AUTHORS
+          sed -i '/trilom-bot/d' AUTHORS
+          sed -i '/semantic-release-bot/d' AUTHORS
+          sed -i '/carnoco@gmail.com/d' AUTHORS
+          sed -i '/GitHub <noreply@github.com>/d' AUTHORS
           echo -e "\r\n$(date)" >> AUTHORS
           git add -A
           git diff-index --quiet HEAD || git commit -m "Updating AUTHORS 📓" -a
@@ -263,15 +267,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: make run
+      - run: yarn build
   # test with jest
   test:
     name: jest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: make run
-      - run: make run COMMAND=test
+      - run: yarn build
+      - run: yarn test-coverage
+      - run: bash <(curl -s https://codecov.io/bash)
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)

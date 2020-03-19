@@ -43,6 +43,8 @@ jobs:
       - uses: actions/checkout@v2
       - run: yarn build
       - run: yarn test-coverage
+      - run: bash <(curl -s https://codecov.io/bash)
+        if: contains(env.isFork, 'false')
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -69,12 +71,13 @@ jobs:
     if: github.event.pull_request.head.repo.full_name != github.repository
     steps:
       - uses: actions/checkout@v2
+      - run: yarn build
       - name: Lint and report
         uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-check
-          eslint_flags: 'src/**/*.ts'
+          eslint_flags: '--ext .ts ./'
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)
@@ -83,12 +86,13 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v2
+      - run: yarn build
       - name: Lint and report
         uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.TRILOM_BOT_TOKEN }}
           reporter: github-pr-review
-          eslint_flags: 'src/**/*.ts'
+          eslint_flags: '--ext .ts ./'
       - uses: actions/github-script@0.6.0
         if: failure()
         with:
@@ -125,15 +129,15 @@ jobs:
           token: ${{ secrets.TRILOM_BOT_TOKEN }}  
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
-      - run: make run
-      - run: make run COMMAND=format-check
-      - name: make run COMMAND=format and push code if check failed
+      - run: yarn build
+      - run: yarn format-check
+      - name: yarn format and push code if check failed
         if: failure() && github.actor != 'trilom-bot' && contains(env.isFork, 'false')
         env:
           GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}  
         run: |
-          make run COMMAND=format
-          sudo make clean
+          yarn format
+          sudo yarn clean
           git config --local user.email "trilom-bot@trailmix.me"
           git config --local user.name "trilom-bot"
           git add -A
