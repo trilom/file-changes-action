@@ -4,6 +4,6 @@ useTabs: false
 semi: false
 singleQuote: true
 trailingComma: none
-bracketSpacing: true
+bracketSpacing: false
 arrowParens: avoid
 parser: typescript

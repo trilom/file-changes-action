@@ -12,8 +12,8 @@
     "build-release": "yarn build-package --minify",
     "test": "jest",
     "test-coverage": "jest --coverage",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint --ext .ts ./",
     "clean": "rm -rf node_modules lib dist"
   },
@@ -36,10 +36,10 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.3",
-    "@actions/github": "^2.1.1",
-    "@octokit/types": "^2.5.0"
+    "@actions/github": "^2.1.1"
   },
   "devDependencies": {
+    "@octokit/types": "^2.5.0",
     "@types/jest": "^24.9.1",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
