@@ -1,14 +1,14 @@
-import { Context } from '@actions/github/lib/context'
+import {Context} from '@actions/github/lib/context'
 import {mock} from '.'
 import {octokitMock} from '../octokit'
 
 const github = mock()
 
 describe('Testing GitHubMock object ...', () => {
-  beforeAll(() =>  jest.restoreAllMocks())
+  beforeAll(() => jest.restoreAllMocks())
   it('...GitHubMock is a mock', () => {
     expect(jest.isMockFunction(github.github.GitHub)).toBe(true)
-    expect(github.context).toMatchObject(new Context)
+    expect(github.context).toMatchObject(new Context())
   })
   it('...GitHubMock mocks GitHub', () => {
     const {GitHub} = require('@actions/github')

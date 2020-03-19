@@ -1,16 +1,20 @@
 import {fn as paginate} from './paginate'
 import {
-  OctokitPaginatePrRequest, 
-  OctokitPaginatePrResponse, 
-  OctokitPaginatePushRequest, 
+  OctokitPaginatePrRequest,
+  OctokitPaginatePrResponse,
+  OctokitPaginatePushRequest,
   OctokitPaginatePushResponse
 } from './payloads'
 
 describe('Testing Octokit object...', () => {
-  beforeAll(() => { jest.restoreAllMocks() })
+  beforeAll(() => {
+    jest.restoreAllMocks()
+  })
   it('...paginate(request) throws a 404', async () => {
     const request = OctokitPaginatePrRequest
-    await expect(paginate({...request, pull_number:NaN})).rejects.toMatchObject({ name: 'HttpError', status: '404' })
+    await expect(
+      paginate({...request, pull_number: NaN})
+    ).rejects.toMatchObject({name: 'HttpError', status: '404'})
   })
   it('...paginate(request) for pull request', () => {
     const request = OctokitPaginatePrRequest

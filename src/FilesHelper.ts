@@ -1,10 +1,7 @@
-import { 
-  setOutput as coreSetOutput, 
-  debug as coreDebug 
-} from '@actions/core'
-import { writeFileSync } from 'fs'
+import {setOutput as coreSetOutput, debug as coreDebug} from '@actions/core'
+import {writeFileSync} from 'fs'
 import {ChangedFiles} from 'typings/ChangedFiles'
-import { GitHubFile } from 'typings/GitHubFile'
+import {GitHubFile} from 'typings/GitHubFile'
 import {getErrorString} from './UtilsHelper'
 
 /**
@@ -14,16 +11,33 @@ import {getErrorString} from './UtilsHelper'
  */
 export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
   try {
-    coreDebug(`Here are the files I am changing: ${JSON.stringify(files, null, 2)}`)
-    const changedFiles = {files: [], added: [], removed: [], modified:[]} as ChangedFiles
+    coreDebug(
+      `Here are the files I am changing: ${JSON.stringify(files, null, 2)}`
+    )
+    const changedFiles = {
+      files: [],
+      added: [],
+      removed: [],
+      modified: []
+    } as ChangedFiles
     files.forEach(f => {
-      changedFiles[f.status].push(f.filename || (f.added || f.removed || f.modified))
-      changedFiles.files.push(f.filename || (f.added || f.removed || f.modified))
+      changedFiles[f.status].push(
+        f.filename || f.added || f.removed || f.modified
+      )
+      changedFiles.files.push(f.filename || f.added || f.removed || f.modified)
     })
     return changedFiles
-  } catch (error) {    
+  } catch (error) {
     const eString = `There was an issue sorting files changed.`
-    throw new Error(getErrorString(error.name, error.status, sortChangedFiles.name, eString, JSON.stringify(error)))
+    throw new Error(
+      getErrorString(
+        error.name,
+        error.status,
+        sortChangedFiles.name,
+        eString,
+        JSON.stringify(error)
+      )
+    )
   }
 }
 
@@ -57,9 +71,8 @@ export function getFormatExt(format: string): string {
 export function formatChangedFiles(format: string, files: string[]): string {
   if (format === 'json') {
     return JSON.stringify(files)
-  } 
+  }
   return files.join(format)
-  
 }
 
 /**
@@ -72,8 +85,16 @@ export function formatChangedFiles(format: string, files: string[]): string {
 export function writeFiles(format: string, key: string, files: string[]): void {
   try {
     const ext = getFormatExt(format)
-    const fileName = ((key === 'files') ? `${key}${ext}` : `files_${key}${ext}`)
-    coreDebug(`Writing output file ${process.env.HOME}/${fileName}${ext} with ${format} and files ${JSON.stringify(files, null, 2)}`)
+    const fileName = key === 'files' ? `${key}${ext}` : `files_${key}${ext}`
+    coreDebug(
+      `Writing output file ${
+        process.env.HOME
+      }/${fileName}${ext} with ${format} and files ${JSON.stringify(
+        files,
+        null,
+        2
+      )}`
+    )
     writeFileSync(
       `${process.env.HOME}/${fileName}`,
       formatChangedFiles(format, files),
@@ -81,7 +102,15 @@ export function writeFiles(format: string, key: string, files: string[]): void {
     )
   } catch (error) {
     const eString = `There was an issue writing output files.`
-    throw new Error(getErrorString(error.name, error.status, writeFiles.name, eString, JSON.stringify(error)))
+    throw new Error(
+      getErrorString(
+        error.name,
+        error.status,
+        writeFiles.name,
+        eString,
+        JSON.stringify(error)
+      )
+    )
   }
 }
 
@@ -92,13 +121,31 @@ export function writeFiles(format: string, key: string, files: string[]): void {
  * @param files string list of files to format
  * @returns string output to be stored to action output
  */
-export function writeOutput(format: string, key: string, files: string[]): void {
+export function writeOutput(
+  format: string,
+  key: string,
+  files: string[]
+): void {
   try {
-    const fileName = ((key === 'files') ? key : `files_${key}`)
-    coreDebug(`Writing output ${fileName} with ${format} and files ${JSON.stringify(files, null, 2)}`)
+    const fileName = key === 'files' ? key : `files_${key}`
+    coreDebug(
+      `Writing output ${fileName} with ${format} and files ${JSON.stringify(
+        files,
+        null,
+        2
+      )}`
+    )
     coreSetOutput(fileName, formatChangedFiles(format, files))
   } catch (error) {
     const eString = `There was an issue setting action outputs.`
-    throw new Error(getErrorString(error.name, error.status, writeOutput.name, eString, JSON.stringify(error)))
+    throw new Error(
+      getErrorString(
+        error.name,
+        error.status,
+        writeOutput.name,
+        eString,
+        JSON.stringify(error)
+      )
+    )
   }
 }

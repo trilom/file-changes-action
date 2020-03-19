@@ -3,7 +3,7 @@ import {mock} from '.'
 const core = mock()
 
 describe('Testing CoreMock object...', () => {
-  beforeAll(() =>  jest.restoreAllMocks())
+  beforeAll(() => jest.restoreAllMocks())
   it('...CoreMock is a mock', () => {
     expect(jest.isMockFunction(core.getInput)).toBe(true)
     expect(jest.isMockFunction(core.setFailed)).toBe(true)
@@ -27,8 +27,9 @@ describe('Testing CoreMock object...', () => {
     expect(core.setOutput).toBeCalledWith('TestName', 'TestValue')
   })
   it('...CoreMock mocks setOutput error', () => {
-    expect(() => 
-      core.setOutput('ERROROUTPUT', 'TestValue')).toThrowError(new Error(JSON.stringify({ name: 'CoreError', status: '500' })))
+    expect(() => core.setOutput('ERROROUTPUT', 'TestValue')).toThrowError(
+      new Error(JSON.stringify({name: 'CoreError', status: '500'}))
+    )
   })
   it('...CoreMock mocks getInput', () => {
     process.env.INPUT_TEST = 'TESTINPUT'

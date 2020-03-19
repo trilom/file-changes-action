@@ -1,4 +1,3 @@
-
 import {fn as compareCommits} from './compareCommits'
 import {
   OctokitReposCompareCommitsRequest,
@@ -6,7 +5,9 @@ import {
 } from '../payloads'
 
 describe('Testing Octokit object...', () => {
-  beforeAll(() => { jest.restoreAllMocks() })
+  beforeAll(() => {
+    jest.restoreAllMocks()
+  })
   it('...repos.compareCommits(request) for push', () => {
     const request = OctokitReposCompareCommitsRequest
     const response = OctokitReposCompareCommitsResponse

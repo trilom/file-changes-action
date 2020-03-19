@@ -7,5 +7,5 @@ export interface Inputs {
   output: string
   fileOutput: string
   event: string
-  [key: string]: string|number;
+  [key: string]: string | number
 }

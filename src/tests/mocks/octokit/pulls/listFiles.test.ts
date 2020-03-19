@@ -1,4 +1,3 @@
-
 import {fn as listFiles} from './listFiles'
 import {
   OctokitPullsListFilesRequest,
@@ -6,7 +5,9 @@ import {
 } from '../payloads'
 
 describe('Testing Octokit object...', () => {
-  beforeAll(() => { jest.restoreAllMocks() })
+  beforeAll(() => {
+    jest.restoreAllMocks()
+  })
   it('...pulls.listFiles(request) for pull request', () => {
     const request = OctokitPullsListFilesRequest
     const response = OctokitPullsListFilesResponse

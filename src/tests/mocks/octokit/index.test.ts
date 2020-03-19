@@ -1,7 +1,7 @@
 import {octokitMock} from '.'
 
 describe('Testing Octokit object ...', () => {
-  beforeAll(() =>  jest.restoreAllMocks())
+  beforeAll(() => jest.restoreAllMocks())
   it('...Octokit is a mock', () => {
     expect(octokitMock).toHaveProperty('paginate')
     expect(octokitMock).toHaveProperty('pulls')
