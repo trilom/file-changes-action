@@ -48,6 +48,7 @@ rules:
     - 2
     - 2
   unicorn/prevent-abbreviations: 0
+  import/no-extraneous-dependencies: [error, {devDependencies: ['**/*.ts']}]
 parser: "@typescript-eslint/parser"
 parserOptions:
   project: ./tsconfig.json
