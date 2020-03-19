@@ -7,14 +7,6 @@ on:
   push:
     branches: [master]
 jobs:
-  debugging:
-    name: debugging info
-    runs-on: ubuntu-latest
-    steps:
-# dump event for debugging      
-      - run: |
-          echo '${{toJSON(github.event)}}'
-          echo '${{toJSON(steps)}}'
   integration:
     runs-on: ubuntu-latest
     strategy:
@@ -29,9 +21,6 @@ jobs:
         # fileOutput: ['json']
     if: (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.')) || contains(github.event.head_commit.message, 'Release merge from') || github.event_name == 'schedule'
     steps:
-      - run: |
-          echo '${{toJSON(github.event)}}'
-          echo '${{toJSON(steps)}}'
       - uses: actions/checkout@v2
         if: matrix.build
       - run: yarn build
