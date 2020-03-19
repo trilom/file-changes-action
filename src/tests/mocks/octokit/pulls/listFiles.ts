@@ -7,7 +7,6 @@ import {
 // Form and export Response Objects
 export { OctokitPullsListFilesResponse as response }
 // Export mock function
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const fn = jest.fn((data: EndpointOptions) => {
   return Promise.resolve({
     data: OctokitPullsListFilesResponse

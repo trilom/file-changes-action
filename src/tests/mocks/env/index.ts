@@ -1,12 +1,15 @@
-// imports
-import * as core from '@actions/core'
-import { GitHub } from '@actions/github'
-import { Context } from '@actions/github/lib/context'
+import type { Context } from '@actions/github/lib/context'
+import type { CoreMock } from 'typings/CoreMock'
+import type { OctokitMock } from 'typings/OctokitMock'
+import type { GitHubMock } from 'typings/GitHubMock'
+import type { FsMock } from 'typings/FsMock'
+import type { GitHubFile } from 'typings/GitHubFile'
 import { resolve as _resolve } from 'path'
-// join all payloads
+import { mock as mockCore } from '../core'
+import { mock as mockGitHub } from '../github'
+import { mock as mockFs } from '../fs'
 import * as octokitPayloads from '../octokit/payloads'
-import * as envPayloads from './payloads'
-import { octokitMock } from '../octokit'
+import * as envPayloads from '../../payloads'
 
 const payloads = {...octokitPayloads, ...envPayloads}
 // export payloads and class
@@ -19,7 +22,37 @@ export function eventName(e:string):string {
   return e.trim()
 }
 
-function formatInput(inputs:{[key:string]: string}):{[key:string]: string}{
+export function getTestEvents(inputs: any, event: string): any[][] {
+  const ret: any[][] = []
+  inputs.forEach((test: any) => {
+    if (typeof test.events === 'string' && test.events === 'all') 
+      ret.push(test.inputs) // add for all events
+    else if (typeof test.events === 'string' && test.events === event) 
+      ret.push(test.inputs) // add for named event
+    else if (Array.isArray(test.events) && test.events.includes(event)) 
+      ret.push(test.inputs) // add for named event in list
+  })
+  return ret
+}
+
+export function getTestFiles(
+  files: string[] = octokitPayloads.normalFileArray,
+  stats:{files: number, [key:string]:number} = { files: 0, added: 0, removed: 0, modified: 0 },
+  limit: number = octokitPayloads.normalFileArray.length
+):{ files: GitHubFile[], stats: {[key:string]:number}} {
+  const s = stats
+  const statuses = Object.keys(stats).filter(key => key !== 'files')
+  return { 
+    files: files.map(file => {
+      const fStatus = statuses[Math.floor(Math.random() * statuses.length)] as string
+      s.files += 1
+      s[fStatus] += 1
+      return { [fStatus]: file, status: fStatus } as unknown as GitHubFile
+    }).filter((file,i) => limit > i) as unknown as GitHubFile[],
+    stats: s }
+}
+
+export function formatInput(inputs:{[key:string]: string}):{[key:string]: string}{
   return Object.fromEntries(Object.entries(inputs).map(input => {
     const t = [
       input[0].replace(input[0], `INPUT_${input[0].replace(/ /g, '_').toUpperCase()}`),
@@ -29,16 +62,6 @@ function formatInput(inputs:{[key:string]: string}):{[key:string]: string}{
 
 export class Env 
 {
-  constructor(
-    envVars: {[key:string]: string} = {}, // any additional env vars on top of process.env
-    inputs: {[key:string]: string} = {},
-    event = 'push') // any additional inputs
-  {
-    // console.log(`I am initing for event ${event}`)
-    this.setEnv(event, envVars, inputs) // set env vars with event input
-    this.setMocks() // set mocks
-  }
-
   public envDefault: {[key:string]: string} = {
     GITHUB_TOKEN: 'EnvDefaultToken',
     GITHUB_WORKSPACE: _resolve(__dirname, '../../workspace/github'),
@@ -49,25 +72,43 @@ export class Env
   public envStart: {[key:string]: string | undefined} = {...process.env}  // store shallow copy of process.env on init
 
   // set mocks
-  contextMock!: Context
-  
-  coreMock!: any
+  coreMock: CoreMock
 
-  githubMock!: GitHub
+  githubMock: GitHubMock
   
-  octokitMock: GitHub = octokitMock as unknown as GitHub
+  octokitMock: OctokitMock
+
+  fsMock: FsMock
+
+  context: Context
 
   event = 'push'
 
+  constructor(
+    envVars: {[key:string]: string}, // any additional env vars on top of process.env
+    inputs: {[key:string]: string},
+    event?: string) // any additional inputs
+  {
+    this.setEnv(event || this.event, envVars, inputs); // set env vars with event input
+    this.coreMock = mockCore() // mock core
+    ;({
+      github: this.githubMock, 
+      octokit: this.octokitMock, 
+      context: this.context
+    }  = mockGitHub()) // mock github
+    this.fsMock = mockFs() // mock fs
+  }
+
   setEnv(
-    event: string = this.event,
+    event: string,
     envVars: {[key:string]: string},
     inputs: {[key:string]: string}):void
   {
     this.event = event
-    const eventPayload = _resolve(__dirname, `../../../../tests/events/${this.event}.json`)
+    const eventPayload = _resolve(__dirname, 
+      `../../../../tests/events/${this.event}.json`)
     this.setInput({
-      ...this.envDefault, // / add default vars
+      ...this.envDefault, // add default vars
       ...{
         GITHUB_EVENT_PATH: eventPayload,
         GITHUB_EVENT_NAME: eventName(this.event)
@@ -78,39 +119,16 @@ export class Env
     )
   }
 
-  setMocks():void {
-    this.setGithubMock()
-    this.setCoreMock()
-  }
-
   setInput(inputs:{[key:string]: string}):void {
     process.env = { ...this.envStart, ...inputs} 
   }
 
   updateInput(inputs:{[key:string]: string}):void {
     process.env = { ...process.env, ...formatInput(inputs)}
-    this.setGithubMock()
-  }
-
-  setCoreMock():void {
-    this.coreMock = {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      getInput: jest.fn((name: string, options?: core.InputOptions) => process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`]),
-      debug: jest.fn(),
-      warning: jest.fn(),
-      info: jest.fn(),
-      error: jest.fn(),
-    }
-    jest.mock('@actions/core', () => this.coreMock)
-  }
-  
-  setGithubMock():void {
-    this.githubMock =  {
-      ...this.octokitMock
-    } as unknown as GitHub
-    this.contextMock = new Context()
-    jest.mock('@actions/github', () => (
-      { GitHub: jest.fn(() =>  this.githubMock),
-        context: this.contextMock}))
+    ;({
+      github: this.githubMock, 
+      octokit: this.octokitMock, 
+      context: this.context
+    }  = mockGitHub())
   }
 }

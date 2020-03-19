@@ -2,8 +2,9 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: "node",
   testRunner: 'jest-circus/runner',
+  testMatch: ['**/*.test.ts'],
   clearMocks: true,
-  collectCoverage: true,
+  collectCoverage: false,
   coverageThreshold: {
     global: {
       branches: 50,

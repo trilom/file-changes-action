@@ -1,7 +1,10 @@
+import { 
+  setOutput as coreSetOutput, 
+  debug as coreDebug 
+} from '@actions/core'
 import { writeFileSync } from 'fs'
-import { setOutput as coreSetOutput, debug as coreDebug } from '@actions/core'
 import type {ChangedFiles} from 'typings/ChangedFiles'
-import type { GitHubFile } from './typings/GitHubFile'
+import type { GitHubFile } from 'typings/GitHubFile'
 import {getErrorString} from './UtilsHelper'
 
 /**
@@ -19,8 +22,8 @@ export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
     })
     return changedFiles
   } catch (error) {    
-    const eString = `There was an issue sorting files changed files.`
-    throw new Error(getErrorString(error.name || 'unknown', error.status, sortChangedFiles.name, eString, JSON.stringify(error)))
+    const eString = `There was an issue sorting files changed.`
+    throw new Error(getErrorString(error.name, error.status, sortChangedFiles.name, eString, JSON.stringify(error)))
   }
 }
 
@@ -78,7 +81,7 @@ export function writeFiles(format: string, key: string, files: string[]): void {
     )
   } catch (error) {
     const eString = `There was an issue writing output files.`
-    throw new Error(getErrorString(error.name || 'unknown', error.status, writeFiles.name, eString, JSON.stringify(error)))
+    throw new Error(getErrorString(error.name, error.status, writeFiles.name, eString, JSON.stringify(error)))
   }
 }
 
@@ -96,6 +99,6 @@ export function writeOutput(format: string, key: string, files: string[]): void 
     coreSetOutput(fileName, formatChangedFiles(format, files))
   } catch (error) {
     const eString = `There was an issue setting action outputs.`
-    throw new Error(getErrorString(error.name || 'unknown', error.status, writeOutput.name, eString, JSON.stringify(error)))
+    throw new Error(getErrorString(error.name, error.status, writeOutput.name, eString, JSON.stringify(error)))
   }
 }

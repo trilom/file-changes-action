@@ -1,7 +1,7 @@
-import {GitHub} from '@actions/github'
+import { GitHub } from '@actions/github'
+import type {GitHubFile} from 'typings/GitHubFile'
+import type { Inferred } from "typings/Inferred"
 import { getErrorString } from './UtilsHelper'
-import type { Inferred } from "./typings/Inferred"
-import type {GitHubFile} from './typings/GitHubFile'
 /**
  * @function initClient
  * @throws {Error} not sure what might trigger this, but it will throw an error.
@@ -14,8 +14,7 @@ export function initClient(
   try {
     return new GitHub(token)
   } catch (error) {
-    const eString = `There was an error creating github client.  \
-Please check your token.`
+    const eString = `There was an error creating github client. Please check your token.`
     throw new Error(getErrorString(error.name, error.status, initClient.name, eString, error))
   }
 }
@@ -44,8 +43,7 @@ export async function getChangedPRFiles(
     )
     return files
   } catch(error) {
-    const eString = `There was an error getting change files for 
-repo:${repo} owner:${owner} pr:${pullNumber}`
+    const eString = `There was an error getting change files for repo:${repo} owner:${owner} pr:${pullNumber}`
     let ePayload: string
     if (error.name === 'HttpError' && +error.status === 404) ePayload = getErrorString(error.name, error.status, getChangedPRFiles.name, eString, error)
     else ePayload = getErrorString(`Unknown Error:${error.name || ''}`, error.status, getChangedPRFiles.name, eString, error.message)
@@ -79,8 +77,7 @@ export async function getChangedPushFiles(
     )
     return files
   } catch (error) {
-    const eString = `There was an error getting change files for 
-repo:${repo} owner:${owner} base:${base} head:${head}`
+    const eString = `There was an error getting change files for repo:${repo} owner:${owner} base:${base} head:${head}`
     let ePayload: string  
     if (error.name === 'HttpError' && +error.status === 404) ePayload = getErrorString(error.name, error.status, getChangedPushFiles.name, eString, error)
     else ePayload = getErrorString(`Unknown Error:${error.name || ''}`, error.status, getChangedPushFiles.name, eString, error.message)
@@ -100,8 +97,9 @@ export async function getChangedFiles(
   { before, after, pr = NaN }: Inferred
 ): Promise<GitHubFile[]> {
   try {
-    if (repoFull.split('/').length > 2) 
-      throw new Error(getErrorString(`Bad-Repo`, 500, getChangedFiles.name, `Repo input of ${repoFull} has more than 2 length after splitting.`))
+    if (repoFull.split('/').length > 2) {
+      throw new Error(getErrorString(`Bad-Repo`, 500, 'self', `Repo input of ${repoFull} has more than 2 length after splitting.`))
+    }
     const owner = repoFull.split('/')[0]
     const repo = repoFull.split('/')[1]
     let files:GitHubFile[] = []
@@ -114,9 +112,13 @@ export async function getChangedFiles(
     const pError = JSON.parse(error.message)
     if (pError.from.includes('getChanged')) 
       throw new Error(JSON.stringify({ ...pError, ...{ from: `${error.status}/${error.name}`} }, null, 2))
-    const eString = `There was an error getting change files outputs 
-pr: ${pr} before: ${before} after: ${after}`
-    const ePayload: string = getErrorString(`Unknown Error:${error.name || ''}`, error.status, getChangedFiles.name, eString, error.message)
+    const eString = `There was an error getting change files outputs pr: ${pr} before: ${before} after: ${after}`
+    const ePayload: string = getErrorString(
+      `Unknown Error:${error.name}`, 
+      error.status, 
+      getChangedFiles.name, 
+      eString, 
+      error.message)
     throw new Error(ePayload)
   }
 }

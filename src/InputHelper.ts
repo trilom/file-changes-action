@@ -1,10 +1,11 @@
 import { 
   warning as coreWarning, 
-  getInput as coreGetInput } from '@actions/core'
+  getInput as coreGetInput 
+} from '@actions/core'
 import { context } from '@actions/github'
+import type {Inferred} from 'typings/Inferred'
+import type {Inputs} from 'typings/Inputs'
 import { getErrorString } from './UtilsHelper'
-import {Inputs} from './typings/Inputs'
-import {Inferred} from './typings/Inferred'
 
 /**
  * @function getInputs
@@ -24,7 +25,7 @@ export function getInputs():Inputs {
       prNumber: +coreGetInput('prNumber') || ((typeof (context.issue.number) === 'undefined') ? NaN : context.issue.number),
       output: coreGetInput('output') || 'json',
       fileOutput: coreGetInput('fileOutput') || 'json',
-      event: context.eventName || 'push'
+      event: context.eventName
     } as Inputs
   } catch (error) {
     const eString = `Received an issue getting action inputs.`

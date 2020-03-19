@@ -1,14 +1,12 @@
 plugins:
   - '@typescript-eslint'
   - eslint-comments
-  - jest
   - promise
   - unicorn
 extends:
   - airbnb-typescript
   - plugin:@typescript-eslint/recommended
   - plugin:eslint-comments/recommended
-  - plugin:jest/recommended
   - plugin:promise/recommended
   - plugin:unicorn/recommended
   - prettier
@@ -23,8 +21,10 @@ settings:
     typescript: {}
 rules:
   unicorn/filename-case: off
+  react/static-property-placement: 0
   no-prototype-builtins: 0
   import/prefer-default-export: 0
+  '@typescript-eslint/no-explicit-any': 0
   import/no-default-export: error
   no-use-before-define:
     - error
@@ -37,8 +37,6 @@ rules:
     - 
       allowExpressions: true
       allowTypedFunctionExpressions: true
-  '@typescript-eslint/no-explicit-any':
-    - off
   '@typescript-eslint/no-use-before-define':
     - error
     -
@@ -57,5 +55,16 @@ parserOptions:
   sourceType: module
 env:
   node: true
-  jest: true
   browser: true
+overrides:
+  - files: ['src/tests/**/*']
+    plugins:
+      - jest
+    extends:
+      - plugin:jest/recommended
+    rules:
+      global-require: 0
+      '@typescript-eslint/no-var-requires': 0
+      no-console: 0
+      '@typescript-eslint/no-unused-vars': 0
+      '@typescript-eslint/no-throw-literal': 0
