@@ -40,14 +40,14 @@ jobs:
           pushAfter: cde426492d870040962d2c03f1921516b86fce64
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - uses: trilom/file-changes-action@master-rebase
+      - uses: trilom/file-changes-action@${{ github.ref }}
         id: file_changes_nobuild_pr
         if: "! matrix.build && matrix.event_type == 'pull_request'"
         with:
           prNumber: 36
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - uses: trilom/file-changes-action@master-rebase
+      - uses: trilom/file-changes-action@${{ github.ref }}
         id: file_changes_nobuild_push
         if: "! matrix.build && matrix.event_type == 'push'"
         with:
