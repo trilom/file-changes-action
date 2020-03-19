@@ -134,6 +134,7 @@ jobs:
           sed -i '/semantic-release-bot/d' AUTHORS
           sed -i '/carnoco@gmail.com/d' AUTHORS
           sed -i '/GitHub <noreply@github.com>/d' AUTHORS
+          sed -i '/dependabot[bot]/d' AUTHORS
           echo -e "\r\n$(date)" >> AUTHORS
           git add -A
           git diff-index --quiet HEAD || git commit -m "Updating AUTHORS 📓" -a

@@ -165,7 +165,7 @@ describe('Testing FilesHelper.ts...', () => {
         )
         expect(coreDebug).toHaveBeenCalledWith(
           expect.stringContaining(
-            'Writing output file /Users/bkillian/files_testKey.txt.txt with error and files "json"'
+            `Writing output file ${process.env.HOME}/files_testKey.txt.txt with error and files "json"`
           )
         )
       })

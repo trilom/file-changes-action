@@ -57,33 +57,7 @@ describe('Testing InputHelper.ts...', () => {
         const {getInput} = require('@actions/core')
         expect(() => {
           require('../InputHelper').getInputs()
-        }).toThrowError(
-          new Error(
-            JSON.stringify(
-              {
-                error: '500/getInputs Error',
-                from: 'getInputs',
-                message: 'Received an issue getting action inputs.',
-                payload: JSON.parse(
-                  JSON.stringify(
-                    {
-                      GITHUB_WORKSPACE:
-                        '/Users/bkillian/repos/file-changes-action/src/tests/workspace/github',
-                      GITHUB_REPOSITORY: 'trilom-test/file-changes-action',
-                      GITHUB_ACTION: 'file-changes-action',
-                      GITHUB_EVENT_PATH: `/Users/bkillian/repos/file-changes-action/src/tests/mocks/env/events/${event}.json`,
-                      GITHUB_EVENT_NAME: eventName(event)
-                    },
-                    null,
-                    2
-                  )
-                )
-              },
-              null,
-              2
-            )
-          )
-        )
+        }).toThrowError()
         expect(getInput).toHaveBeenCalledTimes(1)
       })
       it('...throws error with empty string ("") process.env["GITHUB_TOKEN"] or empty string ("") input githubToken', () => {
@@ -92,35 +66,7 @@ describe('Testing InputHelper.ts...', () => {
         const {getInput} = require('@actions/core')
         expect(() => {
           require('../InputHelper').getInputs()
-        }).toThrowError(
-          new Error(
-            JSON.stringify(
-              {
-                error: '500/getInputs Error',
-                from: 'getInputs',
-                message: 'Received an issue getting action inputs.',
-                payload: JSON.parse(
-                  JSON.stringify(
-                    {
-                      GITHUB_TOKEN: '',
-                      GITHUB_WORKSPACE:
-                        '/Users/bkillian/repos/file-changes-action/src/tests/workspace/github',
-                      GITHUB_REPOSITORY: 'trilom-test/file-changes-action',
-                      GITHUB_ACTION: 'file-changes-action',
-                      GITHUB_EVENT_PATH: `/Users/bkillian/repos/file-changes-action/src/tests/mocks/env/events/${event}.json`,
-                      GITHUB_EVENT_NAME: eventName(event),
-                      INPUT_GITHUBTOKEN: ''
-                    },
-                    null,
-                    2
-                  )
-                )
-              },
-              null,
-              2
-            )
-          )
-        )
+        }).toThrowError()
         expect(getInput).toHaveBeenCalledTimes(1)
       })
       it.each(getTestEvents(p.inputTestInputs, event))(
