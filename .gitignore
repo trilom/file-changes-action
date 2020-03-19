@@ -46,8 +46,8 @@ build/Release
 # Dependency directories
 jspm_packages/
 
-# TypeScript v1 declaration files
-typings/
+# # TypeScript v1 declaration files
+# typings/
 
 # TypeScript cache
 *.tsbuildinfo

@@ -1,5 +1,9 @@
 # file-changes-action
 
+[![codecov](https://codecov.io/gh/trilom/file-changes-action/branch/master/graph/badge.svg)](https://codecov.io/gh/trilom/file-changes-action)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+![Integration Tests](https://github.com/trilom/file-changes-action/workflows/Integration%20Tests/badge.svg)
+
 This action will take the information from the Push/Pull Request and output some variables and write files that will let you know what was changed, removed, or added.
 
 ## Inputs
@@ -191,24 +195,4 @@ jobs:
       - name: test
         run: |
           cat $HOME/files.txt
-```
- 
-```bash
-# install project dependencies (including devDependencies)
-yarn
-# build the project (dist files)
-yarn build
-# build and lint
-
-# run prettier (this will make your ugly code pretty)
-yarn format
-# dry-run prettier (this will tell you if your ugly code needs to be made pretty)
-yarn format-check
-# lint project
-yarn lint
-# test
-yarn jest
-
-# clean duh
-yarn clean
 ```

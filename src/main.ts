@@ -1,157 +1,40 @@
-// External Dependencies
-import * as core from '@actions/core'
-import * as fs from 'fs'
-import * as gh from '@actions/github'
-import {ChangedFiles, sortChangedFiles} from './ChangedFiles'
-
-async function getChangedPRFiles(
-  repo: string,
-  client: gh.GitHub,
-  prNumber: number
-): Promise<ChangedFiles> {
-  const options = client.pulls.listFiles.endpoint.merge({
-    owner: repo.split('/')[0],
-    repo: repo.split('/')[1],
-    pull_number: prNumber
-  })
-  return sortChangedFiles(
-    await client.paginate(options).then(files => {
-      return files
-    })
-  )
-}
-
-async function getChangedPushFiles(
-  repo: string,
-  client: gh.GitHub,
-  base: string,
-  head: string
-): Promise<ChangedFiles> {
-  const response = await client.repos.compareCommits({
-    owner: repo.split('/')[0],
-    repo: repo.split('/')[1],
-    base,
-    head
-  })
-  return sortChangedFiles(response.data.files)
-}
-
-function writeFiles(format: string, changedFiles: ChangedFiles): void {
-  switch (format.trim()) {
-    case 'json':
-      format = '.json'
-      break
-    case ',':
-      format = '.csv'
-      break
-    default:
-      format = '.txt'
-      break
-  }
-  //write files to preserve original functionality
-  fs.writeFileSync(
-    `${process.env.HOME}/files${format}`,
-    changedFiles.fileOutput(format),
-    'utf-8'
-  )
-  fs.writeFileSync(
-    `${process.env.HOME}/files_modified${format}`,
-    changedFiles.updatedOutput(format),
-    'utf-8'
-  )
-  fs.writeFileSync(
-    `${process.env.HOME}/files_added${format}`,
-    changedFiles.createdOutput(format),
-    'utf-8'
-  )
-  fs.writeFileSync(
-    `${process.env.HOME}/files_deleted${format}`,
-    changedFiles.deletedOutput(format),
-    'utf-8'
-  )
-}
-
-function writeOutput(format: string, changedFiles: ChangedFiles): void {
-  //also export some outputs
-  core.setOutput('files', changedFiles.fileOutput(format))
-  core.setOutput('files_added', changedFiles.createdOutput(format))
-  core.setOutput('files_modified', changedFiles.updatedOutput(format))
-  core.setOutput('files_deleted', changedFiles.deletedOutput(format))
-}
-
+import {setFailed as coreSetFailed} from '@actions/core'
+import {getInputs, inferInput} from './InputHelper'
+import {writeOutput, writeFiles, sortChangedFiles} from './FilesHelper'
+import {getChangedFiles, initClient} from './GithubHelper'
+import {errorMessage} from './UtilsHelper'
 // figure out if it is a PR or Push
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
-    const github: any = gh.context
-    const repo: string = core.getInput('githubRepo')
-    const token: string = core.getInput('githubToken')
-    const output: string = core.getInput('output')
-    const fileOutput: string = core.getInput('fileOutput')
-    const pushBefore: string = core.getInput('pushBefore')
-    const pushAfter: string = core.getInput('pushAfter')
-    const prNumber: string = core.getInput('prNumber')
-    const isPush = pushBefore !== '' && pushAfter !== ''
-    const isPR = prNumber !== ''
-    const client = new gh.GitHub(token)
-    let changedFiles = new ChangedFiles()
-    if (isPush && isPR) {
-      core.setFailed(
-        `You can't pick PR and Push, I don't know which one to do.`
-      )
-    } else if (isPR) {
-      // do PR actions
-      if (prNumber != null) {
-        try {
-          core.error(`${prNumber}`)
-          core.error(`${repo}`)
-          changedFiles = await getChangedPRFiles(
-            repo,
-            client,
-            parseInt(prNumber)
-          )
-        } catch (error) {
-          core.error(
-            `There was an error getting Pull Request change files:${error}`
-          )
-          throw error
-        }
-      } else {
-        core.setFailed(
-          'Could not get pull request number from context, exiting'
-        )
-        return
-      }
-    } else if (isPush) {
-      // do push actions
-      try {
-        changedFiles = await getChangedPushFiles(
-          repo,
-          client,
-          pushBefore,
-          pushAfter
-        )
-      } catch (error) {
-        core.error(`There was an error getting Push change files:${error}`)
-        throw error
-      }
-    } else {
-      core.setFailed(
-        `Change not initiated by a PR or Push, it was ${
-          github.eventName
-        } instead.  Github:${JSON.stringify(github)}`
-      )
-      return
-    }
-    // write file output
-    writeFiles(fileOutput, changedFiles)
-
-    // write output vars
-    writeOutput(output, changedFiles)
-
+    // get inputs
+    const inputs = getInputs()
+    // parse input
+    const inferred = inferInput(
+      inputs.pushBefore,
+      inputs.pushAfter,
+      inputs.prNumber
+    )
+    // prepare client
+    const client = initClient(inputs.githubToken)
+    // get changed files
+    const changedFilesArray = await getChangedFiles(
+      client,
+      inputs.githubRepo,
+      inferred
+    )
+    // sort changed files
+    const changedFiles = sortChangedFiles(changedFilesArray)
+    Object.keys(changedFiles).forEach(key => {
+      // write file output
+      writeFiles(inputs.fileOutput, key, changedFiles[key])
+      // write output vars
+      writeOutput(inputs.output, key, changedFiles[key])
+    })
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(0)
   } catch (error) {
-    core.error(error)
-    core.setFailed(error.message)
+    const pError = JSON.parse(error.message)
+    coreSetFailed(errorMessage(pError.from, pError))
   }
 }
 

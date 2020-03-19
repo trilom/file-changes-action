@@ -43,29 +43,29 @@
 
 - When any `opened`, `reopened`, or `synchronize` **Pull Request** type runs(**pr.yml**):
   - Assign it to trilom (**add-reviews**)
-  - Build code with `make run` which runs `yarn` and `tsc` (**build**)
+  - Build code with `yarn build` which runs `yarn` and `tsc` (**build**)
     - Label with builds if passing and on inner workspace
-  - Test code with `make run COMMAND=test` which runs `jest` (**test**)
+  - Test code with `yarn test-coverage` which runs `jest` (**test**)
     - Label with tested if passing and on inner workspace
   - Test code with eslint reviewdog and report back if inner workspace (**lintdog**)
     - Label with pretty if passing and on inner workspace
-  - Check format of code with `make run COMMAND=format-check` which runs `prettier --check` (**format_check_push**)
+  - Check format of code with `yarn format-check` which runs `prettier --check` (**format_check_push**)
     - If:
       - Fork then pull **Pull Request** github.ref with GITHUB_TOKEN
       - Inner **Pull Request** then pull HEAD repo ref
-    - Build code with `make run` which runs `yarn` and `tsc`
+    - Build code with `yarn build` which runs `yarn` and `tsc`
       - If format-check succeeds and on inner workspace
         - Label with pretty
       - If format-check fails and on inner workspace and actor is not trilom-bot
-        - Run `make run COMMAND=format` which runs `prettier --write`
-        - Clean build files with `make clean`
+        - Run `yarn format` which runs `prettier --write`
+        - Clean build files with `yarn clean`
         - Commit the format changes as trilom-bot to **Pull Request** head
 
 ## Push
 
 - When any **Push** type runs to _master_, _next_, _alpha_, or _beta_(**push.yml**):
-  - Build code with `make run` which runs `yarn` and `tsc` (**build**)
-  - Test code with `make run COMMAND=test` which runs `jest` (**test**)
+  - Build code with `yarn build` which runs `yarn` and `tsc` (**build**)
+  - Test code with `yarn test-coverage` which runs `jest` (**test**)
   - Test code with eslint reviewdog and report back with github checks(**lintdog**)
 - When any **Push** type runs to _master_, _next_, _alpha_, or _beta_ with a head_commit message **NOT** containing 'trilom/v1.' or 'trilom/v2.':
   - Build **dist/\*\*.js** files, update **AUTHORS**, format **src/\*\*.ts** files and commit.

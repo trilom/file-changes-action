@@ -1,16 +1,21 @@
 {
   "name": "@trilom/file-changes-action",
   "version": "1.2.0",
+  "engines": {
+    "node": "12.16.1"
+  },
   "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
     "build": "yarn && tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
-    "lint": "eslint src/**/*.ts",
-    "release-pack": "ncc build",
-    "test": "echo \"Error: no test specified\" && exit 0",
-    "clean": "rm -rf node_modules"
+    "build-package": "yarn build --build tsconfig.build.json && ncc build",
+    "build-release": "yarn build-package --minify",
+    "test": "jest",
+    "test-coverage": "jest --coverage",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
+    "lint": "eslint --ext .ts ./",
+    "clean": "rm -rf node_modules lib dist"
   },
   "repository": {
     "type": "git",
@@ -29,92 +34,33 @@
   "author": "Bryan Killian <me@trilom.org>",
   "homepage": "https://github.com/trilom/file-changes-action#README",
   "license": "MIT",
-  "release": {
-    "branches": [
-      "+([1-9])?(.{+([1-9]),x}).x",
-      "master",
-      "next",
-      {
-        "name": "alpha",
-        "prerelease": true
-      },
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ],
-    "dryRun": false,
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      [
-        "semantic-release-slack-bot",
-        {
-          "notifyOnSuccess": true,
-          "notifyOnFail": true,
-          "markdownReleaseNotes": true,
-          "onSuccessTemplate": {
-            "text": "$package_name version v$npm_package_version!\n\n$release_notes"
-          }
-        }
-      ],
-      [
-        "@semantic-release/changelog",
-        {
-          "changelogFile": "CHANGELOG.md"
-        }
-      ],
-      "@semantic-release/npm",
-      [
-        "@semantic-release/github",
-        {
-          "assets": [
-            {
-              "path": "dist/**/*.js",
-              "label": "Packaged JS Code"
-            }
-          ],
-          "successComment": "🎉🦍🎉 This <%= issue.pull_request ? 'pull request' : 'issue' %> has been resolved in version <%= nextRelease.version %> at `trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n ## Release<%= _.size(releases) > 1 ? 's' : '' %><% _.forEach(releases, function(release) { %>\n\t\t**Release Name:** [<%= release.name %>](<%= release.url %>)<% }); %>\n\n ## Commits<% _.forEach(commits, function(commit) { %>\n\t\t@<%= commit.author %> - [_<%= commit.message %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>",
-          "labels": [
-            "failure"
-          ],
-          "releasedLabels": [
-            "releases/${nextRelease.gitTag}"
-          ],
-          "assigness": [
-            "trilom"
-          ]
-        }
-      ],
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "CHANGELOG.md",
-            "package.json",
-            "yarn.lock"
-          ],
-          "message": "chore(release): 🎉🦍🎉 Release <%= nextRelease.version %> - <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n<%= nextRelease.notes %>"
-        }
-      ]
-    ]
-  },
   "dependencies": {
-    "@actions/core": "^1.2.0",
-    "@actions/github": "^2.0.0"
+    "@actions/core": "^1.2.3",
+    "@actions/github": "^2.1.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "@typescript-eslint/parser": "^2.8.0",
+    "@octokit/types": "^2.5.0",
+    "@types/jest": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.24.0",
+    "@typescript-eslint/parser": "^2.24.0",
     "@zeit/ncc": "^0.20.5",
-    "eslint": "^5.16.0",
-    "eslint-plugin-github": "^2.0.0",
-    "eslint-plugin-jest": "^22.21.0",
+    "codecov": "^3.6.5",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-typescript": "^7.0.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-eslint-comments": "^3.1.2",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^2.5.0",
+    "eslint-plugin-unicorn": "^17.2.0",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
-    "js-yaml": "^3.13.1",
     "prettier": "^1.19.1",
-    "ts-jest": "^24.2.0",
-    "typescript": "^3.6.4"
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.8.3"
   }
 }

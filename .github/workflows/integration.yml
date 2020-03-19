@@ -21,8 +21,8 @@ jobs:
       matrix:
         event_type: ['push', 'pull_request']
         build: ['true', 'false']
-        output: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
-        fileOutput: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+        output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
+        fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         # event_type: ['pull_request']
         # build: ['true']
         # output: ['json']
@@ -34,7 +34,7 @@ jobs:
           echo '${{toJSON(steps)}}'
       - uses: actions/checkout@v2
         if: matrix.build
-      - run: make run
+      - run: yarn build
         if: matrix.build
       - uses: ./
         id: file_changes_build_pr
