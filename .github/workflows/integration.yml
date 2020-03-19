@@ -12,40 +12,22 @@ jobs:
     strategy:
       matrix:
         event_type: ['push', 'pull_request']
-        build: ['true', 'false']
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
     if: (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.')) || contains(github.event.head_commit.message, 'Release merge from') || github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v2
-        if: matrix.build
       - run: yarn build
-        if: matrix.build
       - uses: ./
         id: file_changes_build_pr
-        if: matrix.build && matrix.event_type == 'pull_request'
+        if: matrix.event_type == 'pull_request'
         with:
           prNumber: 83
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
       - uses: ./
         id: file_changes_build_push
-        if: matrix.build && matrix.event_type == 'push'
-        with:
-          pushBefore: 6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2
-          pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
-          output: ${{ matrix.output }}
-          fileOutput: ${{ matrix.fileOutput }}
-      - uses: ${{ format('trilom/file-changes-action@{0}', github.ref) }}
-        id: file_changes_nobuild_pr
-        if: "! matrix.build && matrix.event_type == 'pull_request'"
-        with:
-          prNumber: 83
-          output: ${{ matrix.output }}
-          fileOutput: ${{ matrix.fileOutput }}
-      - uses: ${{ format('trilom/file-changes-action@{0}', github.ref) }}
-        id: file_changes_nobuild_push
-        if: "! matrix.build && matrix.event_type == 'push'"
+        if: matrix.event_type == 'push'
         with:
           pushBefore: 6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2
           pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
@@ -57,17 +39,17 @@ jobs:
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
-          files: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files), toJSON(steps.file_changes_build_push.outputs.files), toJSON(steps.file_changes_nobuild_pr.outputs.files), toJSON(steps.file_changes_nobuild_push.outputs.files)) }}
-          files_modified: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified), toJSON(steps.file_changes_nobuild_pr.outputs.files_modified), toJSON(steps.file_changes_nobuild_push.outputs.files_modified)) }}
-          files_added: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added), toJSON(steps.file_changes_nobuild_pr.outputs.files_added), toJSON(steps.file_changes_nobuild_push.outputs.files_added)) }}
-          files_deleted: ${{ format('{0}{1}{2}{3}', toJSON(steps.file_changes_build_pr.outputs.files_deleted), toJSON(steps.file_changes_build_push.outputs.files_deleted), toJSON(steps.file_changes_nobuild_pr.outputs.files_deleted), toJSON(steps.file_changes_nobuild_push.outputs.files_deleted)) }}
+          files: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files), toJSON(steps.file_changes_build_push.outputs.files)) }}
+          files_modified: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified)) }}
+          files_added: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added)) }}
+          files_deleted: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_deleted), toJSON(steps.file_changes_build_push.outputs.files_deleted)) }}
       - run: chmod +x test.sh && bash test.sh
         working-directory: .github/actions/integration
         if: success() && matrix.output != 'json'
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
-          files: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files, steps.file_changes_nobuild_pr.outputs.files, steps.file_changes_nobuild_push.outputs.files) }}
-          files_modified: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified, steps.file_changes_nobuild_pr.outputs.files_modified, steps.file_changes_nobuild_push.outputs.files_modified) }}
-          files_added: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added, steps.file_changes_nobuild_pr.outputs.files_added, steps.file_changes_nobuild_push.outputs.files_added) }}
-          files_deleted: ${{ format('{0}{1}{2}{3}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files_deleted, steps.file_changes_nobuild_pr.outputs.files_deleted, steps.file_changes_nobuild_push.outputs.files_deleted) }}
+          files: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files ) }}
+          files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified ) }}
+          files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added ) }}
+          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted ) }}
