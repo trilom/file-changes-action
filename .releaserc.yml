@@ -16,7 +16,7 @@ plugins:
       notifyOnFail: true
       markdownReleaseNotes: true
       onSuccessTemplate:
-        text: "$package_name version v$npm_package_version!\n\n$release_notes"
+        text: "$package_name version v$npm_package_version!\n\n\n$release_notes"
   -
     - "@semantic-release/changelog"
     - changelogFile: CHANGELOG.md
@@ -26,24 +26,34 @@ plugins:
     - assets:
       - path: "dist/**/*.js"
         label: Packaged JS Code
-      successComment: |
-        🎉🦍🎉 This 
-        <%= issue.pull_request ? 'pull request' : 'issue' %> 
-        has been resolved in version <%= nextRelease.version %> at 
-        `trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n
-        `- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>
-        `\n\n ## Release<%= _.size(releases) > 1 ? 's' : '' %>
+      successComment: >
+        # 🎉🦍🎉 This <% issue.pull_request ? 'pull request' : 'issue' %> 
+        has been resolved in version *<%= nextRelease.version %>* at
+        *trilom/file-changes-action@<%= nextRelease.gitTag %>*
+        
+        `  - name: File Changes Action
+             uses: trilom/file-changes-action@<%= nextRelease.gitTag %>`
+        
+        ## Release<%= _.size(releases) > 1 ? 's' : '' %>
+
         <% _.forEach(releases, function(release) { %>
-        \n\t\t**Release Name:** [<%= release.name %>](<%= release.url %>)<% }); %>
-        \n\n ## Commits<% _.forEach(commits, function(commit) { %>
-        \n\t\t@<%= commit.author %> - [_<%= commit.message %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>"
+        **Release Name:** [<%= release.name %>](<%= release.url %>)<% }); %>
+
+        ## Commits
+        
+        <% _.forEach(commits, function(commit) { %>
+        @<%= commit.author.name %> - [_<%= _.replace(commit.message, /[()\\\/_\*]/g, '') %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>
       labels: [failure]
-      releasedLabels: ["releases/${nextRelease.gitTag}"]
+      releasedLabels: ['releases/<%= nextRelease.gitTag %>']
       assignees: trilom
   -
     - "@semantic-release/git"
     - assets: [CHANGELOG.md, package.json, yarn.lock]
-      message: |
-        chore(release): 🎉🦍🎉 Release <%= nextRelease.version %> - 
-        <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> 
-        [skip ci]\n\n`- name: File Changes Action\n\tuses: trilom/file-changes-action@<%= nextRelease.gitTag %>`\n\n<%= nextRelease.notes %>"
+      message: >
+        chore(release): 🎉🦍🎉 Release <%= nextRelease.version %> -
+        <%= new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %> [skip ci]
+        
+        `- name: File Changes Action
+           uses: trilom/file-changes-action@<%= nextRelease.gitTag %>`
+        
+        <%= nextRelease.notes %>
