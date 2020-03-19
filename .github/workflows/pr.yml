@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: make run
+      - run: yarn build
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
@@ -41,8 +41,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - run: make run
-      - run: make run COMMAND=test
+      - run: yarn build
+      - run: yarn test-coverage
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
