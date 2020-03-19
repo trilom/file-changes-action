@@ -36,14 +36,14 @@ jobs:
           pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - uses: format('trilom/file-changes-action@{0}', github.ref)
+      - uses: ${{ format('trilom/file-changes-action@{0}', github.ref) }}
         id: file_changes_nobuild_pr
         if: "! matrix.build && matrix.event_type == 'pull_request'"
         with:
           prNumber: 83
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - uses: format('trilom/file-changes-action@{0}', github.ref)
+      - uses: ${{ format('trilom/file-changes-action@{0}', github.ref) }}
         id: file_changes_nobuild_push
         if: "! matrix.build && matrix.event_type == 'push'"
         with:
