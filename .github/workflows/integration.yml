@@ -49,7 +49,7 @@ jobs:
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
-          files: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files ) }}
-          files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified ) }}
-          files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added ) }}
-          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted ) }}
+          files: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files ) }}
+          files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files ) }}
+          files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files ) }}
+          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files ) }}
