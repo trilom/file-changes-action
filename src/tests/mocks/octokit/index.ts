@@ -1,5 +1,5 @@
-import type { EndpointOptions, OctokitResponse } from '@octokit/types'
-import type {OctokitMock} from 'typings/OctokitMock'
+import { EndpointOptions, OctokitResponse } from '@octokit/types'
+import {OctokitMock} from 'typings/OctokitMock'
 // mock endpoints
 import { fn as endpointMerge } from './endpoint/merge'
 import { fn as paginate } from './paginate'

@@ -1,4 +1,4 @@
-import type { CoreMock } from 'typings/CoreMock'
+import { CoreMock } from 'typings/CoreMock'
 
 const coreMock: CoreMock = {
   setFailed: jest.fn((message) => {

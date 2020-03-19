@@ -1,4 +1,4 @@
-import type { EndpointOptions } from '@octokit/types'
+import { EndpointOptions } from '@octokit/types'
 import {fn as merge} from './merge'
 import {
   OctokitPullsListFilesEndpointMergeRequest, 

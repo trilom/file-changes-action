@@ -1,6 +1,6 @@
 // Imports
-import type { Inferred } from 'typings/Inferred'
-import type { TestInput } from 'typings/TestInput'
+import { Inferred } from 'typings/Inferred'
+import { TestInput } from 'typings/TestInput'
 import * as p from './mocks/octokit/payloads'
 
 /**

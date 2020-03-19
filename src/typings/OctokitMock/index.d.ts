@@ -1,4 +1,4 @@
-import type { EndpointOptions, RequestOptions, OctokitResponse } from '@octokit/types'
+import { EndpointOptions, RequestOptions, OctokitResponse } from '@octokit/types'
 
 export interface OctokitMock {
   paginate: (

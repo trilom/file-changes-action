@@ -1,6 +1,6 @@
 import { GitHub } from '@actions/github'
-import type {GitHubFile} from 'typings/GitHubFile'
-import type { Inferred } from "typings/Inferred"
+import {GitHubFile} from 'typings/GitHubFile'
+import { Inferred } from "typings/Inferred"
 import { getErrorString } from './UtilsHelper'
 /**
  * @function initClient

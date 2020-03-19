@@ -1,6 +1,6 @@
 import { Context } from '@actions/github/lib/context'
-import type { GitHubMock } from 'typings/GitHubMock'
-import type { OctokitMock } from 'typings/OctokitMock'
+import { GitHubMock } from 'typings/GitHubMock'
+import { OctokitMock } from 'typings/OctokitMock'
 import { octokitMock } from '../octokit'
 
 function getGitHubMock(context: Context):GitHubMock {

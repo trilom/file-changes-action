@@ -1,4 +1,4 @@
-import type {FsMock} from 'typings/FsMock'
+import {FsMock} from 'typings/FsMock'
 
 const fsMock = {
   writeFileSync: jest.fn( (path, data, options ) => {

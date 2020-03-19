@@ -1,5 +1,5 @@
 // Import Request and Response Objects
-import type { EndpointOptions, RequestOptions } from '@octokit/types'
+import { EndpointOptions, RequestOptions } from '@octokit/types'
 import {
   // OctokitReposCompareCommitsEndpointMergeRequest,
   OctokitReposCompareCommitsEndpointMergeResponse,

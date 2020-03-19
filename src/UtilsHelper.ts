@@ -1,5 +1,5 @@
 import {setFailed} from '@actions/core'
-import type {ActionError} from 'typings/ActionError'
+import {ActionError} from 'typings/ActionError'
 /**
  * @function getErrorString
  * @param name name of error

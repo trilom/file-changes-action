@@ -1,4 +1,4 @@
-import type {InputOptions} from '@actions/core'
+import {InputOptions} from '@actions/core'
 
 export interface CoreMock {
   setFailed: (message: string) => void

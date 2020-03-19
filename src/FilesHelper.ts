@@ -3,8 +3,8 @@ import {
   debug as coreDebug 
 } from '@actions/core'
 import { writeFileSync } from 'fs'
-import type {ChangedFiles} from 'typings/ChangedFiles'
-import type { GitHubFile } from 'typings/GitHubFile'
+import {ChangedFiles} from 'typings/ChangedFiles'
+import { GitHubFile } from 'typings/GitHubFile'
 import {getErrorString} from './UtilsHelper'
 
 /**

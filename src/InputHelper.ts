@@ -3,8 +3,8 @@ import {
   getInput as coreGetInput 
 } from '@actions/core'
 import { context } from '@actions/github'
-import type {Inferred} from 'typings/Inferred'
-import type {Inputs} from 'typings/Inputs'
+import {Inferred} from 'typings/Inferred'
+import {Inputs} from 'typings/Inputs'
 import { getErrorString } from './UtilsHelper'
 
 /**
