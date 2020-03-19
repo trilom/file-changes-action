@@ -106,7 +106,7 @@ export class Env
   {
     this.event = event
     const eventPayload = _resolve(__dirname, 
-      `../../../../tests/events/${this.event}.json`)
+      `./events/${this.event}.json`)
     this.setInput({
       ...this.envDefault, // add default vars
       ...{

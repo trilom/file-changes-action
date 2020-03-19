@@ -54,7 +54,7 @@ describe('Testing InputHelper.ts...', () => {
             GITHUB_WORKSPACE:"/Users/bkillian/repos/file-changes-action/src/tests/workspace/github",
             GITHUB_REPOSITORY:"trilom-test/file-changes-action",
             GITHUB_ACTION:"file-changes-action",
-            GITHUB_EVENT_PATH:`/Users/bkillian/repos/file-changes-action/tests/events/${event}.json`,
+            GITHUB_EVENT_PATH:`/Users/bkillian/repos/file-changes-action/src/tests/mocks/env/events/${event}.json`,
             GITHUB_EVENT_NAME:eventName(event)}, null, 2))
         }, null, 2)))
         expect(getInput).toHaveBeenCalledTimes(1)
@@ -74,7 +74,7 @@ describe('Testing InputHelper.ts...', () => {
             GITHUB_WORKSPACE:"/Users/bkillian/repos/file-changes-action/src/tests/workspace/github",
             GITHUB_REPOSITORY:"trilom-test/file-changes-action",
             GITHUB_ACTION:"file-changes-action",
-            GITHUB_EVENT_PATH:`/Users/bkillian/repos/file-changes-action/tests/events/${event}.json`,
+            GITHUB_EVENT_PATH:`/Users/bkillian/repos/file-changes-action/src/tests/mocks/env/events/${event}.json`,
             GITHUB_EVENT_NAME:eventName(event),
             INPUT_GITHUBTOKEN:""}, null, 2))
         }, null, 2)))
