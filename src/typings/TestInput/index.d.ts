@@ -5,6 +5,6 @@ import {Inferred} from 'typings/Inferred'
  * @param event event to parse input for.
  */
 export interface TestInput {
-  inputs: string[] | object | Inferred[]
+  inputs: string [] | string[][] | object | Inferred[]
   events: string | string[]
 }

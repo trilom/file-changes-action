@@ -17,74 +17,27 @@ export const testEvents: string[] = [
   'schedule'
 ]
 
-export function changedFilesInput(event: string): TestInput[] {
-  return [
-    {
-      inputs: [
-        {type: 'normal', format: 'json'},
-        p.normalFileArray,
-        JSON.stringify(p.normalFileArray)
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'normal', format: ','},
-        p.normalFileArray,
-        p.normalFileArray.join(',')
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'normal', format: ' '},
-        p.normalFileArray,
-        p.normalFileArray.join(' ')
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'normal', format: '_<br />&nbsp;&nbsp;_'},
-        p.normalFileArray,
-        p.normalFileArray.join('_<br />&nbsp;&nbsp;_')
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'weird', format: 'json'},
-        p.weirdFileArray,
-        JSON.stringify(p.weirdFileArray)
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'weird', format: ','},
-        p.weirdFileArray,
-        p.weirdFileArray.join(',')
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'weird', format: ' '},
-        p.weirdFileArray,
-        p.weirdFileArray.join(' ')
-      ],
-      events: event
-    },
-    {
-      inputs: [
-        {type: 'weird', format: '_<br />&nbsp;&nbsp;_'},
-        p.weirdFileArray,
-        p.weirdFileArray.join('_<br />&nbsp;&nbsp;_')
-      ],
-      events: event
-    }
-  ]
-}
+export function changedFilesInput(
+  event = 'pull', 
+  files: string[] = p.normalFileArray,
+  formats: string[] = ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']): TestInput[] {
+  return formats.map(format => {
+    if (format === 'json')
+      return {      
+        inputs: [
+      format,
+      files,
+      JSON.stringify(files)
+    ], events: event} as TestInput
+    return {
+    inputs: [
+      format,
+      files,
+      files.join(format)
+    ],
+    events: event
+  } as TestInput})
+  }
 /**
  * FilesHelper Test inputs
  */
