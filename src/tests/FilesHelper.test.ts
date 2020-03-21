@@ -88,6 +88,21 @@ describe('Testing FilesHelper.ts...', () => {
      * @function formatChangedFiles
      */
     describe('...with function formatChangedFiles...', () => {
+      it.each(getTestEvents(p.changedFilesInput('push', ['/test/file', '/test/file2']), 'push'))(
+      '... with %o',
+      (format, input, expected) => {
+        const ext = require('../FilesHelper').formatChangedFiles(
+          format,
+          input
+        )
+        expect(ext).toBe(expected)
+        if (format === 'json')
+          expect(ext).toBe(
+            `["${input[0]}","${input[1]}"]`
+          )
+        else
+          expect(ext).toBe(`${input[0]}${format}${input[1]}`)
+      })
       it.each(getTestEvents(p.changedFilesInput('push'), 'push'))(
         '...formats a big list %s',
         (inputName, input, expected) => {
