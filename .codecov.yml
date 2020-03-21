@@ -1,7 +1,15 @@
 codecov:
-  require_ci_to_pass: yes
+  notify:
+    require_ci_to_pass: yes
 
 coverage:
+  notify:
+    slack:
+      default:
+        threshold: 1%
+        message: "Coverage {{changed}} for {{owner}}/{{repo}}"  # customize the message
+        attachments: "sunburst, diff"
+        only_pulls: false
   status:
     src:
       target: auto
