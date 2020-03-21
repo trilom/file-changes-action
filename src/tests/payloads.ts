@@ -18,26 +18,22 @@ export const testEvents: string[] = [
 ]
 
 export function changedFilesInput(
-  event = 'pull', 
+  event = 'pull',
   files: string[] = p.normalFileArray,
-  formats: string[] = ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']): TestInput[] {
+  formats: string[] = ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+): TestInput[] {
   return formats.map(format => {
     if (format === 'json')
-      return {      
-        inputs: [
-      format,
-      files,
-      JSON.stringify(files)
-    ], events: event} as TestInput
+      return {
+        inputs: [format, files, JSON.stringify(files)],
+        events: event
+      } as TestInput
     return {
-    inputs: [
-      format,
-      files,
-      files.join(format)
-    ],
-    events: event
-  } as TestInput})
-  }
+      inputs: [format, files, files.join(format)],
+      events: event
+    } as TestInput
+  })
+}
 /**
  * FilesHelper Test inputs
  */

@@ -25,13 +25,16 @@ describe('Testing payloads.ts...', () => {
     {files: ['/test/file', '/test/file2']},
     {files: ['/test/&&&file', '/test/&&&file2']},
     {files: ['/test/f&*(@mafile1', '/test/f&*(@mafile2']},
-    {files: ['/test/ke_c``ommands1', '/test/ke_c``ommands2']}])(
-    '...changedFilesInput default with files %p...',
-    (files) => {
+    {files: ['/test/ke_c``ommands1', '/test/ke_c``ommands2']}
+  ])('...changedFilesInput default with files %p...', files => {
     describe.each(['json', ',', ' ', '_<br />&nbsp;&nbsp;_'])(
       '...with format %s...',
-      (format) => {
-        it(`set default inputs files:${JSON.stringify(files, null, 2)} format:${format}`, () => {
+      format => {
+        it(`set default inputs files:${JSON.stringify(
+          files,
+          null,
+          2
+        )} format:${format}`, () => {
           const input = p.changedFilesInput('pull', files.files, [format])
           expect(input.length).toBe(1)
           expect(input[0].events).toBe('pull')
@@ -39,12 +42,20 @@ describe('Testing payloads.ts...', () => {
             expect(input[0].inputs[0]).toBe(format)
             expect(input[0].inputs[1]).toBe(files.files)
             if (format === 'json' && Array.isArray(input[0].inputs[2]))
-              expect(input[0].inputs[2]).toBe(`[ "${input[0].inputs[2][0]}", "${input[0].inputs[2][1]}" ]`)
-            else if (Array.isArray(input[0].inputs[1]) && Array.isArray(input[0].inputs[2])) {
-              expect(input[0].inputs[2]).toBe(`${input[0].inputs[2][0]}${format}${input[0].inputs[2][1]}`)
+              expect(input[0].inputs[2]).toBe(
+                `[ "${input[0].inputs[2][0]}", "${input[0].inputs[2][1]}" ]`
+              )
+            else if (
+              Array.isArray(input[0].inputs[1]) &&
+              Array.isArray(input[0].inputs[2])
+            ) {
+              expect(input[0].inputs[2]).toBe(
+                `${input[0].inputs[2][0]}${format}${input[0].inputs[2][1]}`
+              )
             }
           }
         })
-      })
-    })
+      }
+    )
   })
+})
