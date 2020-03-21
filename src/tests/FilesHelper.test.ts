@@ -89,10 +89,10 @@ describe('Testing FilesHelper.ts...', () => {
      */
     describe('...with function formatChangedFiles...', () => {
       it.each(getTestEvents(p.changedFilesInput('push'), 'push'))(
-        '...formats %o',
+        '...formats a big list %s',
         (inputName, input, expected) => {
           const ext = require('../FilesHelper').formatChangedFiles(
-            inputName.format,
+            inputName,
             input
           )
           expect(ext).toBe(expected)
@@ -104,15 +104,15 @@ describe('Testing FilesHelper.ts...', () => {
      */
     describe('...with function writeFiles...', () => {
       it.each(getTestEvents(p.changedFilesInput('push'), 'push'))(
-        '...writesFiles %o',
+        '...writesFiles %s',
         (inputName, input, expected) => {
           const coreDebug = require('@actions/core').debug
           const fsWriteFilesSync = require('fs').writeFileSync
           const format = require('../FilesHelper').getFormatExt(
-            inputName.format
+            inputName
           )
           require('../FilesHelper').writeFiles(
-            inputName.format,
+            inputName,
             'testKey',
             input
           )
@@ -127,14 +127,14 @@ describe('Testing FilesHelper.ts...', () => {
         }
       )
       it.each(getTestEvents(p.changedFilesInput('push'), 'push'))(
-        '...writesFiles %o with files key',
+        '...writesFiles %s with files key',
         (inputName, input, expected) => {
           const coreDebug = require('@actions/core').debug
           const fsWriteFilesSync = require('fs').writeFileSync
           const format = require('../FilesHelper').getFormatExt(
-            inputName.format
+            inputName
           )
-          require('../FilesHelper').writeFiles(inputName.format, 'files', input)
+          require('../FilesHelper').writeFiles(inputName, 'files', input)
           expect(coreDebug).toHaveBeenCalledWith(
             expect.stringContaining(JSON.stringify(input, null, 2))
           )
@@ -165,7 +165,7 @@ describe('Testing FilesHelper.ts...', () => {
         )
         expect(coreDebug).toHaveBeenCalledWith(
           expect.stringContaining(
-            `Writing output file ${process.env.HOME}/files_testKey.txt.txt with error and files "json"`
+            `Writing output file ${process.env.HOME}/files_testKey.txt with error and files "json"`
           )
         )
       })
@@ -180,7 +180,7 @@ describe('Testing FilesHelper.ts...', () => {
           const coreDebug = require('@actions/core').debug
           const coreSetOutput = require('@actions/core').setOutput
           require('../FilesHelper').writeOutput(
-            inputName.format,
+            inputName,
             'testKey',
             input
           )
@@ -196,7 +196,7 @@ describe('Testing FilesHelper.ts...', () => {
           const coreDebug = require('@actions/core').debug
           const coreSetOutput = require('@actions/core').setOutput
           require('../FilesHelper').writeOutput(
-            inputName.format,
+            inputName,
             'files',
             input
           )

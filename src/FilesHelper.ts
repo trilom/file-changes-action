@@ -89,7 +89,7 @@ export function writeFiles(format: string, key: string, files: string[]): void {
     coreDebug(
       `Writing output file ${
         process.env.HOME
-      }/${fileName}${ext} with ${format} and files ${JSON.stringify(
+      }/${fileName} with ${format} and files ${JSON.stringify(
         files,
         null,
         2
