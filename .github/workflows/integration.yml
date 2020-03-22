@@ -55,7 +55,7 @@ jobs:
         if: github.event_name == 'issue_comment'
         run: |
           pr=$(echo "${{github.event.comment.body}}" | sed 's|.*/integration||') &&
-          echo "::set-env name=pr::${pr}"
+          echo "::set-output name=pr::${pr}"
         env:
           comment: ${{ toJson(github) }}
       # use pr number from integration command
