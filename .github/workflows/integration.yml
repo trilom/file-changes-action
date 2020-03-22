@@ -1,5 +1,7 @@
 name: Integration Tests
 on:
+  issue_comment:
+    types: [created]
   schedule:
     - cron: '0 0 * * *'
   pull_request:
@@ -14,7 +16,18 @@ jobs:
         event_type: ['push', 'pull_request']
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
-    if: (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.')) || contains(github.event.head_commit.message, 'Release merge from') || github.event_name == 'schedule'
+    if: >-
+      ( startsWith(github.head_ref, '1.') 
+        || startsWith(github.head_ref, '2.')) 
+      || 
+      contains(github.event.head_commit.message, 'Release merge from')
+      ||
+      github.event_name == 'schedule'
+      ||
+      ( github.event_name == 'issue_comment'
+        && github.event.issue.pull_request != '' 
+        && contains(github.event.comment.body, '/integration') 
+        && github.actor == 'trilom')
     steps:
       - uses: actions/checkout@v2
       - run: yarn build
