@@ -38,6 +38,9 @@ jobs:
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
     if: >-
+      ( startsWith(github.head_ref, '1.') 
+        || startsWith(github.head_ref, '2.')) 
+      || 
       contains(github.event.head_commit.message, 'Release merge from')
       ||
       github.event_name == 'schedule'
