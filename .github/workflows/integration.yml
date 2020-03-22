@@ -50,10 +50,29 @@ jobs:
         && contains(github.event.comment.body, '/integration') 
         && github.actor == 'trilom')
     steps:
-      - uses: actions/checkout@v2
+      # get pr number if exists
+      - id: pr
         if: github.event_name == 'issue_comment'
+        run: |
+          pr=$(echo "${{github.event.comment.body}}"sed 's|.*/integration||') &&
+          echo "::set-env name=pr::$pr"
+        env:
+          comment: ${{ toJson(github) }}
+      # use pr number from integration command
+      - uses: actions/checkout@v2
+        if: github.event_name == 'issue_comment' && steps.pr.output.pr != ''
+        with:
+          ref: ${{format('refs/pull/{0}/merge', steps.pr.output.pr )}}
+      # use the issue number if pr is blank
+      - uses: actions/checkout@v2
+        if: github.event_name == 'issue_comment' && steps.pr.output.pr == '' && github.event.issue.pull_request != '' 
         with:
           ref: ${{format('refs/pull/{0}/merge', github.event.issue.number )}}
+      - name: fail if no PR number and issue comment
+        if: github.event_name == 'issue_comment' && steps.pr.output.pr == '' && github.event.issue.pull_request == '' 
+        run: |
+          echo "Please provide a PR number to use like /integration13 for PR# 13."
+          exit 1
       - uses: actions/checkout@v2
         if: github.event_name != 'issue_comment'
       - run: yarn build
