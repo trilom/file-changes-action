@@ -13,13 +13,6 @@ jobs:
   always_job:
     name: Always run job
     runs-on: ubuntu-latest
-    env:
-      GITHUB_CONTEXT: ${{ toJson(github) }}
-      JOB_CONTEXT: ${{ toJson(job) }}
-      STEPS_CONTEXT: ${{ toJson(steps) }}
-      RUNNER_CONTEXT: ${{ toJson(runner) }}
-      STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-      MATRIX_CONTEXT: ${{ toJson(matrix) }}
     steps:
       - run: |
           echo "$GITHUB_CONTEXT"
@@ -34,6 +27,13 @@ jobs:
           cat $(echo $STRATEGY_CONTEXT)
           echo "$MATRIX_CONTEXT"
           cat $(echo $MATRIX_CONTEXT)
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          JOB_CONTEXT: ${{ toJson(job) }}
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
   integration:
     runs-on: ubuntu-latest
     strategy:
