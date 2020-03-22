@@ -1,5 +1,8 @@
 name: Integration Tests
 on:
+  issue_comment:
+    types: 
+      - created
   schedule:
     - cron: '0 0 * * *'
   pull_request:
@@ -7,6 +10,26 @@ on:
   push:
     branches: [master]
 jobs:
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest
+    steps:
+      - name: dump env
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          JOB_CONTEXT: ${{ toJson(job) }}
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: |
+          echo "GITHUB_EVENT_PATH\n$GITHUB_EVENT_PATH"
+          echo "GITHUB_CONTEXT\n$GITHUB_CONTEXT"
+          echo "JOB_CONTEXT\n$JOB_CONTEXT"
+          echo "STEPS_CONTEXT\n$STEPS_CONTEXT"
+          echo "RUNNER_CONTEXT\n$RUNNER_CONTEXT"
+          echo "STRATEGY_CONTEXT\n$STRATEGY_CONTEXT"
+          echo "MATRIX_CONTEXT\n$MATRIX_CONTEXT"
   integration:
     runs-on: ubuntu-latest
     strategy:
@@ -14,9 +37,25 @@ jobs:
         event_type: ['push', 'pull_request']
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
-    if: (startsWith(github.head_ref, '1.') || startsWith(github.head_ref, '2.')) || contains(github.event.head_commit.message, 'Release merge from') || github.event_name == 'schedule'
+    if: >-
+      ( startsWith(github.head_ref, '1.') 
+        || startsWith(github.head_ref, '2.')) 
+      || 
+      contains(github.event.head_commit.message, 'Release merge from')
+      ||
+      github.event_name == 'schedule'
+      || ( 
+        github.event_name == 'issue_comment'
+        && github.event.issue.number != '' 
+        && contains(github.event.comment.body, '/integration') 
+        && github.actor == 'trilom')
     steps:
       - uses: actions/checkout@v2
+        if: github.event_name == 'issue_comment'
+        with:
+          ref: ${{format('refs/pull/{0}/merge', github.event.issue.number )}}
+      - uses: actions/checkout@v2
+        if: github.event_name != 'issue_comment'
       - run: yarn build
       - uses: ./
         id: file_changes_build_pr
