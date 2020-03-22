@@ -54,7 +54,7 @@ jobs:
       - id: pr
         if: github.event_name == 'issue_comment'
         run: |
-          pr=$(echo "${{github.event.comment.body}}"sed 's|.*/integration||') &&
+          pr=$(echo "${{github.event.comment.body}}" | sed 's|.*/integration||') &&
           echo "::set-env name=pr::${pr}"
         env:
           comment: ${{ toJson(github) }}
