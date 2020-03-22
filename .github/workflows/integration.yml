@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v2
         if: github.event_name == 'issue_comment'
         with:
-          ref: ${{format('refs/pull/{0}/merge', github.event.issue.number ))}}
+          ref: ${{format('refs/pull/{0}/merge', github.event.issue.number )}}
       - uses: actions/checkout@v2
         if: github.event_name != 'issue_comment'
       - run: yarn build
