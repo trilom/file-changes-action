@@ -23,20 +23,13 @@ jobs:
           STRATEGY_CONTEXT: ${{ toJson(strategy) }}
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
         run: |
-          echo "GITHUB_EVENT_PATH"
-          echo "$GITHUB_EVENT_PATH"
-          echo "GITHUB_CONTEXT"
-          echo "$GITHUB_CONTEXT"
-          echo "JOB_CONTEXT"
-          echo "$JOB_CONTEXT"
-          echo "STEPS_CONTEXT"
-          echo "$STEPS_CONTEXT"
-          echo "RUNNER_CONTEXT"
-          echo "$RUNNER_CONTEXT"
-          echo "STRATEGY_CONTEXT"
-          echo "$STRATEGY_CONTEXT"
-          echo "MATRIX_CONTEXT"
-          echo "$MATRIX_CONTEXT"
+          echo "GITHUB_EVENT_PATH\n$GITHUB_EVENT_PATH"
+          echo "GITHUB_CONTEXT\n$GITHUB_CONTEXT"
+          echo "JOB_CONTEXT\n$JOB_CONTEXT"
+          echo "STEPS_CONTEXT\n$STEPS_CONTEXT"
+          echo "RUNNER_CONTEXT\n$RUNNER_CONTEXT"
+          echo "STRATEGY_CONTEXT\n$STRATEGY_CONTEXT"
+          echo "MATRIX_CONTEXT\n$MATRIX_CONTEXT"
   integration:
     runs-on: ubuntu-latest
     strategy:
