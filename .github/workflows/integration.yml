@@ -1,7 +1,8 @@
 name: Integration Tests
 on:
   issue_comment:
-    types: [created]
+    types: 
+      - created
   schedule:
     - cron: '0 0 * * *'
   pull_request:
@@ -12,10 +13,27 @@ jobs:
   always_job:
     name: Always run job
     runs-on: ubuntu-latest
+    env:
+      GITHUB_CONTEXT: ${{ toJson(github) }}
+      JOB_CONTEXT: ${{ toJson(job) }}
+      STEPS_CONTEXT: ${{ toJson(steps) }}
+      RUNNER_CONTEXT: ${{ toJson(runner) }}
+      STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+      MATRIX_CONTEXT: ${{ toJson(matrix) }}
     steps:
-      - run: echo '${{toJSON(github.event)}}'
-      - run: echo '${{github.event_name}}'
-      - run: echo '${{github.actor}}'
+      - run: |
+          echo "$GITHUB_CONTEXT"
+          cat $(echo $GITHUB_CONTEXT)
+          echo "$JOB_CONTEXT"
+          cat $(echo $JOB_CONTEXT)
+          echo "$STEPS_CONTEXT"
+          cat $(echo $STEPS_CONTEXT)
+          echo "$RUNNER_CONTEXT"
+          cat $(echo $RUNNER_CONTEXT)
+          echo "$STRATEGY_CONTEXT"
+          cat $(echo $STRATEGY_CONTEXT)
+          echo "$MATRIX_CONTEXT"
+          cat $(echo $MATRIX_CONTEXT)
   integration:
     runs-on: ubuntu-latest
     strategy:
@@ -27,8 +45,8 @@ jobs:
       contains(github.event.head_commit.message, 'Release merge from')
       ||
       github.event_name == 'schedule'
-      ||
-      ( github.event_name == 'issue_comment'
+      || ( 
+        github.event_name == 'issue_comment'
         && github.event.issue.number != '' 
         && contains(github.event.comment.body, '/integration') 
         && github.actor == 'trilom')
