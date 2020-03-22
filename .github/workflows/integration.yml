@@ -14,19 +14,7 @@ jobs:
     name: Always run job
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "$GITHUB_CONTEXT"
-          cat $(echo $GITHUB_CONTEXT)
-          echo "$JOB_CONTEXT"
-          cat $(echo $JOB_CONTEXT)
-          echo "$STEPS_CONTEXT"
-          cat $(echo $STEPS_CONTEXT)
-          echo "$RUNNER_CONTEXT"
-          cat $(echo $RUNNER_CONTEXT)
-          echo "$STRATEGY_CONTEXT"
-          cat $(echo $STRATEGY_CONTEXT)
-          echo "$MATRIX_CONTEXT"
-          cat $(echo $MATRIX_CONTEXT)
+      - name: dump env
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           JOB_CONTEXT: ${{ toJson(job) }}
@@ -34,6 +22,21 @@ jobs:
           RUNNER_CONTEXT: ${{ toJson(runner) }}
           STRATEGY_CONTEXT: ${{ toJson(strategy) }}
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: |
+          echo "GITHUB_EVENT_PATH"
+          echo "$GITHUB_EVENT_PATH"
+          echo "GITHUB_CONTEXT"
+          echo "$GITHUB_CONTEXT"
+          echo "JOB_CONTEXT"
+          echo "$JOB_CONTEXT"
+          echo "STEPS_CONTEXT"
+          echo "$STEPS_CONTEXT"
+          echo "RUNNER_CONTEXT"
+          echo "$RUNNER_CONTEXT"
+          echo "STRATEGY_CONTEXT"
+          echo "$STRATEGY_CONTEXT"
+          echo "MATRIX_CONTEXT"
+          echo "$MATRIX_CONTEXT"
   integration:
     runs-on: ubuntu-latest
     strategy:
