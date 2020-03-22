@@ -9,6 +9,13 @@ on:
   push:
     branches: [master]
 jobs:
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo '${{toJSON(github.event)}}'
+      - run: echo '${{github.event_name}}'
+      - run: echo '${{github.actor}}'
   integration:
     runs-on: ubuntu-latest
     strategy:
@@ -17,15 +24,12 @@ jobs:
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
         fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
     if: >-
-      ( startsWith(github.head_ref, '1.') 
-        || startsWith(github.head_ref, '2.')) 
-      || 
       contains(github.event.head_commit.message, 'Release merge from')
       ||
       github.event_name == 'schedule'
       ||
       ( github.event_name == 'issue_comment'
-        && github.event.issue.pull_request != '' 
+        && github.event.issue.number != '' 
         && contains(github.event.comment.body, '/integration') 
         && github.actor == 'trilom')
     steps:

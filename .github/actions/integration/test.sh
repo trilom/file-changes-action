@@ -5,7 +5,7 @@ testOutput () {
     elif [ "${2}" == "," ]; then
         local output_length=$(awk -F"${2}" '{print NF-1}' <<< $(echo "${1}"))
     else
-        local output_length=$(awk -F" " '{print NF-1}' <<< $(echo "${1}"))
+        local output_length=$(awk -F"${2}" '{print NF-1}' <<< $(echo "${1}"))
     fi
     echo "$output_length"
 }
@@ -17,7 +17,7 @@ testFile () {
     elif [ "${2}" == "," ]; then
         local file_length=$(cat ${1}.csv | awk -F"${2}" '{print NF-1}')
     else
-        local file_length=$(cat ${1}.txt | awk -F" " '{print NF-1}')
+        local file_length=$(cat ${1}.txt | awk -F"${2}" '{print NF-1}')
     fi
     echo "$file_length"
 }
@@ -35,6 +35,9 @@ prepareTest () {
         elif [ "$3" == "," ]; then
             declare ${file}="functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda.json,functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json,functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json,functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json"
             echo ${!file} > "${file}.csv"
+        elif [ "$3" == "_<br />&nbsp;&nbsp;_" ]; then
+            declare ${file}='functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda.json_<br />&nbsp;&nbsp;_functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json_<br />&nbsp;&nbsp;_functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json_<br />&nbsp;&nbsp;_functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json'
+            echo ${!file} > "${file}.txt"
         else
             declare ${file}='functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda.json functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json functions/twitch-sadako/webhookSubscribeLambda/test/webhookSubscribeLambda_post.json'
             echo ${!file} > "${file}.txt"
