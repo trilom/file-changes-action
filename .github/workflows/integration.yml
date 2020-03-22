@@ -33,6 +33,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         event_type: ['push', 'pull_request']
         output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
@@ -50,13 +51,32 @@ jobs:
         && contains(github.event.comment.body, '/integration') 
         && github.actor == 'trilom')
     steps:
-      - uses: actions/checkout@v2
+      # get pr number if exists
+      - id: pr
         if: github.event_name == 'issue_comment'
+        run: |
+          pr=$(echo "${{github.event.comment.body}}" | sed 's|.*/integration||') &&
+          echo "::set-output name=pr::${pr}"
+        env:
+          comment: ${{ toJson(github) }}
+      # use pr number from integration command
+      - uses: actions/checkout@v2
+        if: github.event_name == 'issue_comment' && steps.pr.outputs.pr != ''
         with:
-          ref: ${{format('refs/pull/{0}/merge', github.event.issue.number )}}
+          ref: ${{format('refs/pull/{0}/head', steps.pr.outputs.pr )}}
+      # use the issue number if pr is blank
+      - uses: actions/checkout@v2
+        if: github.event_name == 'issue_comment' && steps.pr.outputs.pr == '' && github.event.issue.pull_request != '' 
+        with:
+          ref: ${{format('refs/pull/{0}/head', github.event.issue.number )}}
+      - name: fail if no PR number and issue comment
+        if: github.event_name == 'issue_comment' && steps.pr.outputs.pr == '' && github.event.issue.pull_request == '' 
+        run: |
+          echo "Please provide a PR number to use like /integration13 for PR# 13."
+          exit 1
       - uses: actions/checkout@v2
         if: github.event_name != 'issue_comment'
-      - run: yarn build
+      - run: yarn build-package
       - uses: ./
         id: file_changes_build_pr
         if: matrix.event_type == 'pull_request'
@@ -72,7 +92,7 @@ jobs:
           pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - run: chmod +x test.sh && bash test.sh
+      - run: chmod +x test.sh && ./test.sh
         working-directory: .github/actions/integration
         if: success() && matrix.output == 'json'
         env:
@@ -82,13 +102,13 @@ jobs:
           files_modified: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified)) }}
           files_added: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added)) }}
           files_deleted: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_deleted), toJSON(steps.file_changes_build_push.outputs.files_deleted)) }}
-      - run: chmod +x test.sh && bash test.sh
+      - run: chmod +x test.sh && ./test.sh
         working-directory: .github/actions/integration
         if: success() && matrix.output != 'json'
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
           files: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files ) }}
-          files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files ) }}
-          files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files ) }}
-          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files ) }}
+          files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified ) }}
+          files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added ) }}
+          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files_deleted ) }}
