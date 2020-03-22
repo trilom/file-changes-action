@@ -64,7 +64,7 @@ jobs:
         if: github.event_name == 'issue_comment' && steps.pr.outputs.pr != ''
         with:
           ref: ${{format('refs/pull/{0}/head', steps.pr.outputs.pr )}}
-      # use the issue number if pr is blank
+      # use the issue number if pr is blank 
       - uses: actions/checkout@v2
         if: github.event_name == 'issue_comment' && steps.pr.outputs.pr == '' && github.event.issue.pull_request != '' 
         with:
