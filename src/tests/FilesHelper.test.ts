@@ -97,6 +97,7 @@ describe('Testing FilesHelper.ts...', () => {
         const ext = require('../FilesHelper').formatChangedFiles(format, input)
         expect(ext).toBe(expected)
         if (format === 'json') expect(ext).toBe(`["${input[0]}","${input[1]}"]`)
+        else if (format === 'space') expect(ext).toBe(`${input[0]} ${input[1]}`)
         else expect(ext).toBe(`${input[0]}${format}${input[1]}`)
       })
       it.each(getTestEvents(p.changedFilesInput('push'), 'push'))(
