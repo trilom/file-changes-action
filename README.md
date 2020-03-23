@@ -18,11 +18,11 @@ _Optional_  - `string` - specific github token, github.token is used by default 
 
 ### output
 
-_Optional_  - `string` - type of output for output variables, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example ' |FILE:' will output 'file1.yml |FILE:file2.yml |FILE:file3.yml'.
+_Optional_  - `string` - type of output for output variables, default is json.  Use ',' for comma separated values, or 'space' for space delimited values.  You can also create your own delimiter for example ' |FILE:' will output 'file1.yml |FILE:file2.yml |FILE:file3.yml'.
 
 ### fileOutput
 
-_Optional_  - `string` - type of output for file output, default is json.  Use ',' for comma separated values, or ' ' for space delimited values.  You can also create your own delimiter for example `\ |FILE:` will output:
+_Optional_  - `string` - type of output for file output, default is json.  Use ',' for comma separated values, or 'space' for space delimited values.  You can also create your own delimiter for example `\ |FILE:` will output:
 
 > file1.yml |FILE:file2.yml |FILE:file3.yml  
 
@@ -164,7 +164,7 @@ jobs:
           cat $HOME/files.csv
 ```
 
-You can set the output and fileOutput to ' ' for txt output.  We also used a specific token, and got info for the PR that this push came from.
+You can set the output and fileOutput to 'space' for txt output.  We also used a specific token, and got info for the PR that this push came from.
 
 ```yaml
 name: push-develop
@@ -190,8 +190,8 @@ jobs:
         with:
           githubToken: ${{ env.BOT_USER_TOKEN }}
           prNumber: ${{ steps.pr.outputs.results }}
-          output: ' '
-          fileOutput: ' '
+          output: space
+          fileOutput: space
       - name: test
         run: |
           cat $HOME/files.txt
