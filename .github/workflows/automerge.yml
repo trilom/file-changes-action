@@ -20,7 +20,8 @@ jobs:
         && github.event.pull_request.head.repo.full_name == github.repository
         && contains(github.event.pull_request.labels.*.name, 'pretty')
         && contains(github.event.pull_request.labels.*.name, 'builds')
-        && contains(github.event.pull_request.labels.*.name, 'tested')
+        && contains(github.event.pull_request.labels.*.name, 'tested-unit')
+        && contains(github.event.pull_request.labels.*.name, 'tested-integration')
         && contains(github.event.pull_request.labels.*.name, 'lintdogged')
         && ! contains(github.event.pull_request.labels.*.name, 'automated merge')
         && ! contains(github.event.pull_request.labels.*.name, 'hold merge')
@@ -31,7 +32,8 @@ jobs:
         && github.actor == 'trilom'
         && contains(github.event.issue.labels.*.name, 'pretty')
         && contains(github.event.issue.labels.*.name, 'builds')
-        && contains(github.event.issue.labels.*.name, 'tested')
+        && contains(github.event.issue.labels.*.name, 'tested-unit')
+        && contains(github.event.issue.labels.*.name, 'tested-integration')
         && contains(github.event.issue.labels.*.name, 'lintdogged')
         && ! contains(github.event.issue.labels.*.name, 'automated merge')
         && ! contains(github.event.issue.labels.*.name, 'hold merge'))
@@ -45,7 +47,7 @@ jobs:
 # this breaks the /release on issue_comment portion unless I get the head.ref from github-script
           MERGE_COMMIT_MESSAGE: 'Auto merge from ${{ github.event.pull_request.head.ref }} PR#{pullRequest.number}: {pullRequest.title}'
           UPDATE_METHOD: merge
-          MERGE_LABELS: 'pretty,builds,tested,lintdogged'
+          MERGE_LABELS: 'pretty,builds,tested-unit,tested-integration,lintdogged'
           UPDATE_LABELS: ''
 # if failure, get payload of PR and notify
       - name: if failure, get pr payload

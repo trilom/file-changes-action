@@ -231,9 +231,9 @@ jobs:
             
             &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_added}}_
             
-            ## Files deleted
+            ## Files removed
             
-            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_deleted}}_
+            &nbsp;&nbsp;_${{ steps.file_changes.outputs.files_removed}}_
           labels: 'automated pr'
           assignees: '${{ steps.login.outputs.result }},trilom'
           reviewers: trilom
@@ -269,15 +269,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: yarn build
-  # test with jest
-  test:
-    name: jest
+  # unit test with jest
+  test-unit:
+    name: jest unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - run: yarn build
       - run: yarn test-coverage
       - run: bash <(curl -s https://codecov.io/bash)
+  # integration test with jest
+  test-integration:
+    name: jest integration tests
+    needs: test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: yarn build
+      - run: yarn test-integration
   # lint code and comment back if possible
   lintdog:
     name: eslintdog (reviewdog)
