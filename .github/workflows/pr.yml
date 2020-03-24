@@ -72,6 +72,8 @@ jobs:
       - uses: actions/checkout@v2
       - run: yarn build
       - run: yarn test-integration
+        env:
+          GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
       - uses: actions/github-script@0.6.0
         if: failure() && contains(env.isFork, 'false')
         with:
