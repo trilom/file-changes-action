@@ -72,9 +72,6 @@ export function formatChangedFiles(format: string, files: string[]): string {
   if (format === 'json') {
     return JSON.stringify(files)
   }
-  if (format === 'space') {
-    return files.join(' ')
-  }
   return files.join(format)
 }
 
