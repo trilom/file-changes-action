@@ -12,6 +12,7 @@
     "build-release": "yarn build-package --minify",
     "test": "jest",
     "test-coverage": "jest --coverage",
+    "test-integration": "jest -c jest.config.integration.js",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint --ext .ts ./",

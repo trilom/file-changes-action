@@ -11,9 +11,9 @@ import {getErrorString} from './UtilsHelper'
  */
 export function getInputs(): Inputs {
   try {
-    const token =
+    const githubToken =
       coreGetInput('githubToken') || process.env.GITHUB_TOKEN || false
-    if (!token)
+    if (!githubToken)
       throw new Error(
         getErrorString(
           'getInputs Error',
@@ -36,7 +36,7 @@ export function getInputs(): Inputs {
       githubRepo:
         coreGetInput('githubRepo') ||
         `${context.repo.owner}/${context.repo.repo}`,
-      githubToken: token,
+      githubToken,
       pushBefore:
         coreGetInput('pushBefore') ||
         (context.payload.before === undefined ? false : context.payload.before),
@@ -52,7 +52,7 @@ export function getInputs(): Inputs {
     const eString = `Received an issue getting action inputs.`
     const retVars = Object.fromEntries(
       Object.entries(process.env).filter(
-        key => key[0].includes('GITHUB') || key[0].includes('INPUT_')
+        key => key[0].includes('GITHUB') || key[0].includes('INPUT_') || key[0] === 'HOME'
       )
     )
     throw new Error(

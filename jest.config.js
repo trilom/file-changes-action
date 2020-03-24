@@ -3,6 +3,7 @@ module.exports = {
   testEnvironment: "node",
   testRunner: 'jest-circus/runner',
   testMatch: ['**/*.test.ts'],
+  testPathIgnorePatterns: ['/src/tests/integration.test.ts'],
   clearMocks: true,
   collectCoverage: false,
   coverageThreshold: {

@@ -106,6 +106,17 @@ describe.each(p.testEvents)('Testing Env object with %s event...', event => {
     expect(process.env.INPUT_TEST_INPUT).toEqual('new_value')
     delete process.env.INPUT_TEST_INPUT
   })
+  it('...Env can return an unmocked environment', () => {
+    const tenv = new Env({}, {}, event, false)
+    expect(tenv.coreMock).toMatchObject({})
+    expect(tenv.coreMock).not.toMatchObject(env.coreMock)
+    expect(tenv.fsMock).toMatchObject({})
+    expect(tenv.fsMock).not.toMatchObject(env.fsMock)
+    expect(tenv.githubMock).toMatchObject({})
+    expect(tenv.githubMock).not.toMatchObject(env.githubMock)
+    expect(tenv.octokitMock).toMatchObject({})
+    expect(tenv.octokitMock).not.toMatchObject(env.octokitMock)
+  })
   if (event === 'push') {
     it('...Env mocks Octokit.pulls.listFiles', () => {
       // console.log(JSON.stringify(env))
