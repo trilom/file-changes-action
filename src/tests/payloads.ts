@@ -454,10 +454,18 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
-      {event: 'schedule', before: 'abcd12345', after: '12345abcd', pr: 1},
-      {before: 'abcd12345', after: '12345abcd'} as Inferred
+      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
     ],
-    events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
+    events: ['issue_comment_created', 'issue_comment_edited']
+  },
+  {
+    inputs: [
+      'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
+      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {pr: 83} as Inferred
+    ],
+    events: ['schedule']
   },
   {
     inputs: [
@@ -478,8 +486,8 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH inputs NOT PUSH or PULL_REQUEST event',
-      {event: 'schedule', before: 'abcd12345', after: '12345abcd', pr: NaN},
-      {before: 'abcd12345', after: '12345abcd', pr: 44} as Inferred
+      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: NaN},
+      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
   },

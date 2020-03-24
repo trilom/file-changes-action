@@ -87,7 +87,9 @@ export function inferInput(
   if (pr) {
     if (before && after) {
       coreWarning(allInput) // Not PR or Push - all inputs | PUSH*
-      return {before, after} // Not PR or Push - pr inputs | PR
+      if (event === 'issue_comment')
+        return {before, after} // If you explicitly set a before/after in an issue comment it will return those
+      return {pr} // Not PR or Push - pr inputs | PR if a PR before and after assume its a synchronize and return the whole PR
     }
     if (before || after) coreWarning(weirdInput) // Not PR or Push - pull_request event with single push input | PR*
     return {pr} // Not PR or Push - pr inputs | PR
