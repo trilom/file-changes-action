@@ -38,8 +38,8 @@ export function getInputs(): Inputs {
         (typeof context.issue.number === 'undefined'
           ? NaN
           : context.issue.number),
-      output: coreGetInput('output') || 'json',
-      fileOutput: coreGetInput('fileOutput') || 'json',
+      output: coreGetInput('output') || ' ',
+      fileOutput: coreGetInput('fileOutput') || ' ',
       event: context.eventName
     } as Inputs
   } catch (error) {
