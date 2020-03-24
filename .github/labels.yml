@@ -4,9 +4,12 @@
 - name: builds
   description: Code that builds with yarn and tsc
   color: 39bc44
-- name: tested
-  description: Code that has passed test with jest
+- name: tested-unit
+  description: Code that has passed unit tests with jest
   color: 9520bc
+- name: tested-integration
+  description: Code that has passed integration tests with jest
+  color: fc5aee
 - name: "doesnt read directions"
   description: "Doesn't know how to read directions, please PR to develop"
   color: d876e3
