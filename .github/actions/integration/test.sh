@@ -72,7 +72,7 @@ testResults () {
             result=51
         elif [ "$4" == 'files_modified' ]; then
             result=12
-        elif [ "$4" == 'files_deleted' ]; then
+        elif [ "$4" == 'files_removed' ]; then
             result=7
         fi
         if [ "$2" == 'json' ]; then
@@ -107,15 +107,15 @@ runTest () {
 
 test () {
     if [ "$output" == "" ] || [ "$fileOutput" == "" ]; then
-        for format in "json" "," " "; do \
+        for format in "json" "," "\' \'"; do \
             echo '\033[1;92mFORMAT:"'$format'"\033[0m'
-            for file in "files" "files_modified" "files_added" "files_deleted"; do \
+            for file in "files" "files_modified" "files_added" "files_removed"; do \
                 echo '\033[1;92mFILE:'$file'\033[0m'
                 runTest $file "$format" "$format"
             done
         done
     else
-        for file in "files" "files_modified" "files_added" "files_deleted"; do \
+        for file in "files" "files_modified" "files_added" "files_removed"; do \
             echo '\033[1;92mFILE:'$file'\033[0m'
             runTest $file "$fileOutput" "$output"
         done

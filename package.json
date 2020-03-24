@@ -4,7 +4,7 @@
   "engines": {
     "node": "12.16.1"
   },
-  "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
+  "description": "Creates outputs variables of files modified, added, or removed by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
     "build": "yarn && tsc",

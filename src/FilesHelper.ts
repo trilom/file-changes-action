@@ -7,7 +7,7 @@ import {getErrorString} from './UtilsHelper'
 /**
  * @function sortChangedFiles
  * @param files pass in array of GithubFile's to be sorted
- * @returns ChangedFiles object that has .files, .added, .modified, and .deleted
+ * @returns ChangedFiles object that has .files, .added, .modified, and .removed
  */
 export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
   try {
@@ -78,7 +78,7 @@ export function formatChangedFiles(format: string, files: string[]): string {
 /**
  * @function writeFiles
  * @param format output format 'json' will stringify anything else will files.join('string')
- * @param key changedFiles type added, modified, deleted, or files
+ * @param key changedFiles type added, modified, removed, or files
  * @param files string list of files to format
  * @returns string output to be stored in file
  */
@@ -113,7 +113,7 @@ export function writeFiles(format: string, key: string, files: string[]): void {
 /**
  * @function writeOutput
  * @param format output format 'json' will stringify anything else will files.join('string')
- * @param key changedFiles type added, modified, deleted, or files
+ * @param key changedFiles type added, modified, removed, or files
  * @param files string list of files to format
  * @returns string output to be stored to action output
  */

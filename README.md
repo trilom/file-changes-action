@@ -44,7 +44,7 @@ _Optional_  - `string` - pass in a specific PR number to get file changes from.
 
 ### files
 
-steps.file_changes.outputs.files - `string` - The names all new, updated, and deleted files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files - `string` - The names all new, updated, and removed files.  The output is dependant on the output input, default is a json string.
 
 ### files_added
 
@@ -54,9 +54,9 @@ steps.file_changes.outputs.files_added - `string` - The names of the newly creat
 
 steps.file_changes.outputs.files_modified - `string` - The names of the updated files.  The output is dependant on the output input, default is a json string.
 
-### files_deleted
+### files_removed
 
-steps.file_changes.outputs.files_deleted - `string` - The names of the deleted files.  The output is dependant on the output input, default is a json string.
+steps.file_changes.outputs.files_removed - `string` - The names of the removed files.  The output is dependant on the output input, default is a json string.
 
 ## Example usage
 
@@ -106,9 +106,9 @@ If a push is made then it will compare commits from the SHA `github.payload.befo
 
 After gathering this information it will output the files in 2 ways.  
   
-- As an output variable, you can use this variable by using `steps.file_changes_outputs_files`, `steps.file_changes.outputs.files_modified`, `steps.file_changes.outputs.files_added`, `steps.file_changes.outputs.files_deleted`.
+- As an output variable, you can use this variable by using `steps.file_changes_outputs_files`, `steps.file_changes.outputs.files_modified`, `steps.file_changes.outputs.files_added`, `steps.file_changes.outputs.files_removed`.
 
-- As a file on the container stored at `$HOME/files.json`, `$HOME/files_modified.json`, `$HOME/files_added.json`, `$HOME/files_deleted.json`.  
+- As a file on the container stored at `$HOME/files.json`, `$HOME/files_modified.json`, `$HOME/files_added.json`, `$HOME/files_removed.json`.  
 
 - _NOTE:_ If you set a custom delimiter in output or fileOutput inputs then you will receive different files.  For example a delimiter of ',' will output at `$HOME/files.csv` instead of `$HOME/files.json`.  Likewise, anything other than 'json' or ',' delmiters will output `$HOME/files.txt` files instead of `$HOME/files.json` by default.
 
@@ -138,11 +138,11 @@ jobs:
           cat $HOME/files.json
           cat $HOME/files_modified.json
           cat $HOME/files_added.json
-          cat $HOME/files_deleted.json
+          cat $HOME/files_removed.json
           echo '${{ steps.file_changes.outputs.files}}'
           echo '${{ steps.file_changes.outputs.files_modified}}'
           echo '${{ steps.file_changes.outputs.files_added}}'
-          echo '${{ steps.file_changes.outputs.files_deleted}}'
+          echo '${{ steps.file_changes.outputs.files_removed}}'
 ```
 
 You can set the output and fileOutput to ',' for csv output.
