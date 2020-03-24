@@ -217,7 +217,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'gets changed files for a push',
       {
         repo: 'trilom/file-changes-action',
-        ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       p.OctokitPaginatePushResponse
     ],
@@ -228,7 +231,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'throws an error with a malformed owner/repo for a push',
       {
         repo: 'trilom/testing/afew/backslash',
-        ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       {
         error: '500/Unknown Error:Error',
@@ -255,7 +261,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'throws an error with invalid owner for a push',
       {
         repo: 'trilom-NOTREAL/backslash',
-        ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       {
         error: '404/HttpError',
@@ -270,7 +279,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'throws an error with no after for a push',
-      {repo: 'trilom/cloudformation', ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'} as Inferred)},
+      {
+        repo: 'trilom/cloudformation',
+        ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'} as Inferred)
+      },
       {
         error: '404/HttpError',
         from: 'undefined/Error',
@@ -284,7 +296,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'throws an error with no before for a push',
-      {repo: 'trilom/cloudformation', ...({after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)},
+      {
+        repo: 'trilom/cloudformation',
+        ...({after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)
+      },
       {
         error: '404/HttpError',
         from: 'undefined/Error',
@@ -383,8 +398,22 @@ export const inputTestInputs: TestInput[] = [
     events: 'all'
   },
   {inputs: ['githubToken', 'InputTestToken', 'InputTestToken'], events: 'all'},
-  {inputs: ['pushBefore', '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'], events: 'all'},
-  {inputs: ['pushAfter', '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'], events: 'all'},
+  {
+    inputs: [
+      'pushBefore',
+      '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+      '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'
+    ],
+    events: 'all'
+  },
+  {
+    inputs: [
+      'pushAfter',
+      '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+      '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+    ],
+    events: 'all'
+  },
   {inputs: ['prNumber', '83', 83], events: 'all'},
   {inputs: ['output', 'json', 'json'], events: 'all'},
   {inputs: ['fileOutput', 'json', 'json'], events: 'all'}
@@ -393,28 +422,44 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST event',
-      {event: 'pull_request', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
-      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+      {
+        event: 'pull_request',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
-    events: [
-      'pull_request_opened',
-      'pull_request_reopened'
-    ]
+    events: ['pull_request_opened', 'pull_request_reopened']
   },
   {
     inputs: [
       'sets PR inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST_SYNCHRONIZE event',
-      {event: 'pull_request', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
-      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+      {
+        event: 'pull_request',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
-    events: [
-      'pull_request_synchronize'
-    ]
+    events: ['pull_request_synchronize']
   },
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with single PUSH input and PULL_REQUEST event, ALSO WARN weird',
-      {event: 'pull_request', before: '787a72d40923de2f5308e7095ff9e6063fdbc219', after: '', pr: 83},
+      {
+        event: 'pull_request',
+        before: '787a72d40923de2f5308e7095ff9e6063fdbc219',
+        after: '',
+        pr: 83
+      },
       {pr: 83} as Inferred
     ],
     events: [
@@ -438,7 +483,12 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with pr input and PUSH event',
-      {event: 'push', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {
+        event: 'push',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
       {pr: 83} as Inferred
     ],
     events: ['push', 'push_merge']
@@ -446,23 +496,44 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with no pr input and PUSH event',
-      {event: 'push', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: NaN},
-      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+      {
+        event: 'push',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: NaN
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
     events: ['push', 'push_merge']
   },
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
-      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
-      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited']
   },
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
-      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
       {pr: 83} as Inferred
     ],
     events: ['schedule']
@@ -470,7 +541,12 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with single PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN weird',
-      {event: 'schedule', before: '', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {
+        event: 'schedule',
+        before: '',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
       {pr: 83} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
@@ -486,8 +562,16 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH inputs NOT PUSH or PULL_REQUEST event',
-      {event: 'schedule', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: NaN},
-      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: NaN
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
   },
@@ -609,9 +693,17 @@ export const errorMessageInputs: TestInput[] = [
  * main Test inputs
  */
 export const mainInputs: TestInput[] = [
-  { inputs: ['push', {pushBefore: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', pushAfter: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'}, 'push'], 
-    events: 'all' },
-  { inputs: ['pull_request', {prNumber: '83'}, 'pull_request'], 
-    events: 'all' }
+  {
+    inputs: [
+      'push',
+      {
+        pushBefore: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        pushAfter: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      },
+      'push'
+    ],
+    events: 'all'
+  },
+  {inputs: ['pull_request', {prNumber: '83'}, 'pull_request'], events: 'all'}
 ]
 export {errorMessageInputs as mainErrorInputs}

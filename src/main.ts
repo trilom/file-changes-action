@@ -37,5 +37,4 @@ export async function run(): Promise<void> {
   }
 }
 /* istanbul ignore next */
-if (!(process.env.INPUT_MOCK === 'true'))
-  run()
+if (!(process.env.INPUT_MOCK === 'true')) run()

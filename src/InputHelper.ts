@@ -24,7 +24,10 @@ export function getInputs(): Inputs {
       )
     let prNumber
     if (typeof context.issue.number !== 'undefined') {
-      if (+coreGetInput('prNumber') !== context.issue.number && coreGetInput('prNumber')) {
+      if (
+        +coreGetInput('prNumber') !== context.issue.number &&
+        coreGetInput('prNumber')
+      ) {
         prNumber = +coreGetInput('prNumber')
       } else {
         prNumber = context.issue.number
@@ -52,7 +55,10 @@ export function getInputs(): Inputs {
     const eString = `Received an issue getting action inputs.`
     const retVars = Object.fromEntries(
       Object.entries(process.env).filter(
-        key => key[0].includes('GITHUB') || key[0].includes('INPUT_') || key[0] === 'HOME'
+        key =>
+          key[0].includes('GITHUB') ||
+          key[0].includes('INPUT_') ||
+          key[0] === 'HOME'
       )
     )
     throw new Error(
@@ -76,7 +82,12 @@ export function inferInput(
   const weirdInput = `Received event from ${event}, but also received a before(${before}) or after(${after}) value.\n I am assuming you want to use a Push event but forgot something, so I'm giving you a message.`
   const allInput = `Received event from ${event}, but received a before(${before}), after(${after}), and PR(${pr}).\n I am assuming you want to use one or the other but I am giving you Push.`
   if (event === 'pull_request') {
-    if (before && after && (before !== context.payload.before || after !== context.payload.after)) return {before, after} // PR(push) - pull_request event with push inputs | PUSH
+    if (
+      before &&
+      after &&
+      (before !== context.payload.before || after !== context.payload.after)
+    )
+      return {before, after} // PR(push) - pull_request event with push inputs | PUSH
     if (before || after) coreWarning(weirdInput) // PR(push) - pull_request event with single push input | PR*
     return {pr} // PR - pull_request event with no push inputs | PR
   }
@@ -87,8 +98,7 @@ export function inferInput(
   if (pr) {
     if (before && after) {
       coreWarning(allInput) // Not PR or Push - all inputs | PUSH*
-      if (event === 'issue_comment')
-        return {before, after} // If you explicitly set a before/after in an issue comment it will return those
+      if (event === 'issue_comment') return {before, after} // If you explicitly set a before/after in an issue comment it will return those
       return {pr} // Not PR or Push - pr inputs | PR if a PR before and after assume its a synchronize and return the whole PR
     }
     if (before || after) coreWarning(weirdInput) // Not PR or Push - pull_request event with single push input | PR*

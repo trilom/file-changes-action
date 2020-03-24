@@ -111,7 +111,7 @@ export class Env {
     mock = true
   ) {
     this.setEnv(event || this.event, envVars, inputs) // set env vars with event input
-    if (mock){
+    if (mock) {
       this.coreMock = mockCore() // mock core
       ;({
         github: this.githubMock,

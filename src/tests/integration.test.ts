@@ -8,8 +8,8 @@ let processStdoutMock: jest.SpyInstance
 let consoleLogMock: jest.SpyInstance
 let output = ''
 
-function cleanupTest(path: string, ext: string):void {
-  ['files', 'files_modified', 'files_added', 'files_removed'].forEach(type => {
+function cleanupTest(path: string, ext: string): void {
+  ;['files', 'files_modified', 'files_added', 'files_removed'].forEach(type => {
     unlinkSync(`${path}/${type}${ext}`)
   })
   rmdirSync(path)
@@ -33,18 +33,23 @@ describe('Testing main.ts...', () => {
                   beforeAll(() => {
                     // originalWrite = process.stdout.write
                     // originalConsoleLog = console.log
-                    consoleLogMock = jest.spyOn(console, 'log').mockImplementation((
-                      message:string
-                    ) => {
-                      output += ` ${message}`
-                    })
-                    processStdoutMock = jest.spyOn(process.stdout, 'write').mockImplementation((
-                      command:string | Uint8Array, 
-                      encoding?: string, 
-                      cb?:() => void) => {
-                      output += ` ${command}`
-                      return false
-                    })
+                    consoleLogMock = jest
+                      .spyOn(console, 'log')
+                      .mockImplementation((message: string) => {
+                        output += ` ${message}`
+                      })
+                    processStdoutMock = jest
+                      .spyOn(process.stdout, 'write')
+                      .mockImplementation(
+                        (
+                          command: string | Uint8Array,
+                          encoding?: string,
+                          cb?: () => void
+                        ) => {
+                          output += ` ${command}`
+                          return false
+                        }
+                      )
                   })
                   beforeEach(() => {
                     env = new Env(
@@ -53,7 +58,10 @@ describe('Testing main.ts...', () => {
                       },
                       {
                         githubRepo: 'trilom/file-changes-action',
-                        githubToken: process.env.GITHUB_TOKEN || process.env.INPUT_GITHUBTOKEN || '',
+                        githubToken:
+                          process.env.GITHUB_TOKEN ||
+                          process.env.INPUT_GITHUBTOKEN ||
+                          '',
                         output: outputInput,
                         fileOutput: fileOutputInput,
                         ...eventInput
@@ -75,27 +83,96 @@ describe('Testing main.ts...', () => {
                   })
                   it('...no-mock', async () => {
                     mkdirSync(process.env.HOME || '', {recursive: true})
-                    await expect(require('../main').run()).resolves.toBe(undefined)
+                    await expect(require('../main').run()).resolves.toBe(
+                      undefined
+                    )
                     expect(output).toContain('::set-output name=files')
                     expect(output).toContain('::set-output name=files_added')
                     expect(output).toContain('::set-output name=files_modified')
                     expect(output).toContain('::set-output name=files_removed')
-                    expect(existsSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`)).toBeTruthy()
-                    expect(existsSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`)).toBeTruthy()
-                    expect(existsSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`)).toBeTruthy()
-                    expect(existsSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`)).toBeTruthy()
+                    expect(
+                      existsSync(
+                        `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`
+                      )
+                    ).toBeTruthy()
+                    expect(
+                      existsSync(
+                        `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`
+                      )
+                    ).toBeTruthy()
+                    expect(
+                      existsSync(
+                        `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`
+                      )
+                    ).toBeTruthy()
+                    expect(
+                      existsSync(
+                        `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`
+                      )
+                    ).toBeTruthy()
                     if (fileOutputExpected === '.json') {
-                      expect(JSON.parse(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`, 'utf8'))).toHaveLength(73)
-                      expect(JSON.parse(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`, 'utf8'))).toHaveLength(52)
-                      expect(JSON.parse(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`, 'utf8'))).toHaveLength(13)
-                      expect(JSON.parse(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`, 'utf8'))).toHaveLength(8)
+                      expect(
+                        JSON.parse(
+                          readFileSync(
+                            `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`,
+                            'utf8'
+                          )
+                        )
+                      ).toHaveLength(73)
+                      expect(
+                        JSON.parse(
+                          readFileSync(
+                            `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`,
+                            'utf8'
+                          )
+                        )
+                      ).toHaveLength(52)
+                      expect(
+                        JSON.parse(
+                          readFileSync(
+                            `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`,
+                            'utf8'
+                          )
+                        )
+                      ).toHaveLength(13)
+                      expect(
+                        JSON.parse(
+                          readFileSync(
+                            `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`,
+                            'utf8'
+                          )
+                        )
+                      ).toHaveLength(8)
                     } else {
-                      expect(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`, 'utf8').split(fileOutputInput)).toHaveLength(73)
-                      expect(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`, 'utf8').split(fileOutputInput)).toHaveLength(52)
-                      expect(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`, 'utf8').split(fileOutputInput)).toHaveLength(13)
-                      expect(readFileSync(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`, 'utf8').split(fileOutputInput)).toHaveLength(8)
+                      expect(
+                        readFileSync(
+                          `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files${fileOutputExpected}`,
+                          'utf8'
+                        ).split(fileOutputInput)
+                      ).toHaveLength(73)
+                      expect(
+                        readFileSync(
+                          `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_added${fileOutputExpected}`,
+                          'utf8'
+                        ).split(fileOutputInput)
+                      ).toHaveLength(52)
+                      expect(
+                        readFileSync(
+                          `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_modified${fileOutputExpected}`,
+                          'utf8'
+                        ).split(fileOutputInput)
+                      ).toHaveLength(13)
+                      expect(
+                        readFileSync(
+                          `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/files_removed${fileOutputExpected}`,
+                          'utf8'
+                        ).split(fileOutputInput)
+                      ).toHaveLength(8)
                     }
-                    cleanupTest(`./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`, fileOutputExpected)
+                    cleanupTest(
+                      `./src/tests/outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`,
+                      fileOutputExpected
+                    )
                   }, 10000)
                 }
               )

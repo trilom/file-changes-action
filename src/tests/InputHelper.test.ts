@@ -95,7 +95,7 @@ describe('Testing InputHelper.ts...', () => {
             )
           }
           if (
-            event.includes('pull_request')||
+            event.includes('pull_request') ||
             event.includes('issue_comment')
           ) {
             expect(prNumber).toBe(
@@ -126,9 +126,7 @@ describe('Testing InputHelper.ts...', () => {
               : process.env.GITHUB_REPOSITORY
           )
           expect(output).toBe(inputName === 'output' ? expected : ' ')
-          expect(fileOutput).toBe(
-            inputName === 'fileOutput' ? expected : ' '
-          )
+          expect(fileOutput).toBe(inputName === 'fileOutput' ? expected : ' ')
           expect(inputEventName).toBe(contextEventName)
           expect(getInput).toBeCalled()
         }

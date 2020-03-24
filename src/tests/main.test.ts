@@ -48,7 +48,9 @@ describe('Testing main.ts...', () => {
                     )
                     filesHelper.writeOutput = jest.fn(() => {})
                     filesHelper.writeFiles = jest.fn(() => {})
-                    await expect(require('../main').run()).resolves.toBe(undefined)
+                    await expect(require('../main').run()).resolves.toBe(
+                      undefined
+                    )
                     expect(githubHelper.getChangedFiles).toBeCalled()
                     expect(filesHelper.writeOutput).toBeCalled()
                     expect(filesHelper.writeFiles).toBeCalled()
@@ -62,10 +64,17 @@ describe('Testing main.ts...', () => {
                         thrown = true
                         throw new Error(e)
                       })
-                      await expect(require('../main').run()).rejects.toThrowError(new Error(JSON.stringify(
-                        {
-                          name: 'Error', message: "Error", from: f
-                        })))
+                      await expect(
+                        require('../main').run()
+                      ).rejects.toThrowError(
+                        new Error(
+                          JSON.stringify({
+                            name: 'Error',
+                            message: 'Error',
+                            from: f
+                          })
+                        )
+                      )
                       expect(inputHelper.getInputs).toHaveBeenCalledTimes(1)
                     }
                   )
