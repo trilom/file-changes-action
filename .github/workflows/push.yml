@@ -167,7 +167,7 @@ jobs:
           git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:${{ github.ref }}
       - name: get changed files and format for automerge PR body
         id: file_changes
-        uses: trilom/file-changes-action@test/v1
+        uses: trilom/file-changes-action@master
         if: steps.semantic.outputs.new_release_published == 'true'
         with:
           githubToken: ${{ env.GITHUB_TOKEN }}
