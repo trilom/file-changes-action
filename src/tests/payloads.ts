@@ -393,12 +393,21 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST event',
-      {event: 'pull_request', before: '1234abcd', after: 'abcd1234', pr: 3},
-      {before: '1234abcd', after: 'abcd1234'} as Inferred
+      {event: 'pull_request', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
     ],
     events: [
       'pull_request_opened',
-      'pull_request_reopened',
+      'pull_request_reopened'
+    ]
+  },
+  {
+    inputs: [
+      'sets PR inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST_SYNCHRONIZE event',
+      {event: 'pull_request', before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: 83},
+      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred
+    ],
+    events: [
       'pull_request_synchronize'
     ]
   },

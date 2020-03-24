@@ -22,6 +22,16 @@ export function getInputs(): Inputs {
           'Received no token, a token is a requirement.'
         )
       )
+    let prNumber
+    if (typeof context.issue.number !== 'undefined') {
+      if (+coreGetInput('prNumber') !== context.issue.number && coreGetInput('prNumber')) {
+        prNumber = +coreGetInput('prNumber')
+      } else {
+        prNumber = context.issue.number
+      }
+    } else {
+      prNumber = +coreGetInput('prNumber') || NaN
+    }
     return {
       githubRepo:
         coreGetInput('githubRepo') ||
@@ -33,11 +43,7 @@ export function getInputs(): Inputs {
       pushAfter:
         coreGetInput('pushAfter') ||
         (context.payload.after === undefined ? false : context.payload.after),
-      prNumber:
-        +coreGetInput('prNumber') ||
-        (typeof context.issue.number === 'undefined'
-          ? NaN
-          : context.issue.number),
+      prNumber,
       output: coreGetInput('output') || ' ',
       fileOutput: coreGetInput('fileOutput') || ' ',
       event: context.eventName
@@ -68,9 +74,9 @@ export function inferInput(
 ): Inferred {
   const event = context.eventName
   const weirdInput = `Received event from ${event}, but also received a before(${before}) or after(${after}) value.\n I am assuming you want to use a Push event but forgot something, so I'm giving you a message.`
-  const allInput = `Received event from ${event}, but received a before(${before}), after(${after}), and PR(${pr}).\n I am assuming you want to use one or the other but I am giving you Pull Request.`
+  const allInput = `Received event from ${event}, but received a before(${before}), after(${after}), and PR(${pr}).\n I am assuming you want to use one or the other but I am giving you Push.`
   if (event === 'pull_request') {
-    if (before && after) return {before, after} // PR(push) - pull_request event with push inputs | PUSH
+    if (before && after && (before !== context.payload.before || after !== context.payload.after)) return {before, after} // PR(push) - pull_request event with push inputs | PUSH
     if (before || after) coreWarning(weirdInput) // PR(push) - pull_request event with single push input | PR*
     return {pr} // PR - pull_request event with no push inputs | PR
   }
