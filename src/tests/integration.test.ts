@@ -1,6 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync } from 'fs'
-import { resolve as _resolve } from 'path'
-import { eventName as formatEventName, formatInput, getTestEvents, p } from './mocks/env'
+import {existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync} from 'fs'
+import {resolve as _resolve} from 'path'
+import {
+  eventName as formatEventName,
+  formatInput,
+  getTestEvents,
+  p
+} from './mocks/env'
 
 // debugger
 

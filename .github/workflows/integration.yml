@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         event_type: ['push', 'pull_request']
-        output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
-        fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
+        output: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+        fileOutput: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
     if: >-
       ( startsWith(github.head_ref, '1.') 
         || startsWith(github.head_ref, '2.')) 
@@ -92,19 +92,11 @@ jobs:
           pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      - run: chmod +x test.sh && ./test.sh
+      - run: |
+          mv $HOME/files* .
+          chmod +x test.sh && ./test.sh
         working-directory: .github/actions/integration
-        if: success() && matrix.output == 'json'
-        env:
-          fileOutput: ${{ matrix.fileOutput }}
-          output: ${{ matrix.output }}
-          files: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files), toJSON(steps.file_changes_build_push.outputs.files)) }}
-          files_modified: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified)) }}
-          files_added: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added)) }}
-          files_removed: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_removed), toJSON(steps.file_changes_build_push.outputs.files_removed)) }}
-      - run: chmod +x test.sh && ./test.sh
-        working-directory: .github/actions/integration
-        if: success() && matrix.output != 'json'
+        if: success()
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
