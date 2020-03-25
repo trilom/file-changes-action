@@ -45,7 +45,7 @@ plugins:
         ## Commits
         
         <% _.forEach(commits, function(commit) { %>
-        @<%= commit.author.name %> - [_<% _.replace(commit.message, /[()\\\/_\*]/g, '') %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>
+        @<%= commit.author.name %> - [_<%= commit.message.toString().replace(/[()\\\/_\*]/g, '') %>_](https://github.com/trilom/file-changes-action/commit/<%= commit.hash %>)<% }); %>
       labels: [failure]
       releasedLabels: ["releases/${nextRelease.gitTag}"]
       assignees: trilom
