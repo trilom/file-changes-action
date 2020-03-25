@@ -16,7 +16,7 @@
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint --ext .ts ./",
-    "clean": "rm -rf node_modules lib dist"
+    "clean": "rm -rf node_modules lib"
   },
   "repository": {
     "type": "git",
