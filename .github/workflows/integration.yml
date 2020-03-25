@@ -36,8 +36,8 @@ jobs:
       fail-fast: false
       matrix:
         event_type: ['push', 'pull_request']
-        output: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
-        fileOutput: ['json', ',', ''' ''', '_<br />&nbsp;&nbsp;_']
+        output: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
+        fileOutput: ['json', ',', ' ', '_<br />&nbsp;&nbsp;_']
     if: >-
       ( startsWith(github.head_ref, '1.') 
         || startsWith(github.head_ref, '2.')) 

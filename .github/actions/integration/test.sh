@@ -107,7 +107,7 @@ runTest () {
 
 test () {
     if [ "$output" == "" ] || [ "$fileOutput" == "" ]; then
-        for format in "json" "," "\' \'"; do \
+        for format in "json" "," " "; do \
             echo '\033[1;92mFORMAT:"'$format'"\033[0m'
             for file in "files" "files_modified" "files_added" "files_removed"; do \
                 echo '\033[1;92mFILE:'$file'\033[0m'
