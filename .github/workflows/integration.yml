@@ -92,19 +92,19 @@ jobs:
           pushAfter: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968
           output: ${{ matrix.output }}
           fileOutput: ${{ matrix.fileOutput }}
-      # - run: chmod +x test.sh && ./test.sh
-      #   working-directory: .github/actions/integration
-      #   if: success() && matrix.output == 'json'
-      #   env:
-      #     fileOutput: ${{ matrix.fileOutput }}
-      #     output: ${{ matrix.output }}
-      #     files: ${{ toJSON(format('{0}{1}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files)) }}
-      #     files_modified: ${{ toJSON(format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified)) }}
-      #     files_added: ${{ toJSON(format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added)) }}
-      #     files_removed: ${{ toJSON(format('{0}{1}', steps.file_changes_build_pr.outputs.files_removed, steps.file_changes_build_push.outputs.files_removed)) }}
       - run: chmod +x test.sh && ./test.sh
         working-directory: .github/actions/integration
-        if: success()
+        if: success() && matrix.output == 'json'
+        env:
+          fileOutput: ${{ matrix.fileOutput }}
+          output: ${{ matrix.output }}
+          files: ${{ toJson(format('{0}{1}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files)) }}
+          files_modified: ${{ toJson(format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified)) }}
+          files_added: ${{ toJson(format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added)) }}
+          files_removed: ${{ toJson(format('{0}{1}', steps.file_changes_build_pr.outputs.files_removed, steps.file_changes_build_push.outputs.files_removed)) }}
+      - run: chmod +x test.sh && ./test.sh
+        working-directory: .github/actions/integration
+        if: success() && matrix.output != 'json'
         env:
           fileOutput: ${{ matrix.fileOutput }}
           output: ${{ matrix.output }}
