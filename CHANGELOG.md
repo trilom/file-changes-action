@@ -1,3 +1,13 @@
+## [1.2.2](https://github.com/trilom/file-changes-action/compare/v1.2.1...v1.2.2) (2020-03-25)
+
+
+### Bug Fixes
+
+* **issue_comment:** this needs to return PR info not commit info if before and after explicitly set, else PR ([eee976b](https://github.com/trilom/file-changes-action/commit/eee976b2219f243f83583baab84fa89376006acc))
+* **naming:** renamed "deleted" to "removed".  sorry if this is breaking for you. ([800537f](https://github.com/trilom/file-changes-action/commit/800537f435a66454c64fc2b42cfd82ca33cc093d))
+* **pull_request_synchronize events:** issue with PR Synchronize events, it would return commit files instead of PR files, this is adjusted to return ALL PR files with PR synchronize event ([fb7bcc7](https://github.com/trilom/file-changes-action/commit/fb7bcc76581402f20aa64da82cd1174e313ec02c))
+* **space issue:** this should resolve the issue with using a blank space.  the assumption here is that 'json' is default, if you use ' ' it will be '' which is the app default, not the action default of 'json' ([0e4184f](https://github.com/trilom/file-changes-action/commit/0e4184fe04f87323c60b71c1ccf2af95f9f35b8c)), closes [#81](https://github.com/trilom/file-changes-action/issues/81)
+
 ## [1.2.1](https://github.com/trilom/file-changes-action/compare/v1.2.0...v1.2.1) (2020-03-19)
 
 
