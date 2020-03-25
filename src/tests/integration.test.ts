@@ -1,11 +1,6 @@
-import {existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync} from 'fs'
-import {resolve as _resolve} from 'path'
-import {
-  eventName as formatEventName,
-  formatInput,
-  getTestEvents,
-  p
-} from './mocks/env'
+import { existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync } from 'fs'
+import { resolve as _resolve } from 'path'
+import { eventName as formatEventName, formatInput, getTestEvents, p } from './mocks/env'
 
 // debugger
 
@@ -60,7 +55,6 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
                   ),
                   {recursive: true}
                 )
-                console.log(process.env.GITHUB_TOKEN)
                 process.env = {
                   HOME: _resolve(
                     __dirname,
