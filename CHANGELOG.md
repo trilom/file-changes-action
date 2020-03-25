@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/trilom/file-changes-action/compare/v1.2.2...v1.2.3) (2020-03-25)
+
+
+### Bug Fixes
+
+* **test release:** testing a release ([dfca448](https://github.com/trilom/file-changes-action/commit/dfca448d9d1f04825a549ba0bc7d6b097df295a2))
+
 ## [1.2.2](https://github.com/trilom/file-changes-action/compare/v1.2.1...v1.2.2) (2020-03-25)
 
 
