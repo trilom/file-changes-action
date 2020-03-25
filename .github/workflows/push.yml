@@ -25,7 +25,9 @@ jobs:
               repo: context.payload.repository.name,
               commit_sha: context.payload.head_commit.id
             })
-            return result.data[0].number || 40;
+            if (result.data.length >= 1) {
+              return result.data[0].number
+            } else return 87
       - name: get original PR user
         uses: actions/github-script@0.6.0
         id: label
@@ -185,7 +187,9 @@ jobs:
               repo: context.payload.repository.name,
               commit_sha: context.payload.head_commit.id
             })
-            return result.data[0].number || 40;
+            if (result.data.length >= 1) {
+              return result.data[0].number
+            } else return 87
       - name: get original PR user
         uses: actions/github-script@0.6.0
         id: login
@@ -199,7 +203,9 @@ jobs:
               repo: context.payload.repository.name,
               pull_number: ${{ steps.pr.outputs.result }}
             })
-            return result.data.user.login || 'nope';
+            if (result.data.user === true && result.data.user.login === true) {
+              return result.data.user.login
+            } else return 'trilom';
       - name: create release PR
         id: create-pr
         uses: peter-evans/create-pull-request@v2
