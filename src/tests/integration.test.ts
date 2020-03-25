@@ -1,10 +1,15 @@
-import { existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync } from 'fs'
-import { resolve as _resolve } from 'path'
-import { eventName as formatEventName, formatInput, getTestEvents, p } from './mocks/env'
+import {existsSync, mkdirSync, readFileSync, rmdirSync, unlinkSync} from 'fs'
+import {resolve as _resolve} from 'path'
+import {
+  eventName as formatEventName,
+  formatInput,
+  getTestEvents,
+  p
+} from './mocks/env'
 
 // debugger
 
-const pEnv:{[key:string]:string|undefined} = {...process.env}
+const pEnv: {[key: string]: string | undefined} = {...process.env}
 
 let processStdoutMock: jest.SpyInstance
 let consoleLogMock: jest.SpyInstance
@@ -14,7 +19,7 @@ function cleanupTest(path: string, ext: string): void {
   ;['files', 'files_modified', 'files_added', 'files_removed'].forEach(type => {
     unlinkSync(`${path}/${type}${ext}`)
   })
-  rmdirSync(path) 
+  rmdirSync(path)
 }
 
 describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
@@ -48,12 +53,24 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
                       return false
                     }
                   )
-                mkdirSync(_resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`), {recursive: true})
+                mkdirSync(
+                  _resolve(
+                    __dirname,
+                    `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`
+                  ),
+                  {recursive: true}
+                )
                 console.log(process.env.GITHUB_TOKEN)
                 process.env = {
-                  HOME: _resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`),
+                  HOME: _resolve(
+                    __dirname,
+                    `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`
+                  ),
                   GITHUB_EVENT_NAME: formatEventName(event),
-                  GITHUB_EVENT_PATH: _resolve(__dirname, `mocks/env/events/${event}.json`),
+                  GITHUB_EVENT_PATH: _resolve(
+                    __dirname,
+                    `mocks/env/events/${event}.json`
+                  ),
                   ...formatInput({
                     githubRepo: 'trilom/file-changes-action',
                     githubToken: process.env.GITHUB_TOKEN || '',
@@ -65,7 +82,10 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
               })
               afterEach(() => {
                 cleanupTest(
-                  _resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`),
+                  _resolve(
+                    __dirname,
+                    `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`
+                  ),
                   fileOutputExpected
                 )
                 process.env = {...pEnv}
@@ -73,22 +93,31 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
                 jest.restoreAllMocks()
               })
               it('...no-mock', async () => {
-                await expect(require('../main').run()).resolves.toBe(
-                  undefined
-                )
-                const counts = { files: 73, files_added: 52, files_modified: 13, files_removed: 8 } as {[key:string]:number}
-                Object.keys(counts).forEach( async key => {
+                await expect(require('../main').run()).resolves.toBe(undefined)
+                const counts = {
+                  files: 73,
+                  files_added: 52,
+                  files_modified: 13,
+                  files_removed: 8
+                } as {[key: string]: number}
+                Object.keys(counts).forEach(async key => {
                   expect(output).toContain(`::set-output name=${key}`)
                   expect(
                     existsSync(
-                      _resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`)
+                      _resolve(
+                        __dirname,
+                        `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`
+                      )
                     )
                   ).toBeTruthy()
                   if (fileOutputExpected === '.json') {
                     expect(
                       JSON.parse(
                         readFileSync(
-                          _resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`),
+                          _resolve(
+                            __dirname,
+                            `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`
+                          ),
                           'utf8'
                         )
                       )
@@ -96,7 +125,10 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
                   } else {
                     expect(
                       readFileSync(
-                        _resolve(__dirname, `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`),
+                        _resolve(
+                          __dirname,
+                          `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}/${key}${fileOutputExpected}`
+                        ),
                         'utf8'
                       ).split(fileOutputInput)
                     ).toHaveLength(counts[key])

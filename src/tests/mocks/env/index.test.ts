@@ -1,4 +1,4 @@
-import { Env, eventName, formatInput, getTestEvents, getTestFiles, p } from '.'
+import {Env, eventName, formatInput, getTestEvents, getTestFiles, p} from '.'
 
 let env: Env
 
