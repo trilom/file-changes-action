@@ -15,13 +15,6 @@ let processStdoutMock: jest.SpyInstance
 let consoleLogMock: jest.SpyInstance
 let output = ''
 
-function cleanupTest(path: string, ext: string): void {
-  ;['files', 'files_modified', 'files_added', 'files_removed'].forEach(type => {
-    unlinkSync(`${path}/${type}${ext}`)
-  })
-  rmdirSync(path)
-}
-
 describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
   /**
    * @function run
@@ -80,13 +73,6 @@ describe.each(p.testEvents)('Testing main.ts with %s event...', event => {
                 }
               })
               afterEach(() => {
-                cleanupTest(
-                  _resolve(
-                    __dirname,
-                    `outputs/${event}/${eventName}/o_${outputName}f_${fileOutputName}`
-                  ),
-                  fileOutputExpected
-                )
                 process.env = {...pEnv}
                 output = ''
                 jest.restoreAllMocks()
