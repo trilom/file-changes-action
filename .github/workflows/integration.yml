@@ -64,7 +64,7 @@ jobs:
         if: github.event_name == 'issue_comment' && steps.pr.outputs.pr != ''
         with:
           ref: ${{format('refs/pull/{0}/head', steps.pr.outputs.pr )}}
-      # use the issue number if pr is blank
+      # use the issue number if pr is blank 
       - uses: actions/checkout@v2
         if: github.event_name == 'issue_comment' && steps.pr.outputs.pr == '' && github.event.issue.pull_request != '' 
         with:
@@ -101,7 +101,7 @@ jobs:
           files: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files), toJSON(steps.file_changes_build_push.outputs.files)) }}
           files_modified: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_modified), toJSON(steps.file_changes_build_push.outputs.files_modified)) }}
           files_added: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_added), toJSON(steps.file_changes_build_push.outputs.files_added)) }}
-          files_deleted: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_deleted), toJSON(steps.file_changes_build_push.outputs.files_deleted)) }}
+          files_removed: ${{ format('{0}{1}', toJSON(steps.file_changes_build_pr.outputs.files_removed), toJSON(steps.file_changes_build_push.outputs.files_removed)) }}
       - run: chmod +x test.sh && ./test.sh
         working-directory: .github/actions/integration
         if: success() && matrix.output != 'json'
@@ -111,4 +111,4 @@ jobs:
           files: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files, steps.file_changes_build_push.outputs.files ) }}
           files_modified: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_modified, steps.file_changes_build_push.outputs.files_modified ) }}
           files_added: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_added, steps.file_changes_build_push.outputs.files_added ) }}
-          files_deleted: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_deleted, steps.file_changes_build_push.outputs.files_deleted ) }}
+          files_removed: ${{ format('{0}{1}', steps.file_changes_build_pr.outputs.files_removed, steps.file_changes_build_push.outputs.files_removed ) }}

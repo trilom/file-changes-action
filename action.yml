@@ -1,5 +1,5 @@
 name: 'File Changes Action'
-description: 'Creates outputs variables of files modified, added, or deleted by a PR or Push.'
+description: 'Creates outputs variables of files modified, added, or removed by a PR or Push.'
 author: 'Bryan Killian <me@trilom.org>'
 inputs:
   githubRepo:
@@ -20,19 +20,21 @@ inputs:
     required: false
   output:
     description: 'Choose between json (default), or custom delimiter by passing a string, for example '','' for csv variable output'
-    required: false
+    required: true
+    default: json
   fileOutput:
     description: 'Choose between json (default), or custom delimiter by passing a string, for example '','' for csv file output.  If you set as json the file output will be suffixed with .json, if you select '','' then the output will be .csv, else .txt will be the output.'
-    required: false
+    required: true
+    default: json
 outputs:
   files:
-    description: 'The names all new, updated, and deleted files'
+    description: 'The names all new, updated, and removed files'
   files_added:
     description: 'The names of the newly created files'
   files_modified:
     description: 'The names of the updated files'
-  files_deleted:
-    description: 'The names of the deleted files'
+  files_removed:
+    description: 'The names of the removed files'
 runs:
   using: 'node12'
   main:  'dist/index.js'

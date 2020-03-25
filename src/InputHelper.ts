@@ -11,9 +11,9 @@ import {getErrorString} from './UtilsHelper'
  */
 export function getInputs(): Inputs {
   try {
-    const token =
+    const githubToken =
       coreGetInput('githubToken') || process.env.GITHUB_TOKEN || false
-    if (!token)
+    if (!githubToken)
       throw new Error(
         getErrorString(
           'getInputs Error',
@@ -22,31 +22,43 @@ export function getInputs(): Inputs {
           'Received no token, a token is a requirement.'
         )
       )
+    let prNumber
+    if (typeof context.issue.number !== 'undefined') {
+      if (
+        +coreGetInput('prNumber') !== context.issue.number &&
+        coreGetInput('prNumber')
+      ) {
+        prNumber = +coreGetInput('prNumber')
+      } else {
+        prNumber = context.issue.number
+      }
+    } else {
+      prNumber = +coreGetInput('prNumber') || NaN
+    }
     return {
       githubRepo:
         coreGetInput('githubRepo') ||
         `${context.repo.owner}/${context.repo.repo}`,
-      githubToken: token,
+      githubToken,
       pushBefore:
         coreGetInput('pushBefore') ||
         (context.payload.before === undefined ? false : context.payload.before),
       pushAfter:
         coreGetInput('pushAfter') ||
         (context.payload.after === undefined ? false : context.payload.after),
-      prNumber:
-        +coreGetInput('prNumber') ||
-        (typeof context.issue.number === 'undefined'
-          ? NaN
-          : context.issue.number),
-      output: coreGetInput('output') || 'json',
-      fileOutput: coreGetInput('fileOutput') || 'json',
+      prNumber,
+      output: coreGetInput('output') || ' ',
+      fileOutput: coreGetInput('fileOutput') || ' ',
       event: context.eventName
     } as Inputs
   } catch (error) {
     const eString = `Received an issue getting action inputs.`
     const retVars = Object.fromEntries(
       Object.entries(process.env).filter(
-        key => key[0].includes('GITHUB') || key[0].includes('INPUT_')
+        key =>
+          key[0].includes('GITHUB') ||
+          key[0].includes('INPUT_') ||
+          key[0] === 'HOME'
       )
     )
     throw new Error(
@@ -68,9 +80,14 @@ export function inferInput(
 ): Inferred {
   const event = context.eventName
   const weirdInput = `Received event from ${event}, but also received a before(${before}) or after(${after}) value.\n I am assuming you want to use a Push event but forgot something, so I'm giving you a message.`
-  const allInput = `Received event from ${event}, but received a before(${before}), after(${after}), and PR(${pr}).\n I am assuming you want to use one or the other but I am giving you Pull Request.`
+  const allInput = `Received event from ${event}, but received a before(${before}), after(${after}), and PR(${pr}).\n I am assuming you want to use one or the other but I am giving you Push.`
   if (event === 'pull_request') {
-    if (before && after) return {before, after} // PR(push) - pull_request event with push inputs | PUSH
+    if (
+      before &&
+      after &&
+      (before !== context.payload.before || after !== context.payload.after)
+    )
+      return {before, after} // PR(push) - pull_request event with push inputs | PUSH
     if (before || after) coreWarning(weirdInput) // PR(push) - pull_request event with single push input | PR*
     return {pr} // PR - pull_request event with no push inputs | PR
   }
@@ -81,7 +98,8 @@ export function inferInput(
   if (pr) {
     if (before && after) {
       coreWarning(allInput) // Not PR or Push - all inputs | PUSH*
-      return {before, after} // Not PR or Push - pr inputs | PR
+      if (event === 'issue_comment') return {before, after} // If you explicitly set a before/after in an issue comment it will return those
+      return {pr} // Not PR or Push - pr inputs | PR if a PR before and after assume its a synchronize and return the whole PR
     }
     if (before || after) coreWarning(weirdInput) // Not PR or Push - pull_request event with single push input | PR*
     return {pr} // Not PR or Push - pr inputs | PR

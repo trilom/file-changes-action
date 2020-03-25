@@ -141,7 +141,7 @@ export const weirdFileArray: string[] = [
   ".github/actions/deploy_infrastruc1234'ture/deploy.sh",
   '.github/actions/make_commands/&&&index.js',
   '.github/actions/make_comdf&*(@mands/test/files_added.json',
-  '.github/actions/make_c``ommands/test/files_deleted.json',
+  '.github/actions/make_c``ommands/test/files_removed.json',
   '.github/actions/make  commands/test/files_modified.json',
   '.pre-commit-config.yaml',
   'cloudformation/Makefile',

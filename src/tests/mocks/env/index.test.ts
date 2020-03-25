@@ -1,4 +1,4 @@
-import {Env, p, eventName, formatInput, getTestEvents, getTestFiles} from '.'
+import {Env, eventName, formatInput, getTestEvents, getTestFiles, p} from '.'
 
 let env: Env
 
@@ -105,6 +105,31 @@ describe.each(p.testEvents)('Testing Env object with %s event...', event => {
     env.updateInput({test_input: 'new_value'})
     expect(process.env.INPUT_TEST_INPUT).toEqual('new_value')
     delete process.env.INPUT_TEST_INPUT
+  })
+  it('...Env can return an unmocked environment', () => {
+    const tenv = new Env({}, {}, event, false)
+    expect(tenv.coreMock).toMatchObject({})
+    expect(tenv.coreMock).not.toMatchObject(env.coreMock)
+    expect(tenv.fsMock).toMatchObject({})
+    expect(tenv.fsMock).not.toMatchObject(env.fsMock)
+    expect(tenv.githubMock).toMatchObject({})
+    expect(tenv.githubMock).not.toMatchObject(env.githubMock)
+    expect(tenv.octokitMock).toMatchObject({})
+    expect(tenv.octokitMock).not.toMatchObject(env.octokitMock)
+  })
+  it('...Env can update input for an unmocked environment', () => {
+    const tenv = new Env({}, {test_input: 'test_value'}, event, false)
+    expect(process.env.INPUT_TEST_INPUT).toEqual('test_value')
+    env.updateInput({test_input: 'new_value'}, false)
+    expect(process.env.INPUT_TEST_INPUT).toEqual('new_value')
+    expect(tenv.coreMock).toMatchObject({})
+    expect(tenv.coreMock).not.toMatchObject(env.coreMock)
+    expect(tenv.fsMock).toMatchObject({})
+    expect(tenv.fsMock).not.toMatchObject(env.fsMock)
+    expect(tenv.githubMock).toMatchObject({})
+    expect(tenv.githubMock).not.toMatchObject(env.githubMock)
+    expect(tenv.octokitMock).toMatchObject({})
+    expect(tenv.octokitMock).not.toMatchObject(env.octokitMock)
   })
   if (event === 'push') {
     it('...Env mocks Octokit.pulls.listFiles', () => {

@@ -1,4 +1,4 @@
-import {Env, p, eventName, getTestEvents} from './mocks/env'
+import {Env, eventName, getTestEvents, p} from './mocks/env'
 
 let env: Env
 
@@ -46,10 +46,10 @@ describe('Testing InputHelper.ts...', () => {
         }
         expect(githubToken).toBe(process.env.INPUT_GITHUBTOKEN)
         expect(githubRepo).toBe(process.env.GITHUB_REPOSITORY)
-        expect(output).toBe('json')
-        expect(fileOutput).toBe('json')
+        expect(output).toBe(' ')
+        expect(fileOutput).toBe(' ')
         expect(inputEventName).toBe(contextEventName)
-        expect(getInput).toHaveBeenCalledTimes(7)
+        expect(getInput).toHaveBeenCalled()
       })
       it('...throws error with no token (undefined) process.env["GITHUB_TOKEN"] or (undefined) input githubToken', () => {
         delete process.env.GITHUB_TOKEN
@@ -125,12 +125,10 @@ describe('Testing InputHelper.ts...', () => {
               ? expected
               : process.env.GITHUB_REPOSITORY
           )
-          expect(output).toBe(inputName === 'output' ? expected : 'json')
-          expect(fileOutput).toBe(
-            inputName === 'fileOutput' ? expected : 'json'
-          )
+          expect(output).toBe(inputName === 'output' ? expected : ' ')
+          expect(fileOutput).toBe(inputName === 'fileOutput' ? expected : ' ')
           expect(inputEventName).toBe(contextEventName)
-          expect(getInput).toHaveBeenCalledTimes(7)
+          expect(getInput).toBeCalled()
         }
       )
     })

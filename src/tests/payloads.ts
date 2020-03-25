@@ -41,7 +41,7 @@ export const getFormatExtInputs: TestInput[] = [
   {inputs: ['json', 'json', '.json'], events: 'push'},
   {inputs: ['csv', ',', '.csv'], events: 'push'},
   {inputs: ['txt', ' ', '.txt'], events: 'push'},
-  {inputs: ['txt', '_<br />&nbsp;&nbsp;_', '.txt'], events: 'push'}
+  {inputs: ['txt_hard', '_<br />&nbsp;&nbsp;_', '.txt'], events: 'push'}
 ]
 /**
  * GithubHelper Test inputs
@@ -64,7 +64,7 @@ export const getChangedPRFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'gets changed files for a pull request',
-      {owner: 'trilom', repo: 'file-changes-action', pullNumber: 80},
+      {owner: 'trilom', repo: 'file-changes-action', pullNumber: 83},
       p.OctokitPaginatePrResponse
     ],
     events: 'all'
@@ -89,13 +89,13 @@ export const getChangedPRFilesTestInputs: TestInput[] = [
       {
         owner: 'trilom',
         repo: 'file-chandkdk-action-thatdoesntreallyexist',
-        pullNumber: 80
+        pullNumber: 83
       },
       {
         error: '404/HttpError',
         from: 'getChangedPRFiles',
         message:
-          'There was an error getting change files for repo:file-chandkdk-action-thatdoesntreallyexist owner:trilom pr:80',
+          'There was an error getting change files for repo:file-chandkdk-action-thatdoesntreallyexist owner:trilom pr:83',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -107,13 +107,13 @@ export const getChangedPRFilesTestInputs: TestInput[] = [
       {
         owner: 'this-isntareal-githubowner',
         repo: 'file-changes-action',
-        pullNumber: 80
+        pullNumber: 83
       },
       {
         error: '404/HttpError',
         from: 'getChangedPRFiles',
         message:
-          'There was an error getting change files for repo:file-changes-action owner:this-isntareal-githubowner pr:80',
+          'There was an error getting change files for repo:file-changes-action owner:this-isntareal-githubowner pr:83',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -127,8 +127,8 @@ export const getChangedPushFilesTestInputs: TestInput[] = [
       {
         owner: 'trilom',
         repo: 'file-changes-action',
-        before: 'abcd1234',
-        after: '1234abcd'
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
       },
       p.OctokitPaginatePushResponse
     ],
@@ -141,13 +141,13 @@ export const getChangedPushFilesTestInputs: TestInput[] = [
         owner: 'trilom',
         repo: 'file-changes-action',
         before: '',
-        after: '1234abcd'
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
       },
       {
         error: '404/HttpError',
         from: 'getChangedPushFiles',
         message:
-          'There was an error getting change files for repo:file-changes-action owner:trilom base: head:1234abcd',
+          'There was an error getting change files for repo:file-changes-action owner:trilom base: head:4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -159,14 +159,14 @@ export const getChangedPushFilesTestInputs: TestInput[] = [
       {
         owner: 'trilom',
         repo: 'file-changes-action',
-        before: '1234abcd',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
         after: ''
       },
       {
         error: '404/HttpError',
         from: 'getChangedPushFiles',
         message:
-          'There was an error getting change files for repo:file-changes-action owner:trilom base:1234abcd head:',
+          'There was an error getting change files for repo:file-changes-action owner:trilom base:6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 head:',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -178,14 +178,14 @@ export const getChangedPushFilesTestInputs: TestInput[] = [
       {
         owner: 'trilom',
         repo: 'file-chandkdk-action-thatdoesntreallyexist',
-        before: 'abcd1234',
-        after: '1234abcd'
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
       },
       {
         error: '404/HttpError',
         from: 'getChangedPushFiles',
         message:
-          'There was an error getting change files for repo:file-chandkdk-action-thatdoesntreallyexist owner:trilom base:abcd1234 head:1234abcd',
+          'There was an error getting change files for repo:file-chandkdk-action-thatdoesntreallyexist owner:trilom base:6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 head:4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -197,14 +197,14 @@ export const getChangedPushFilesTestInputs: TestInput[] = [
       {
         owner: 'this-isntareal-githubowner',
         repo: 'file-changes-action',
-        before: 'abcd1234',
-        after: '1234abcd'
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
       },
       {
         error: '404/HttpError',
         from: 'getChangedPushFiles',
         message:
-          'There was an error getting change files for repo:file-changes-action owner:this-isntareal-githubowner base:abcd1234 head:1234abcd',
+          'There was an error getting change files for repo:file-changes-action owner:this-isntareal-githubowner base:6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 head:4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -217,7 +217,10 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'gets changed files for a push',
       {
         repo: 'trilom/file-changes-action',
-        ...({before: 'abcd1234', after: '1234abcd'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       p.OctokitPaginatePushResponse
     ],
@@ -228,13 +231,16 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'throws an error with a malformed owner/repo for a push',
       {
         repo: 'trilom/testing/afew/backslash',
-        ...({before: 'abcd1234', after: '1234abcd'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       {
         error: '500/Unknown Error:Error',
         from: 'getChangedFiles',
         message:
-          'There was an error getting change files outputs pr: NaN before: abcd1234 after: 1234abcd',
+          'There was an error getting change files outputs pr: NaN before: 6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 after: 4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: JSON.stringify(
           {
             error: '500/Bad-Repo',
@@ -255,13 +261,16 @@ export const getChangedFilesTestInputs: TestInput[] = [
       'throws an error with invalid owner for a push',
       {
         repo: 'trilom-NOTREAL/backslash',
-        ...({before: 'abcd1234', after: '1234abcd'} as Inferred)
+        ...({
+          before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+          after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+        } as Inferred)
       },
       {
         error: '404/HttpError',
         from: 'undefined/Error',
         message:
-          'There was an error getting change files for repo:backslash owner:trilom-NOTREAL base:abcd1234 head:1234abcd',
+          'There was an error getting change files for repo:backslash owner:trilom-NOTREAL base:6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 head:4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -270,12 +279,15 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'throws an error with no after for a push',
-      {repo: 'trilom/cloudformation', ...({before: 'abcd1234'} as Inferred)},
+      {
+        repo: 'trilom/cloudformation',
+        ...({before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'} as Inferred)
+      },
       {
         error: '404/HttpError',
         from: 'undefined/Error',
         message:
-          'There was an error getting change files for repo:cloudformation owner:trilom base:abcd1234 head:',
+          'There was an error getting change files for repo:cloudformation owner:trilom base:6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2 head:',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -284,12 +296,15 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'throws an error with no before for a push',
-      {repo: 'trilom/cloudformation', ...({after: 'abcd1234'} as Inferred)},
+      {
+        repo: 'trilom/cloudformation',
+        ...({after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'} as Inferred)
+      },
       {
         error: '404/HttpError',
         from: 'undefined/Error',
         message:
-          'There was an error getting change files for repo:cloudformation owner:trilom base: head:abcd1234',
+          'There was an error getting change files for repo:cloudformation owner:trilom base: head:4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
         payload: {name: 'HttpError', status: '404'}
       }
     ],
@@ -298,7 +313,7 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'gets changed files for a pull request',
-      {repo: 'trilom/file-changes-action', ...({pr: 80} as Inferred)},
+      {repo: 'trilom/file-changes-action', ...({pr: 83} as Inferred)},
       p.OctokitPaginatePrResponse
     ],
     events: 'all'
@@ -306,12 +321,12 @@ export const getChangedFilesTestInputs: TestInput[] = [
   {
     inputs: [
       'throws an error with a malformed owner/repo for a pr',
-      {repo: 'trilom/testing/afew/backslash', ...({pr: 80} as Inferred)},
+      {repo: 'trilom/testing/afew/backslash', ...({pr: 83} as Inferred)},
       {
         error: '500/Unknown Error:Error',
         from: 'getChangedFiles',
         message:
-          'There was an error getting change files outputs pr: 80 before: undefined after: undefined',
+          'There was an error getting change files outputs pr: 83 before: undefined after: undefined',
         payload: JSON.stringify(
           {
             error: '500/Bad-Repo',
@@ -383,9 +398,23 @@ export const inputTestInputs: TestInput[] = [
     events: 'all'
   },
   {inputs: ['githubToken', 'InputTestToken', 'InputTestToken'], events: 'all'},
-  {inputs: ['pushBefore', 'abcd1234', 'abcd1234'], events: 'all'},
-  {inputs: ['pushAfter', '1234abcd', '1234abcd'], events: 'all'},
-  {inputs: ['prNumber', '1', 1], events: 'all'},
+  {
+    inputs: [
+      'pushBefore',
+      '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+      '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2'
+    ],
+    events: 'all'
+  },
+  {
+    inputs: [
+      'pushAfter',
+      '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+      '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+    ],
+    events: 'all'
+  },
+  {inputs: ['prNumber', '83', 83], events: 'all'},
   {inputs: ['output', 'json', 'json'], events: 'all'},
   {inputs: ['fileOutput', 'json', 'json'], events: 'all'}
 ]
@@ -393,20 +422,45 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PUSH inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST event',
-      {event: 'pull_request', before: '1234abcd', after: 'abcd1234', pr: 3},
-      {before: '1234abcd', after: 'abcd1234'} as Inferred
+      {
+        event: 'pull_request',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
-    events: [
-      'pull_request_opened',
-      'pull_request_reopened',
-      'pull_request_synchronize'
-    ]
+    events: ['pull_request_opened', 'pull_request_reopened']
+  },
+  {
+    inputs: [
+      'sets PR inferred outputs with pr inputs and PUSH inputs and PULL_REQUEST_SYNCHRONIZE event',
+      {
+        event: 'pull_request',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
+    ],
+    events: ['pull_request_synchronize']
   },
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with single PUSH input and PULL_REQUEST event, ALSO WARN weird',
-      {event: 'pull_request', before: '1234abcd', after: '', pr: 2},
-      {pr: 2} as Inferred
+      {
+        event: 'pull_request',
+        before: '787a72d40923de2f5308e7095ff9e6063fdbc219',
+        after: '',
+        pr: 83
+      },
+      {pr: 83} as Inferred
     ],
     events: [
       'pull_request_opened',
@@ -417,8 +471,8 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with no PUSH inputs and PULL_REQUEST event',
-      {event: 'pull_request', before: '', after: '', pr: 4},
-      {pr: 4} as Inferred
+      {event: 'pull_request', before: '', after: '', pr: 83},
+      {pr: 83} as Inferred
     ],
     events: [
       'pull_request_opened',
@@ -429,48 +483,95 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with pr input and PUSH event',
-      {event: 'push', before: 'abcd12345', after: '12345abcd', pr: 1},
-      {pr: 1} as Inferred
+      {
+        event: 'push',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {pr: 83} as Inferred
     ],
     events: ['push', 'push_merge']
   },
   {
     inputs: [
       'sets PUSH inferred outputs with no pr input and PUSH event',
-      {event: 'push', before: 'abcd1234', after: '1234abcd', pr: NaN},
-      {before: 'abcd1234', after: '1234abcd'} as Inferred
+      {
+        event: 'push',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: NaN
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
     events: ['push', 'push_merge']
   },
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
-      {event: 'schedule', before: 'abcd12345', after: '12345abcd', pr: 1},
-      {before: 'abcd12345', after: '12345abcd'} as Inferred
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
-    events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
+    events: ['issue_comment_created', 'issue_comment_edited']
+  },
+  {
+    inputs: [
+      'sets PUSH inferred outputs with PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN all',
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {pr: 83} as Inferred
+    ],
+    events: ['schedule']
   },
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with single PUSH and PULL_REQUEST inputs NOT PUSH or PULL_REQUEST event, ALSO WARN weird',
-      {event: 'schedule', before: '', after: 'abcd12345', pr: 3},
-      {pr: 3} as Inferred
+      {
+        event: 'schedule',
+        before: '',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: 83
+      },
+      {pr: 83} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
   },
   {
     inputs: [
       'sets PULL_REQUEST inferred outputs with PULL_REQUEST input NOT PUSH or PULL_REQUEST event',
-      {event: 'schedule', before: '', after: '', pr: 44},
-      {pr: 44} as Inferred
+      {event: 'schedule', before: '', after: '', pr: 83},
+      {pr: 83} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
   },
   {
     inputs: [
       'sets PUSH inferred outputs with PUSH inputs NOT PUSH or PULL_REQUEST event',
-      {event: 'schedule', before: 'abcd12345', after: '12345abcd', pr: NaN},
-      {before: 'abcd12345', after: '12345abcd', pr: 44} as Inferred
+      {
+        event: 'schedule',
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968',
+        pr: NaN
+      },
+      {
+        before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      } as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
   },
@@ -485,7 +586,7 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'throws ERROR with single only before NOT PUSH or PULL_REQUEST event',
-      {before: 'abcd1234', pr: NaN},
+      {before: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2', pr: NaN},
       {} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
@@ -493,7 +594,7 @@ export const inferTestInputs: TestInput[] = [
   {
     inputs: [
       'throws ERROR with single only after NOT PUSH or PULL_REQUEST event',
-      {after: 'abcd1234', pr: NaN},
+      {after: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968', pr: NaN},
       {} as Inferred
     ],
     events: ['issue_comment_created', 'issue_comment_edited', 'schedule']
@@ -513,7 +614,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an getting action inputs.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -525,7 +626,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue inferring inputs to the action.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -537,7 +638,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue initilizing the github client.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -549,7 +650,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue getting changed files from Github.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -561,7 +662,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue sorting changed files from Github.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -573,7 +674,7 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue writing output files.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   },
   {
     inputs: [
@@ -585,10 +686,24 @@ export const errorMessageInputs: TestInput[] = [
       ),
       'There was an issue writing output variables.'
     ],
-    events: ['push', 'pull_request_synchronize']
+    events: 'all'
   }
 ]
 /**
  * main Test inputs
  */
+export const mainInputs: TestInput[] = [
+  {
+    inputs: [
+      'push',
+      {
+        pushBefore: '6ac7697cd1c4f23a08d4d4edbe7dab06b34c58a2',
+        pushAfter: '4ee1a1a2515f4ac1b90a56aaeb060b97f20c8968'
+      },
+      'push'
+    ],
+    events: 'all'
+  },
+  {inputs: ['pull_request', {prNumber: '83'}, 'pull_request'], events: 'all'}
+]
 export {errorMessageInputs as mainErrorInputs}

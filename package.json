@@ -4,7 +4,7 @@
   "engines": {
     "node": "12.16.1"
   },
-  "description": "Creates outputs variables of files modified, added, or deleted by a PR or Push.",
+  "description": "Creates outputs variables of files modified, added, or removed by a PR or Push.",
   "main": "lib/main.js",
   "scripts": {
     "build": "yarn && tsc",
@@ -12,6 +12,7 @@
     "build-release": "yarn build-package --minify",
     "test": "jest",
     "test-coverage": "jest --coverage",
+    "test-integration": "jest -c jest.config.integration.js",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint --ext .ts ./",

@@ -92,31 +92,34 @@ export class Env {
   public envStart: {[key: string]: string | undefined} = {...process.env} // store shallow copy of process.env on init
 
   // set mocks
-  coreMock: CoreMock
+  coreMock: CoreMock = {} as CoreMock
 
-  githubMock: GitHubMock
+  githubMock: GitHubMock = {} as GitHubMock
 
-  octokitMock: OctokitMock
+  octokitMock: OctokitMock = {} as OctokitMock
 
-  fsMock: FsMock
+  fsMock: FsMock = {} as FsMock
 
-  context: Context
+  context: Context = {} as Context
 
   event = 'push'
 
   constructor(
     envVars: {[key: string]: string}, // any additional env vars on top of process.env
     inputs: {[key: string]: string},
-    event?: string // any additional inputs
+    event?: string, // any additional inputs
+    mock = true
   ) {
     this.setEnv(event || this.event, envVars, inputs) // set env vars with event input
-    this.coreMock = mockCore() // mock core
-    ;({
-      github: this.githubMock,
-      octokit: this.octokitMock,
-      context: this.context
-    } = mockGitHub()) // mock github
-    this.fsMock = mockFs() // mock fs
+    if (mock) {
+      this.coreMock = mockCore() // mock core
+      ;({
+        github: this.githubMock,
+        octokit: this.octokitMock,
+        context: this.context
+      } = mockGitHub()) // mock github
+      this.fsMock = mockFs() // mock fs
+    }
   }
 
   setEnv(
@@ -141,12 +144,14 @@ export class Env {
     process.env = {...this.envStart, ...inputs}
   }
 
-  updateInput(inputs: {[key: string]: string}): void {
+  updateInput(inputs: {[key: string]: string}, mock = true): void {
     process.env = {...process.env, ...formatInput(inputs)}
-    ;({
-      github: this.githubMock,
-      octokit: this.octokitMock,
-      context: this.context
-    } = mockGitHub())
+    if (mock) {
+      ;({
+        github: this.githubMock,
+        octokit: this.octokitMock,
+        context: this.context
+      } = mockGitHub())
+    }
   }
 }

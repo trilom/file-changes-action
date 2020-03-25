@@ -30,12 +30,11 @@ export async function run(): Promise<void> {
       // write output vars
       writeOutput(inputs.output, key, changedFiles[key])
     })
-    // eslint-disable-next-line unicorn/no-process-exit
-    process.exit(0)
   } catch (error) {
     const pError = JSON.parse(error.message)
     coreSetFailed(errorMessage(pError.from, pError))
+    throw new Error(JSON.stringify(pError))
   }
 }
-
-run()
+/* istanbul ignore next */
+if (!(process.env.INPUT_MOCK === 'true')) run()
