@@ -5,56 +5,6 @@ on:
     branches: [master, next, alpha, beta]
     tags-ignore: ['**']
 jobs:
-  post-release:
-    name: Perform post release tasks
-    runs-on: ubuntu-latest
-    if: github.actor == 'semantic-release-bot' && contains(github.event.head_commit.message, 'chore(release):')
-    env:
-      GITHUB_TOKEN: ${{ secrets.TRILOM_BOT_TOKEN }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-    steps:
-      - name: get original PR number
-        uses: actions/github-script@0.6.0
-        id: pr
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const result = await github.repos.listPullRequestsAssociatedWithCommit({
-              owner: context.payload.repository.owner.name,
-              repo: context.payload.repository.name,
-              commit_sha: context.payload.head_commit.id
-            })
-            if (result.data.length >= 1) {
-              return result.data[0].number
-            } else return 87
-      - name: get original PR user
-        uses: actions/github-script@0.6.0
-        id: label
-        if: steps.pr.outputs.result != 0
-        with:
-          github-token: ${{env.GITHUB_TOKEN}}
-          result-encoding: string
-          script: |
-            const result = await github.pulls.get({
-              owner: context.payload.repository.owner.name,
-              repo: context.payload.repository.name,
-              pull_number: ${{ steps.pr.outputs.result }}
-            })
-            let rLabel = 'no-label'
-            result.data.labels.filter(label => {
-              (label.name.includes('releases/v')) ? rLabel = label.name.replace('releases/v','') : false
-            })
-            return rLabel;
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - run: |
-          git config --local user.email "trilom-bot@trailmix.me"
-          git config --local user.name "trilom-bot"
-          git add --all
-          git diff-index --quiet HEAD || git commit -m "${{ github.event.head_commit.message }}" -a
-          git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:refs/heads/${{ steps.label.outputs.result }}
   # semantic release an auto-merged branch to github package repo, npm, github actions
   release:
     name: Release to NPM, Github, Github Actions Marketplace

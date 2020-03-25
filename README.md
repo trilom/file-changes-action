@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: file_changes
-        uses: trilom/file-changes-action@v1
+        uses: trilom/file-changes-action@v1.2.3
 
 ### full
 name: changes
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: file_changes
-        uses: trilom/file-changes-action@v1
+        uses: trilom/file-changes-action@v1.2.3
         with:
           # optional target repo
           githubRepo: trilom/file-changes-action
@@ -132,7 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: file_changes
-        uses: trilom/file-changes-action@v1
+        uses: trilom/file-changes-action@v1.2.3
       - name: test
         run: |
           cat $HOME/files.json
@@ -155,7 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: file_changes
-        uses: trilom/file-changes-action@v1
+        uses: trilom/file-changes-action@v1.2.3
         with:
           output: ','
           fileOutput: ','
@@ -186,7 +186,7 @@ jobs:
             })
             return result.data[0].number;
       - id: file_changes
-        uses: trilom/file-changes-action@v1
+        uses: trilom/file-changes-action@v1.2.3
         with:
           githubToken: ${{ env.BOT_USER_TOKEN }}
           prNumber: ${{ steps.pr.outputs.results }}
