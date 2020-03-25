@@ -5,27 +5,23 @@
             "name": "Test - Integration",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
             // "runtimeExecutable": "yarn",
             "disableOptimisticBPs": true,
             "console": "integratedTerminal",
             "sourceMaps": true,
             "internalConsoleOptions": "neverOpen",
-            "args": [
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceFolder}/node_modules/.bin/jest",
+                "--runInBand",
                 "--config",
-                "jest.config.integration.js",
-                "-i"
+                "jest.config.integration.js"
             ],
             "preLaunchTask": "npm: build",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "port": 9229,
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"
             ],
-            "windows": {
-                "program": "${workspaceFolder}/node_modules/jest/bin/jest",
-            }
         },
         {
             "name": "Test - Coverage",
