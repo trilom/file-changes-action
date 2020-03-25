@@ -59,14 +59,16 @@ prepareTest () {
         else
             file=$txt_output
         fi
-    elif [ "$dev" == "dev" ] && [ "$1" != "simple_" ]; then
+    else
         declare -n file=${2}
-        if [ "$4" == "json" ]; then
-            file="$(cat events/${!file}.json)"
-        elif [ "$4" == "," ]; then
-            file="$(cat events/${!file}.csv)"
-        else
-            file="$(cat events/${!file}.txt)"
+        if [ "$dev" == "dev" ]; then
+            if [ "$4" == "json" ]; then
+                file="$(cat events/${!file}.json)"
+            elif [ "$4" == "," ]; then
+                file="$(cat events/${!file}.csv)"
+            else
+                file="$(cat events/${!file}.txt)"
+            fi
         fi
     fi
     echo "${file}"
@@ -96,7 +98,7 @@ testResults () {
         if [ "$2" == 'json' ]; then
             expected=$(($expected+1))
         fi
-        if [ $3 != $expected ]; then
+        if [ "$3" != "$expected" ]; then
             echo -e "\t\033[1;91mTest failure $5/($1)$4:'$2' { EXPECTED:$expected RECEIVED:$3 } \033[0m"
             exit 1;
         fi
