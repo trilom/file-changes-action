@@ -1,0 +1,74 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Test - Integration",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            // "runtimeExecutable": "yarn",
+            "disableOptimisticBPs": true,
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen",
+            "args": [
+                "--config",
+                "jest.config.integration.js",
+                "-i"
+            ],
+            "preLaunchTask": "npm: build",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/lib/**/*.js"
+            ],
+            "windows": {
+                "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+            }
+        },
+        {
+            "name": "Test - Coverage",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            // "runtimeExecutable": "yarn",
+            "disableOptimisticBPs": true,
+            "console": "integratedTerminal",
+            "sourceMaps": true,
+            "internalConsoleOptions": "neverOpen",
+            "args": [
+                "--coverage",
+                "-i"
+            ],
+            "preLaunchTask":"npm: build",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/lib/**/*.js"
+            ],
+            "windows": {
+                "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test - Specific file",
+            "program": "${workspaceFolder}/node_modules/.bin/jest",
+            "args": [
+                "${fileBasenameNoExtension}",
+                "--config",
+                "jest.config.js",
+                "-i"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "disableOptimisticBPs": true,
+            "windows": {
+                "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+            }
+        }
+    ]
+}

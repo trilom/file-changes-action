@@ -6,6 +6,7 @@
       "src",
       "src/tests/mocks/*"
     ],
+    "sourceMap": true,
     "target": "ES2019",
     "module": "commonjs",
     "outDir": "./lib",
@@ -19,5 +20,5 @@
   "include": [
     "src/**/*.ts",
     "."
-  ],
+  ]
 }

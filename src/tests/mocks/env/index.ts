@@ -144,12 +144,14 @@ export class Env {
     process.env = {...this.envStart, ...inputs}
   }
 
-  updateInput(inputs: {[key: string]: string}): void {
+  updateInput(inputs: {[key: string]: string}, mock = true): void {
     process.env = {...process.env, ...formatInput(inputs)}
-    ;({
-      github: this.githubMock,
-      octokit: this.octokitMock,
-      context: this.context
-    } = mockGitHub())
+    if (mock) {
+      ;({
+        github: this.githubMock,
+        octokit: this.octokitMock,
+        context: this.context
+      } = mockGitHub())
+    }
   }
 }

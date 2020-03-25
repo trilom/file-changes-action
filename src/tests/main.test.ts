@@ -1,4 +1,4 @@
-import {Env, p, getTestEvents, getTestFiles} from './mocks/env'
+import { Env, getTestEvents, getTestFiles, p } from './mocks/env'
 
 let env: Env
 
