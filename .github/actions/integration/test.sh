@@ -62,7 +62,7 @@ testResults () {
         fi
         # echo $result
         if [ $3 != $result ]; then
-            echo "\033[1;91mTest failure expected:$result actual:$3 $1 '$2'\033[0m"
+            echo "\033[1;91mTest failure expected:$result actual:$3 prefix:$1 format:'$2'\033[0m"
             exit 1;
         fi
     else
@@ -79,7 +79,7 @@ testResults () {
             result=$(($result+1))
         fi
         if [ $3 != $result ]; then
-            echo "\033[1;91mTest failure expected:$result actual:$3 $1 $4 '$2'\033[0m"
+            echo "\033[1;91mTest failure expected:$result actual:$3 prefix:$1 file:$4 format:'$2'\033[0m"
             exit 1;
         fi
     fi
