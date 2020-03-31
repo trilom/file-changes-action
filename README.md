@@ -4,6 +4,9 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![Integration Tests](https://github.com/trilom/file-changes-action/workflows/Integration%20Tests/badge.svg)
 
+# Like my work?  Hire me!
+> Please reach out if you need something built!  
+
 This action will take the information from the Push/Pull Request and output some variables and write files that will let you know what was changed, removed, or added.
 
 ## Inputs
