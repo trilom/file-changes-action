@@ -1,7 +1,7 @@
 # file-changes-action
 
 [![codecov](https://codecov.io/gh/trilom/file-changes-action/branch/master/graph/badge.svg)](https://codecov.io/gh/trilom/file-changes-action)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![code style: prettier](h)](https://github.com/prettier/prettier)
 ![Integration Tests](https://github.com/trilom/file-changes-action/workflows/Integration%20Tests/badge.svg)
 
 # Like my work?  Hire me!
