@@ -25,7 +25,9 @@ export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
       changedFiles[f.status].push(
         f.filename || f.added || f.removed || f.renamed || f.modified
       )
-      changedFiles.files.push(f.filename || f.added || f.removed || f.modified || f.renamed)
+      changedFiles.files.push(
+        f.filename || f.added || f.removed || f.modified || f.renamed
+      )
     })
     return changedFiles
   } catch (error) {
