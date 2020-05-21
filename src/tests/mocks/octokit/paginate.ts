@@ -25,6 +25,7 @@ export const fn = jest.fn(
       // eslint-disable-next-line prefer-promise-reject-errors
       (!data.base && !data.head && !data.pull_number)
     )
+      // eslint-disable-next-line prefer-promise-reject-errors
       return Promise.reject({name: 'HttpError', status: '404'})
     if (data.pull_number) {
       if (cb)
