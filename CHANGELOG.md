@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/trilom/file-changes-action/compare/v1.2.3...v1.2.4) (2020-05-21)
+
+
+### Bug Fixes
+
+* **change in api:** github api had a change, this should trigger release 1.2.4.  this change here quiets a quacker during the intergration test ([99f8f91](https://github.com/trilom/file-changes-action/commit/99f8f91f3ed1430713973d8f1e2848b5acc58163))
+
 ## [1.2.3](https://github.com/trilom/file-changes-action/compare/v1.2.2...v1.2.3) (2020-03-25)
 
 

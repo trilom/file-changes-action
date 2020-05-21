@@ -1,6 +1,6 @@
 {
   "name": "@trilom/file-changes-action",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "engines": {
     "node": "12.16.3"
   },
