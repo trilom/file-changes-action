@@ -5,7 +5,7 @@
     "node": "12.16.3"
   },
   "description": "Creates outputs variables of files modified, added, or removed by a PR or Push.",
-  "main": "lib/main.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "yarn && tsc",
     "build-package": "yarn build --build tsconfig.build.json && ncc build",
