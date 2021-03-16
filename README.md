@@ -102,7 +102,7 @@ jobs:
 
 ## How to Use
 
-In order to make those decisions we need to know what files have changed and that is where this action comes in.  In the example below we are checking out our repository code, and then running the `trilom/file-changes-action@v1` action.  The only thing you need to provide is a GITHUB_TOKEN so that Octokit can make it's API calls.
+In order to make those decisions we need to know what files have changed and that is where this action comes in.  In the example below we are checking out our repository code, and then running the `trilom/file-changes-action@v1` action.  The only thing you need to provide is a GITHUB_TOKEN so that Octokit can make its API calls.
 
 If a PR is made then it will look at all of the files included in the PR.
 If a push is made then it will compare commits from the SHA `github.payload.before` to the SHA `github.payload.after` of the push.
