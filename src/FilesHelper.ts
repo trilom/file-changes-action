@@ -1,5 +1,6 @@
 import {setOutput as coreSetOutput, debug as coreDebug} from '@actions/core'
 import {writeFileSync} from 'fs'
+import {homedir} from 'os'
 import {ChangedFiles} from 'typings/ChangedFiles'
 import {GitHubFile} from 'typings/GitHubFile'
 import {getErrorString} from './UtilsHelper'
@@ -89,16 +90,15 @@ export function writeFiles(format: string, key: string, files: string[]): void {
   try {
     const ext = getFormatExt(format)
     const fileName = key === 'files' ? `${key}${ext}` : `files_${key}${ext}`
+    const filePath = `${homedir()}/${fileName}`
     coreDebug(
-      `Writing output file ${
-        process.env.HOME
-      }/${fileName} with ${format} and files ${JSON.stringify(files, null, 2)}`
+      `Writing output file ${filePath} with ${format} and files ${JSON.stringify(
+        files,
+        null,
+        2
+      )}`
     )
-    writeFileSync(
-      `${process.env.HOME}/${fileName}`,
-      formatChangedFiles(format, files),
-      'utf-8'
-    )
+    writeFileSync(filePath, formatChangedFiles(format, files), 'utf-8')
   } catch (error) {
     const eString = `There was an issue writing output files.`
     throw new Error(
