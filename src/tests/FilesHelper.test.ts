@@ -25,7 +25,13 @@ describe('Testing FilesHelper.ts...', () => {
           expect(coreDebug).toHaveBeenCalledWith(
             expect.stringContaining(JSON.stringify(files, null, 2))
           )
-          const retStats = {files: 0, added: 0, removed: 0, modified: 0} as {
+          const retStats = {
+            files: 0,
+            added: 0,
+            removed: 0,
+            modified: 0,
+            renamed: 0
+          } as {
             [key: string]: number
           }
           Object.keys(changedFiles).forEach(key => {
@@ -43,7 +49,13 @@ describe('Testing FilesHelper.ts...', () => {
           expect(coreDebug).toHaveBeenCalledWith(
             expect.stringContaining(JSON.stringify(files, null, 2))
           )
-          const retStats = {files: 0, added: 0, removed: 0, modified: 0} as {
+          const retStats = {
+            files: 0,
+            added: 0,
+            removed: 0,
+            modified: 0,
+            renamed: 0
+          } as {
             [key: string]: number
           }
           Object.keys(changedFiles).forEach(key => {

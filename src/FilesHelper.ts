@@ -7,7 +7,7 @@ import {getErrorString} from './UtilsHelper'
 /**
  * @function sortChangedFiles
  * @param files pass in array of GithubFile's to be sorted
- * @returns ChangedFiles object that has .files, .added, .modified, and .removed
+ * @returns ChangedFiles object that has .files, .added, .modified, .renamed, and .removed
  */
 export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
   try {
@@ -18,13 +18,16 @@ export function sortChangedFiles(files: GitHubFile[]): ChangedFiles {
       files: [],
       added: [],
       removed: [],
+      renamed: [],
       modified: []
     } as ChangedFiles
     files.forEach(f => {
       changedFiles[f.status].push(
-        f.filename || f.added || f.removed || f.modified
+        f.filename || f.added || f.removed || f.renamed || f.modified
       )
-      changedFiles.files.push(f.filename || f.added || f.removed || f.modified)
+      changedFiles.files.push(
+        f.filename || f.added || f.removed || f.modified || f.renamed
+      )
     })
     return changedFiles
   } catch (error) {

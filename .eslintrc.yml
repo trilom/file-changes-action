@@ -57,6 +57,8 @@ parserOptions:
 env:
   node: true
   browser: true
+ignorePatterns:
+  - '*.js'
 overrides:
   - files: ['src/tests/**/*']
     plugins:

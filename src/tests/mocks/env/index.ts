@@ -43,6 +43,7 @@ export function getTestFiles(
     files: 0,
     added: 0,
     removed: 0,
+    renamed: 0,
     modified: 0
   },
   limit: number = octokitPayloads.normalFileArray.length

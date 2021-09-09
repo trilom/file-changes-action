@@ -10,26 +10,26 @@ on:
   push:
     branches: [master]
 jobs:
-  always_job:
-    name: Always run job
-    runs-on: ubuntu-latest
-    steps:
-      - name: dump env
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-          JOB_CONTEXT: ${{ toJson(job) }}
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: |
-          echo "GITHUB_EVENT_PATH\n$GITHUB_EVENT_PATH"
-          echo "GITHUB_CONTEXT\n$GITHUB_CONTEXT"
-          echo "JOB_CONTEXT\n$JOB_CONTEXT"
-          echo "STEPS_CONTEXT\n$STEPS_CONTEXT"
-          echo "RUNNER_CONTEXT\n$RUNNER_CONTEXT"
-          echo "STRATEGY_CONTEXT\n$STRATEGY_CONTEXT"
-          echo "MATRIX_CONTEXT\n$MATRIX_CONTEXT"
+  # always_job:
+  #   name: Always run job
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: dump env
+  #       env:
+  #         GITHUB_CONTEXT: ${{ toJson(github) }}
+  #         JOB_CONTEXT: ${{ toJson(job) }}
+  #         STEPS_CONTEXT: ${{ toJson(steps) }}
+  #         RUNNER_CONTEXT: ${{ toJson(runner) }}
+  #         STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+  #         MATRIX_CONTEXT: ${{ toJson(matrix) }}
+  #       run: |
+  #         echo "GITHUB_EVENT_PATH\n$GITHUB_EVENT_PATH"
+  #         echo "GITHUB_CONTEXT\n$GITHUB_CONTEXT"
+  #         echo "JOB_CONTEXT\n$JOB_CONTEXT"
+  #         echo "STEPS_CONTEXT\n$STEPS_CONTEXT"
+  #         echo "RUNNER_CONTEXT\n$RUNNER_CONTEXT"
+  #         echo "STRATEGY_CONTEXT\n$STRATEGY_CONTEXT"
+  #         echo "MATRIX_CONTEXT\n$MATRIX_CONTEXT"
   integration:
     runs-on: ubuntu-latest
     strategy:
