@@ -61,6 +61,10 @@ steps.file_changes.outputs.files_modified - `string` - The names of the updated 
 
 steps.file_changes.outputs.files_removed - `string` - The names of the removed files.  The output is dependant on the output input, default is a json string.
 
+### files_renamed
+
+steps.file_changes.outputs.files_renamed - `string` - The names of the renamed files.  The output is dependant on the output input, default is a json string.
+
 ## Example usage
 
 ```yaml
@@ -142,10 +146,12 @@ jobs:
           cat $HOME/files_modified.json
           cat $HOME/files_added.json
           cat $HOME/files_removed.json
+          cat $HOME/files_renamed.json
           echo '${{ steps.file_changes.outputs.files}}'
           echo '${{ steps.file_changes.outputs.files_modified}}'
           echo '${{ steps.file_changes.outputs.files_added}}'
           echo '${{ steps.file_changes.outputs.files_removed}}'
+          echo '${{ steps.file_changes.outputs.files_renamed}}'
 ```
 
 You can set the output and fileOutput to ',' for csv output.
