@@ -68,11 +68,11 @@ jobs:
         id: pr
         run: |
           echo '${{ steps.pr_json.outputs.result }}' > pr.json
-          echo "::set-output name=user::$( jq -r '.user.login' pr.json )"
-          echo "::set-output name=head::$( jq -r '.head.repo.full_name' pr.json )"
-          echo "::set-output name=head_url::$( jq -r '.head.repo.html_url' pr.json )"
-          echo "::set-output name=base::$( jq -r '.base.repo.full_name' pr.json )"
-          echo "::set-output name=base_url::$( jq -r '.base.repo.html_url' pr.json )"
+          # echo "::set-output name=user::$( jq -r '.user.login' pr.json )"
+          # echo "::set-output name=head::$( jq -r '.head.repo.full_name' pr.json )"
+          # echo "::set-output name=head_url::$( jq -r '.head.repo.html_url' pr.json )"
+          # echo "::set-output name=base::$( jq -r '.base.repo.full_name' pr.json )"
+          # echo "::set-output name=base_url::$( jq -r '.base.repo.html_url' pr.json )"
       - name: if failure, notify
         uses: peter-evans/create-or-update-comment@v1
         if: failure()
